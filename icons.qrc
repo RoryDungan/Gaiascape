@@ -1,0 +1,24 @@
+<RCC>
+    <qresource prefix="/">
+        <file>media/16x16/document-new.png</file>
+        <file>media/16x16/document-open.png</file>
+        <file>media/16x16/document-save.png</file>
+        <file>media/16x16/document-save-as.png</file>
+        <file>media/16x16/edit-redo.png</file>
+        <file>media/16x16/edit-undo.png</file>
+        <file>media/16x16/exit.png</file>
+        <file>media/24x24/document-new.png</file>
+        <file>media/24x24/document-open.png</file>
+        <file>media/24x24/document-save.png</file>
+        <file>media/24x24/document-save-as.png</file>
+        <file>media/24x24/edit-redo.png</file>
+        <file>media/24x24/edit-undo.png</file>
+        <file>media/24x24/paint.png</file>
+        <file>media/24x24/system-log-out.png</file>
+        <file>media/24x24/go-down.png</file>
+        <file>media/24x24/go-up.png</file>
+        <file>media/24x24/list-add.png</file>
+        <file>media/24x24/list-remove.png</file>
+        <file>media/cursor-select.png</file>
+    </qresource>
+</RCC>
