@@ -9,6 +9,10 @@ MainWindow::MainWindow(QWidget *parent) :
     mOgreWidget = new OgreWidget;
     setCentralWidget(mOgreWidget);
 
+    // tabify dock widgets
+    tabifyDockWidget(ui->terrainDockWidget, ui->texturesDockWidget);
+    tabifyDockWidget(ui->texturesDockWidget, ui->skyDockWidget);
+
     // Set mouse cursor
     //mCursorSelect = new QCursor(QPixmap(":/media/cursor-select.png"), 0, 0);
     mOgreWidget->setCursor(QCursor(QPixmap(":/media/cursor-select.png"), 0, 0));
@@ -16,5 +20,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
+    delete mOgreWidget;
     delete ui;
 }

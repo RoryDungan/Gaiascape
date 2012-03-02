@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'MainWindow.ui'
 **
-** Created: Mon 27. Feb 00:31:29 2012
+** Created: Thu 1. Mar 21:33:45 2012
 **      by: Qt User Interface Compiler version 4.8.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -52,8 +52,12 @@ public:
     QToolBar *mainToolBar;
     QStatusBar *statusBar;
     QToolBar *toolBar;
-    QDockWidget *dockWidget;
+    QDockWidget *terrainDockWidget;
     QWidget *dockWidgetContents;
+    QDockWidget *texturesDockWidget;
+    QWidget *dockWidgetContents_2;
+    QDockWidget *skyDockWidget;
+    QWidget *dockWidgetContents_3;
 
     void setupUi(QMainWindow *MainWindow)
     {
@@ -118,12 +122,16 @@ public:
         actionSelect = new QAction(MainWindow);
         actionSelect->setObjectName(QString::fromUtf8("actionSelect"));
         actionSelect->setCheckable(true);
+        actionSelect->setChecked(true);
+        QIcon icon8;
+        icon8.addFile(QString::fromUtf8(":/media/24x24/cursor-select.png"), QSize(), QIcon::Normal, QIcon::Off);
+        actionSelect->setIcon(icon8);
         actionPlace_entities = new QAction(MainWindow);
         actionPlace_entities->setObjectName(QString::fromUtf8("actionPlace_entities"));
         actionPlace_entities->setCheckable(true);
-        QIcon icon8;
-        icon8.addFile(QString::fromUtf8(":/media/24x24/list-add.png"), QSize(), QIcon::Normal, QIcon::Off);
-        actionPlace_entities->setIcon(icon8);
+        QIcon icon9;
+        icon9.addFile(QString::fromUtf8(":/media/24x24/list-add.png"), QSize(), QIcon::Normal, QIcon::Off);
+        actionPlace_entities->setIcon(icon9);
         centralWidget = new QWidget(MainWindow);
         centralWidget->setObjectName(QString::fromUtf8("centralWidget"));
         MainWindow->setCentralWidget(centralWidget);
@@ -147,12 +155,24 @@ public:
         toolBar = new QToolBar(MainWindow);
         toolBar->setObjectName(QString::fromUtf8("toolBar"));
         MainWindow->addToolBar(Qt::LeftToolBarArea, toolBar);
-        dockWidget = new QDockWidget(MainWindow);
-        dockWidget->setObjectName(QString::fromUtf8("dockWidget"));
+        terrainDockWidget = new QDockWidget(MainWindow);
+        terrainDockWidget->setObjectName(QString::fromUtf8("terrainDockWidget"));
         dockWidgetContents = new QWidget();
         dockWidgetContents->setObjectName(QString::fromUtf8("dockWidgetContents"));
-        dockWidget->setWidget(dockWidgetContents);
-        MainWindow->addDockWidget(static_cast<Qt::DockWidgetArea>(2), dockWidget);
+        terrainDockWidget->setWidget(dockWidgetContents);
+        MainWindow->addDockWidget(static_cast<Qt::DockWidgetArea>(2), terrainDockWidget);
+        texturesDockWidget = new QDockWidget(MainWindow);
+        texturesDockWidget->setObjectName(QString::fromUtf8("texturesDockWidget"));
+        dockWidgetContents_2 = new QWidget();
+        dockWidgetContents_2->setObjectName(QString::fromUtf8("dockWidgetContents_2"));
+        texturesDockWidget->setWidget(dockWidgetContents_2);
+        MainWindow->addDockWidget(static_cast<Qt::DockWidgetArea>(2), texturesDockWidget);
+        skyDockWidget = new QDockWidget(MainWindow);
+        skyDockWidget->setObjectName(QString::fromUtf8("skyDockWidget"));
+        dockWidgetContents_3 = new QWidget();
+        dockWidgetContents_3->setObjectName(QString::fromUtf8("dockWidgetContents_3"));
+        skyDockWidget->setWidget(dockWidgetContents_3);
+        MainWindow->addDockWidget(static_cast<Qt::DockWidgetArea>(2), skyDockWidget);
 
         menuBar->addAction(menu_File->menuAction());
         menuBar->addAction(menu_Edit->menuAction());
@@ -217,6 +237,9 @@ public:
         menu_Edit->setTitle(QApplication::translate("MainWindow", "&Edit", 0, QApplication::UnicodeUTF8));
         menu_View->setTitle(QApplication::translate("MainWindow", "&View", 0, QApplication::UnicodeUTF8));
         toolBar->setWindowTitle(QApplication::translate("MainWindow", "toolBar", 0, QApplication::UnicodeUTF8));
+        terrainDockWidget->setWindowTitle(QApplication::translate("MainWindow", "Terrain", 0, QApplication::UnicodeUTF8));
+        texturesDockWidget->setWindowTitle(QApplication::translate("MainWindow", "Textures", 0, QApplication::UnicodeUTF8));
+        skyDockWidget->setWindowTitle(QApplication::translate("MainWindow", "Sky", 0, QApplication::UnicodeUTF8));
     } // retranslateUi
 
 };

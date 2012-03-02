@@ -7,6 +7,7 @@
  * @author kito berg-taylor
  */
 void THIS::init( std::string plugins_file,
+         std::string resources_file,
          std::string ogre_cfg_file,
          std::string ogre_log )
 {
@@ -35,6 +36,28 @@ void THIS::init( std::string plugins_file,
     mOgreRoot->getRenderSystem()->setConfigOption( "Full Screen", "No" );
     mOgreRoot->saveConfig();
     mOgreRoot->initialise(false); // don't create a window
+
+    // Set up resources
+    Ogre::ConfigFile cf;
+    cf.load(resources_file);
+
+    // Go through all sections & settings in the file
+    Ogre::ConfigFile::SectionIterator seci = cf.getSectionIterator();
+
+    Ogre::String secName, typeName, archName;
+    while (seci.hasMoreElements())
+    {
+        secName = seci.peekNextKey();
+        Ogre::ConfigFile::SettingsMultiMap *settings = seci.getNext();
+        Ogre::ConfigFile::SettingsMultiMap::iterator i;
+        for (i = settings->begin(); i != settings->end(); ++i)
+        {
+            typeName = i->first;
+            archName = i->second;
+            Ogre::ResourceGroupManager::getSingleton().addResourceLocation(
+                archName, typeName, secName);
+        }
+    }
 }
 
 /**
@@ -112,10 +135,41 @@ void THIS::initializeGL()
     mCamera = mSceneMgr->createCamera( "QOgreWidget_Cam" );
     mCamera->setPosition( Ogre::Vector3(0,1,0) );
     mCamera->lookAt( Ogre::Vector3(0,0,0) );
-    mCamera->setNearClipDistance( 1.0 );
+    mCamera->setNearClipDistance( 0.1 );
+    if(mOgreRoot->getRenderSystem()->getCapabilities()->hasCapability(Ogre::RSC_INFINITE_FAR_PLANE))
+        mCamera->setFarClipDistance(0);
+    else
+        mCamera->setFarClipDistance(50000);
 
     Ogre::Viewport *mViewport = mOgreWindow->addViewport( mCamera );
     mViewport->setBackgroundColour( Ogre::ColourValue( 0.8,0.8,1 ) );
+
+    setupScene();
+}
+
+/**
+ * @brief set up the scene with a terrain
+ * @author Rory Dungan
+ */
+void THIS::setupScene()
+{
+    // Set up camera
+    mCamera->setPosition(Ogre::Vector3(1683, 50, 2116));
+    mCamera->lookAt(Ogre::Vector3(1963, 50, 1660));
+
+    // Set up light
+    Ogre::Vector3 lightdir(0.55, -0.3, 0.75);
+    lightdir.normalise();
+
+    Ogre::Light* light = mSceneMgr->createLight("tstLight");
+    light->setType(Ogre::Light::LT_DIRECTIONAL);
+    light->setDirection(lightdir);
+    light->setDiffuseColour(Ogre::ColourValue::White);
+    light->setSpecularColour(Ogre::ColourValue(0.4, 0.4, 0.4));
+
+    mSceneMgr->setAmbientLight(Ogre::ColourValue(0.2, 0.2, 0.2));
+
+    mTerrain = new Terrain(mSceneMgr, light);
 }
 
 /**
