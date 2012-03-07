@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QActionGroup>
 #include "OgreWidget.h"
 
 namespace Ui {
@@ -19,7 +20,20 @@ public:
 private:
     Ui::MainWindow *ui;
     OgreWidget* mOgreWidget;
-    QCursor* mCursorSelect;
+    QActionGroup* mToolGroup;
+
+public slots:
+    void fileNew();
+    void fileOpen();
+    void fileSave();
+    void fileSaveAs();
+    void editUndo();
+    void editRedo();
+    void selectTool();
+    void addEntTool();
+    void paintTool();
+    void extrudeTool();
+    void intrudeTool();
 };
 
 #endif // MAINWINDOW_H

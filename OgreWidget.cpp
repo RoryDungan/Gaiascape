@@ -1,4 +1,5 @@
 #include "OgreWidget.h"
+#include <QDebug>
 
 #define THIS OgreWidget
 
@@ -145,6 +146,73 @@ void THIS::initializeGL()
     mViewport->setBackgroundColour( Ogre::ColourValue( 0.8,0.8,1 ) );
 
     setupScene();
+}
+
+/**
+ * @brief Handle mouse input
+ * @author Rory Dungan
+ */
+void THIS::mousePressEvent(QMouseEvent * event)
+{
+    mLastCursorPos = event->pos();
+
+    switch(event->button())
+    {
+    case Qt::RightButton:
+        currentState = IS_ROTATING_CAMERA;
+        break;
+    case Qt::MiddleButton:
+        currentState = IS_MOVING_CAMERA;
+        break;
+    default:
+        break;
+    }
+}
+
+/**
+ * @brief Handle mouse input
+ * @author Rory Dungan
+ */
+void THIS::mouseReleaseEvent(QMouseEvent * event)
+{
+    currentState = IS_IDLE;
+}
+
+/**
+ * @brief Handle mouse input
+ * @author Rory Dungan
+ */
+void THIS::mouseMoveEvent(QMouseEvent * event)
+{
+    // Get amount of movement instead of absolute position
+    int dx = event->x() - mLastCursorPos.x();
+    int dy = event->y() - mLastCursorPos.y();
+
+    switch(currentState)
+    {
+    case IS_ROTATING_CAMERA:
+        mCamera->pitch(Ogre::Degree(dy));
+        mCamera->yaw(Ogre::Degree(dx));
+        updateGL();
+        break;
+    case IS_MOVING_CAMERA:
+        mCamera->moveRelative(Ogre::Vector3(dx-dx*2, dy, 0)); // dx movement is inverted
+        updateGL();
+        break;
+    default:
+        break;
+    }
+
+    mLastCursorPos = event->pos();
+}
+
+/**
+ * @brief Set the mode for interacting with the mouse
+ * @author Rory Dungan
+ */
+void THIS::setInteractionMode(interactionModes i)
+{
+    interactionMode = i;
 }
 
 /**

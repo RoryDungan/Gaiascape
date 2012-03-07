@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'MainWindow.ui'
 **
-** Created: Thu 1. Mar 21:33:45 2012
+** Created: Tue 6. Mar 00:01:06 2012
 **      by: Qt User Interface Compiler version 4.8.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -203,6 +203,18 @@ public:
         toolBar->addAction(actionIntrude);
 
         retranslateUi(MainWindow);
+        QObject::connect(actionSelect, SIGNAL(triggered()), MainWindow, SLOT(selectTool()));
+        QObject::connect(actionE_xit, SIGNAL(triggered()), MainWindow, SLOT(close()));
+        QObject::connect(action_New, SIGNAL(triggered()), MainWindow, SLOT(fileNew()));
+        QObject::connect(action_Open, SIGNAL(triggered()), MainWindow, SLOT(fileOpen()));
+        QObject::connect(action_Save, SIGNAL(triggered()), MainWindow, SLOT(fileSave()));
+        QObject::connect(actionSave_As, SIGNAL(triggered()), MainWindow, SLOT(fileSaveAs()));
+        QObject::connect(action_Undo, SIGNAL(triggered()), MainWindow, SLOT(editUndo()));
+        QObject::connect(action_Redo, SIGNAL(triggered()), MainWindow, SLOT(editRedo()));
+        QObject::connect(actionExtrude, SIGNAL(triggered()), MainWindow, SLOT(extrudeTool()));
+        QObject::connect(actionIntrude, SIGNAL(triggered()), MainWindow, SLOT(intrudeTool()));
+        QObject::connect(actionPaint, SIGNAL(triggered()), MainWindow, SLOT(paintTool()));
+        QObject::connect(actionPlace_entities, SIGNAL(triggered()), MainWindow, SLOT(addEntTool()));
 
         QMetaObject::connectSlotsByName(MainWindow);
     } // setupUi
@@ -236,7 +248,8 @@ public:
         menu_File->setTitle(QApplication::translate("MainWindow", "&File", 0, QApplication::UnicodeUTF8));
         menu_Edit->setTitle(QApplication::translate("MainWindow", "&Edit", 0, QApplication::UnicodeUTF8));
         menu_View->setTitle(QApplication::translate("MainWindow", "&View", 0, QApplication::UnicodeUTF8));
-        toolBar->setWindowTitle(QApplication::translate("MainWindow", "toolBar", 0, QApplication::UnicodeUTF8));
+        mainToolBar->setWindowTitle(QApplication::translate("MainWindow", "Home", 0, QApplication::UnicodeUTF8));
+        toolBar->setWindowTitle(QApplication::translate("MainWindow", "Tools", 0, QApplication::UnicodeUTF8));
         terrainDockWidget->setWindowTitle(QApplication::translate("MainWindow", "Terrain", 0, QApplication::UnicodeUTF8));
         texturesDockWidget->setWindowTitle(QApplication::translate("MainWindow", "Textures", 0, QApplication::UnicodeUTF8));
         skyDockWidget->setWindowTitle(QApplication::translate("MainWindow", "Sky", 0, QApplication::UnicodeUTF8));

@@ -12,14 +12,75 @@ MainWindow::MainWindow(QWidget *parent) :
     // tabify dock widgets
     tabifyDockWidget(ui->terrainDockWidget, ui->texturesDockWidget);
     tabifyDockWidget(ui->texturesDockWidget, ui->skyDockWidget);
+    ui->terrainDockWidget->raise();
 
-    // Set mouse cursor
-    //mCursorSelect = new QCursor(QPixmap(":/media/cursor-select.png"), 0, 0);
-    mOgreWidget->setCursor(QCursor(QPixmap(":/media/cursor-select.png"), 0, 0));
+    // Set up action group for tool buttons
+    mToolGroup = new QActionGroup(this);
+    mToolGroup->addAction(ui->actionSelect);
+    mToolGroup->addAction(ui->actionPlace_entities);
+    mToolGroup->addAction(ui->actionPaint);
+    mToolGroup->addAction(ui->actionExtrude);
+    mToolGroup->addAction(ui->actionIntrude);
 }
 
 MainWindow::~MainWindow()
 {
     delete mOgreWidget;
     delete ui;
+}
+
+// Slots
+void MainWindow::fileNew()
+{
+
+}
+
+void MainWindow::fileOpen()
+{
+
+}
+
+void MainWindow::fileSave()
+{
+
+}
+
+void MainWindow::fileSaveAs()
+{
+
+}
+
+void MainWindow::editUndo()
+{
+
+}
+
+void MainWindow::editRedo()
+{
+
+}
+
+void MainWindow::selectTool()
+{
+
+}
+
+void MainWindow::addEntTool()
+{
+
+}
+
+void MainWindow::paintTool()
+{
+
+}
+
+void MainWindow::extrudeTool()
+{
+
+}
+
+void MainWindow::intrudeTool()
+{
+
 }

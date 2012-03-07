@@ -21,5 +21,7 @@
         <file>media/24x24/list-remove.png</file>
         <file>media/cursor-select.png</file>
         <file>media/24x24/cursor-select.png</file>
+        <file>media/cursor-select-0.png</file>
+        <file>media/cursor-select-1.png</file>
     </qresource>
 </RCC>
