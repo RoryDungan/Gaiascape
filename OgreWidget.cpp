@@ -145,7 +145,48 @@ void THIS::initializeGL()
     Ogre::Viewport *mViewport = mOgreWindow->addViewport( mCamera );
     mViewport->setBackgroundColour( Ogre::ColourValue( 0.8,0.8,1 ) );
 
+    mCamera->setAutoAspectRatio(true);
+
     setupScene();
+}
+
+/**
+ * @brief Modify the terrain with one of the terrain modification tools
+ * @author Rory Dungan
+ */
+void THIS::modifyTerrain(Ogre::Terrain* terrain, const Ogre::Vector3 &centerPos, Ogre::Real timeElapsed)
+{
+    qDebug() << "This is where we actually modify the terrain";
+    Ogre::Vector3 tsPos;
+    terrain->getTerrainPosition(centerPos, &tsPos);
+
+    // We need point coords
+    Ogre::Real terrainSize = (terrain->getSize() -1);
+    long startx = (tsPos.x - mBrushSize) * terrainSize;
+    long starty = (tsPos.y - mBrushSize) * terrainSize;
+    long endx = (tsPos.x + mBrushSize) * terrainSize;
+    long endy = (tsPos.y + mBrushSize) * terrainSize;
+    startx = std::max(startx, 0L);
+    starty = std::max(starty, 0L);
+    endx = std::min(endx, (long)terrainSize);
+    endy = std::min(endy, (long)terrainSize);
+    for(long y = starty; y <= endy; ++y)
+    {
+        for(long x = startx; x <= endx; ++x)
+        {
+            Ogre::Real tsXdist = (x / terrainSize) - tsPos.x;
+            Ogre::Real tsYdist = (y / terrainSize) - tsPos.y;
+
+            Ogre::Real weight = std::min((Ogre::Real)1.0f, Ogre::Math::Sqrt(tsYdist * tsYdist + tsXdist * tsXdist) / Ogre::Real(0.5 * mBrushSize));
+            weight = 1.0f - (weight * weight);
+
+            float addedHeight = weight * 250.0f * timeElapsed;
+            float newHeight = interactionMode == IM_EXTRUDE ? terrain->getHeightAtPoint(x, y) + addedHeight : terrain->getHeightAtPoint(x, y) - addedHeight;
+            terrain->setHeightAtPoint(x, y, newHeight);
+        }
+    }
+    //if(mHeightUpdateCountDown == 0)
+    //    mHeightUpdateCountDown = mHeightUpdateRate;
 }
 
 /**
@@ -158,12 +199,29 @@ void THIS::mousePressEvent(QMouseEvent * event)
 
     switch(event->button())
     {
+    case Qt::LeftButton:
+        if(currentState == IS_IDLE)
+            switch(interactionMode)
+            {
+            case IM_EXTRUDE:
+                currentState = IS_EXTRUDING;
+                qDebug() << "IS_EXTRUDING";
+            case IM_INTRUDE:
+                currentState = IS_EXTRUDING;
+            case IM_PAINT:
+                currentState = IS_PAINTING;
+            case IM_PLACEOBJ:
+                currentState = IS_PLACING_OBJECTS;
+            }
+        break;
     case Qt::RightButton:
         currentState = IS_ROTATING_CAMERA;
         break;
+
     case Qt::MiddleButton:
         currentState = IS_MOVING_CAMERA;
         break;
+
     default:
         break;
     }
@@ -225,6 +283,9 @@ void THIS::setupScene()
     mCamera->setPosition(Ogre::Vector3(1683, 50, 2116));
     mCamera->lookAt(Ogre::Vector3(1963, 50, 1660));
 
+    // Set up skybox
+    //mSceneMgr->setSkyBox(true, "irrSky"); For some reason this crashes, I have no idea why. - Rory
+
     // Set up light
     Ogre::Vector3 lightdir(0.55, -0.3, 0.75);
     lightdir.normalise();
@@ -237,6 +298,7 @@ void THIS::setupScene()
 
     mSceneMgr->setAmbientLight(Ogre::ColourValue(0.2, 0.2, 0.2));
 
+    // Set up terrain
     mTerrain = new Terrain(mSceneMgr, light);
 }
 
@@ -246,6 +308,36 @@ void THIS::setupScene()
  */
 void THIS::paintGL()
 {
+    // If the current state is a state in which the user is interacting with the terrain via the mouse
+    if(currentState == IS_EXTRUDING || currentState == IS_INTRUDING || currentState == IS_PAINTING || currentState == IS_PLACING_OBJECTS)
+    {
+        qDebug() << mLastCursorPos.x()- mCamera->getViewport()->getActualWidth()/2 << " " << mLastCursorPos.y() - mCamera->getViewport()->getActualHeight()/2;
+        // Get the 3d point that the cursor is over
+        // fire ray
+        Ogre::Ray ray = mCamera->getCameraToViewportRay(Ogre::Real(mLastCursorPos.x() - mCamera->getViewport()->getActualWidth()/2), Ogre::Real(mLastCursorPos.y() - mCamera->getViewport()->getActualHeight()/2));
+
+        Ogre::TerrainGroup::RayResult rayResult = mTerrain->mTerrainGroup->rayIntersects(ray);
+        if(rayResult.hit) // Ray hit the terrain
+        {
+            qDebug() << "rayResult hit point " << rayResult.position.x << " " << rayResult.position.y << " " << rayResult.position.z;
+            // Figue out which parts of the terrain this affects
+            Ogre::TerrainGroup::TerrainList terrainList;
+            Ogre::Real brushSizeWorldSpace = /* TERRAIN_WORLD_SIZE * mBrushSize */ 2400;
+            Ogre::Sphere sphere(rayResult.position, brushSizeWorldSpace);
+            mTerrain->getTerrainGroup()->sphereIntersects(sphere, &terrainList);
+
+            switch(currentState)
+            {
+            case IS_EXTRUDING:
+                for(Ogre::TerrainGroup::TerrainList::iterator ti = terrainList.begin(); ti != terrainList.end(); ++ti)
+                    modifyTerrain(*ti, rayResult.position, 17.0f);
+                break;
+            default:
+                break;
+            }
+        }
+    }
+
     assert( mOgreWindow );
     mOgreRoot->renderOneFrame();
 }

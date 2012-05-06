@@ -30,28 +30,9 @@ public:
 
     void setupScene();
 
+    // Ogre::Real is actually just a typedef of float so it's ok to assign it as one
+    void setBrushSize(float size) { mBrushSize = size; }
     Terrain* getTerrain() { return mTerrain; }
-
-protected:
-    virtual void initializeGL();
-    virtual void resizeGL( int, int );
-    virtual void paintGL();
-    virtual void mousePressEvent(QMouseEvent *);
-    virtual void mouseReleaseEvent(QMouseEvent *);
-    virtual void mouseMoveEvent(QMouseEvent *);
-
-    void init( std::string, std::string, std::string, std::string );
-
-    virtual Ogre::RenderSystem* chooseRenderer( Ogre::RenderSystemList* );
-
-    Ogre::Root* mOgreRoot;
-    Ogre::RenderWindow* mOgreWindow;
-    Ogre::Camera* mCamera;
-    Ogre::Viewport* mViewport;
-    Ogre::SceneManager* mSceneMgr;
-
-private:
-    Terrain* mTerrain;
 
     // Is used to tell what action clicking on the widget has
     // Corrosponds to what tool the user has selected
@@ -64,6 +45,34 @@ private:
         IM_PAINT,
         IM_PLACEOBJ
     } interactionMode;
+
+    void setInteractionMode(interactionModes i);
+
+    void setViewMode(Ogre::PolygonMode mode) { mCamera->setPolygonMode(mode); }
+
+protected:
+    virtual void initializeGL();
+    virtual void resizeGL( int, int );
+    virtual void paintGL();
+    virtual void mousePressEvent(QMouseEvent *);
+    virtual void mouseReleaseEvent(QMouseEvent *);
+    virtual void mouseMoveEvent(QMouseEvent *);
+
+    void init( std::string, std::string, std::string, std::string );
+
+    void modifyTerrain(Ogre::Terrain* terrain, const Ogre::Vector3& centerPos, Ogre::Real timeElapsed);
+
+    virtual Ogre::RenderSystem* chooseRenderer( Ogre::RenderSystemList* );
+
+    Ogre::Root* mOgreRoot;
+    Ogre::RenderWindow* mOgreWindow;
+    Ogre::Camera* mCamera;
+    Ogre::Viewport* mViewport;
+    Ogre::SceneManager* mSceneMgr;
+
+private:
+    Terrain* mTerrain;
+    Ogre::Real mBrushSize;
 
     // Corrosponds to what the user is doing right now
     enum interactionStates
@@ -81,9 +90,6 @@ private:
 
     // Stores the last position of the cursor
     QPoint mLastCursorPos;
-
-public:
-    void setInteractionMode(interactionModes i);
 };
 
 #endif // OGREWIDGET_H

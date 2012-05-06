@@ -34,6 +34,10 @@ public slots:
     void paintTool();
     void extrudeTool();
     void intrudeTool();
+    void viewWireframe();
+    void viewSolid();
+    void viewTextured();
+
 };
 
 #endif // MAINWINDOW_H

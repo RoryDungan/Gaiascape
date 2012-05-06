@@ -13,9 +13,9 @@ Terrain::Terrain(Ogre::SceneManager* sceneManager, Ogre::Light* light)
     configureTerrainDefaults(light);
 
     // define our terrains and instruct the TerrainGroup to load them all
-    for(long x = 0; x <= 0; ++x)
-        for(long y = 0; y <= 0; ++y)
-            defineTerrain(x, y);
+    //for(long x = 0; x <= 0; ++x)
+    //    for(long y = 0; y <= 0; ++y)
+            defineTerrain(0,0);
 
     // sync load since we want everything in place when we start
     mTerrainGroup->loadAllTerrains(true);

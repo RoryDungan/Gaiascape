@@ -9,8 +9,9 @@ class Terrain
 {
 public:
     Terrain(Ogre::SceneManager* sceneManager, Ogre::Light *light);
+    Ogre::TerrainGroup* getTerrainGroup() { return mTerrainGroup; }
 
-private:
+//private:
     Ogre::SceneManager* mSceneManager;
     Ogre::TerrainGlobalOptions* mTerrainGlobals;
     Ogre::TerrainGroup* mTerrainGroup;
