@@ -1,4 +1,4 @@
-#include "Terrain.h"
+#include "include/ogre/Terrain.h"
 
 Terrain::Terrain(Ogre::SceneManager* sceneManager, Ogre::Light* light)
 {

@@ -1,4 +1,4 @@
-#include "OgreWidget.h"
+#include "include/ogre/OgreWidget.h"
 #include <QDebug>
 
 #define THIS OgreWidget

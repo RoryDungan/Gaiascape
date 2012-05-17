@@ -12,13 +12,18 @@ TEMPLATE = app
 CXXFLAGS += -fno-strict-aliasing
 
 SOURCES += main.cpp\
-        MainWindow.cpp \
-    OgreWidget.cpp \
-    Terrain.cpp
+    src/algorithms/terrainBlock.cpp \
+    src/algorithms/globalTerrainMaster.cpp \
+    src/ogre/Terrain.cpp \
+    src/ogre/OgreWidget.cpp \
+    src/ogre/MainWindow.cpp
 
-HEADERS  += MainWindow.h \
-    OgreWidget.h \
-    Terrain.h
+HEADERS  += include/algorithms/terrainBlock.h \
+    include/algorithms/random.h \
+    include/algorithms/globalTerrainMaster.h \
+    include/ogre/Terrain.h \
+    include/ogre/OgreWidget.h \
+    include/ogre/MainWindow.h
 
 FORMS    += MainWindow.ui
 
