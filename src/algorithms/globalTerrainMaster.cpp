@@ -142,6 +142,8 @@ bool globalTerrainMaster::genHeight(int heightValue)
     // The easiest way to do this is to essentially copy all that is in the genQuadrant function, and when calling
     // the next set of functions, assign a seperate thread for each of the four functions.
     genQuadrant(0, 0, iDimensions, iDimensions, 1, iQuadrants);
+
+    return true;
 }
 
 bool globalTerrainMaster::genTemp(int temperValue)
@@ -236,4 +238,5 @@ bool globalTerrainMaster::displayMap()
     }
     std::cout << "\n";
     std::cout << "iNumberOfBlocks = " << iNumberOfBlocks << "\n";
+    return true;
 }

@@ -1,0 +1,111 @@
+#include "MainWindow.h"
+#include "ui_MainWindow.h"
+#include <QTimer>
+
+MainWindow::MainWindow(QWidget *parent) :
+    QMainWindow(parent),
+    ui(new Ui::MainWindow)
+{
+    ui->setupUi(this);
+    mOgreWidget = new OgreWidget;
+    setCentralWidget(mOgreWidget);
+    mOgreWidget->setInteractionMode(OgreWidget::IM_SELECT);
+
+    // tabify dock widgets
+    setTabPosition(Qt::AllDockWidgetAreas, QTabWidget::East);
+    tabifyDockWidget(ui->terrainDockWidget, ui->texturesDockWidget);
+    tabifyDockWidget(ui->texturesDockWidget, ui->skyDockWidget);
+    tabifyDockWidget(ui->skyDockWidget, ui->foliageDockWidget);
+    ui->terrainDockWidget->raise();
+
+    // Set up action group for tool buttons
+    mToolGroup = new QActionGroup(this);
+    mToolGroup->addAction(ui->actionSelect);
+    mToolGroup->addAction(ui->actionPlace_entities);
+    mToolGroup->addAction(ui->actionPaint);
+    mToolGroup->addAction(ui->actionExtrude);
+    mToolGroup->addAction(ui->actionIntrude);
+
+    // set up timer to get the Ogre widget to render at 60fps
+    QTimer* timer = new QTimer(this);
+    connect(timer, SIGNAL(timeout()), mOgreWidget, SLOT(updateGL()));
+    timer->start(1000.0f/60.0f);
+}
+
+MainWindow::~MainWindow()
+{
+    delete mOgreWidget;
+    delete mToolGroup;
+    delete ui;
+}
+
+// Slots
+void MainWindow::fileNew()
+{
+
+}
+
+void MainWindow::fileOpen()
+{
+
+}
+
+void MainWindow::fileSave()
+{
+
+}
+
+void MainWindow::fileSaveAs()
+{
+
+}
+
+void MainWindow::editUndo()
+{
+
+}
+
+void MainWindow::editRedo()
+{
+
+}
+
+void MainWindow::selectTool()
+{
+    mOgreWidget->setInteractionMode(OgreWidget::IM_SELECT);
+}
+
+void MainWindow::addEntTool()
+{
+    mOgreWidget->setInteractionMode(OgreWidget::IM_PLACEOBJ);
+}
+
+void MainWindow::paintTool()
+{
+    mOgreWidget->setInteractionMode(OgreWidget::IM_PAINT);
+}
+
+void MainWindow::extrudeTool()
+{
+    mOgreWidget->setInteractionMode(OgreWidget::IM_EXTRUDE);
+}
+
+void MainWindow::intrudeTool()
+{
+    mOgreWidget->setInteractionMode(OgreWidget::IM_INTRUDE);
+}
+
+void MainWindow::viewSolid()
+{
+    mOgreWidget->setViewMode(Ogre::PM_SOLID);
+}
+
+void MainWindow::viewTextured()
+{
+
+}
+
+void MainWindow::viewWireframe()
+{
+    mOgreWidget->setViewMode(Ogre::PM_WIREFRAME);
+}
