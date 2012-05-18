@@ -12,18 +12,20 @@ TEMPLATE = app
 CXXFLAGS += -fno-strict-aliasing
 
 SOURCES += src/main.cpp\
-    src/algorithms/TerrainBlock.cpp \
-    src/algorithms/GlobalTerrainMaster.cpp \
     src/Terrain.cpp \
     src/OgreWidget.cpp \
-    src/MainWindow.cpp
+    src/MainWindow.cpp \
+    src/algorithms/HeightMapGen.cpp \
+    src/algorithms/HMBlock.cpp
 
 HEADERS  += include/algorithms/TerrainBlock.h \
     include/algorithms/Random.h \
-    include/algorithms/GlobalTerrainMaster.h \
     include/Terrain.h \
     include/OgreWidget.h \
-    include/MainWindow.h
+    include/MainWindow.h \
+    src/algorithms/HeightMapGen.h \
+    include/algorithms/HeightMapGen.h \
+    include/algorithms/HMBlock.h
 
 INCLUDEPATH += include/ \
     include/OGRE/

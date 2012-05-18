@@ -37,8 +37,9 @@ Terrain::Terrain(Ogre::SceneManager* sceneManager, Ogre::Light* light)
 
 void Terrain::defineTerrain(long x, long y)
 {
-    Ogre::String filename = mTerrainGroup->generateFilename(x, y);
+    /*Ogre::String filename = mTerrainGroup->generateFilename(x, y);
     if(Ogre::ResourceGroupManager::getSingleton().resourceExists(mTerrainGroup->getResourceGroup(), filename))
+        // Define terrain here:
         mTerrainGroup->defineTerrain(x, y);
     else
     {
@@ -49,9 +50,16 @@ void Terrain::defineTerrain(long x, long y)
             img.flipAroundY();
         if(y % 2 != 0)
             img.flipAroundX();
+
+        // Define Terrain here:
         mTerrainGroup->defineTerrain(x, y, &img);
         mTerrainsImported = true;
-    }
+    }*/
+
+    // The reason why this looks weird is that all HMgen classes must start with what they are calculating,
+    // in this case, a HM.
+    HeightMapGen HMHMgen(iTerrainSize);
+    mTerrainGroup->defineTerrain(1,1,10.0f);
 }
 
 void Terrain::initBlendMaps(Ogre::Terrain *terrain)
