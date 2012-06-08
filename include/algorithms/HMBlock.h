@@ -13,12 +13,12 @@ class HMBlock
         unsigned int iBlockID;
 
 
-        void setHeight(int height);
-        int  getHeight();
+        void setHeight(float height);
+        float  getHeight();
         bool isHeightSet();
     protected:
     private:
-        int          iHeight;
+        float          iHeight;
         bool         bHeightSet;
 };
 

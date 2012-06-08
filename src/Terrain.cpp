@@ -22,7 +22,7 @@ Terrain::Terrain(Ogre::SceneManager* sceneManager, Ogre::Light* light)
             defineTerrain(0,0);
 
     // sync load since we want everything in place when we start
-    mTerrainGroup->loadAllTerrains(true);
+    mTerrainGroup->loadAllTerrains(false);
 
     // Now, if we just imported our terrains, we would like our blendmaps to be calculated:
     if(mTerrainsImported)
@@ -61,9 +61,24 @@ void Terrain::defineTerrain(long x, long y)
     }*/
 
     // The reason why this looks weird is that all HMgen classes must start with what they are calculating,
-    // in this case, a HM.
-    HeightMapGen HMHMgen(iTerrainSize);
-    mTerrainGroup->defineTerrain(1,1,10.0f);
+    // in this case, a HM.    
+    HeightMapGen HMHMgen(0.0f, iTerrainSize);
+    // Convert the array of TerrainBlocks to an array of floats
+    float array[HMHMgen.retrieveDimensions()][HMHMgen.retrieveDimensions()];
+
+    for(short unsigned int x; x <= HMHMgen.retrieveDimensions(); x++)
+        for(short unsigned int y; y <= HMHMgen.retrieveDimensions(); y++)
+            array[x][y] = HMHMgen.getByLoc(x, y)->getHeight();
+
+    float* ptr;
+
+    Ogre::Terrain::ImportData mImpData;
+    mImpData.inputFloat = &array[0][0];
+
+    mTerrainGroup->defineTerrain(0, 0, &mImpData);
+
+    // mTerrainGroup->defineTerrain(0,0,10.0f);
+    // mTerrainGroup->getTerrain(0, 0)->setPosition(Ogre::Vector3(10,10,0));
 }
 
 void Terrain::initBlendMaps(Ogre::Terrain *terrain)

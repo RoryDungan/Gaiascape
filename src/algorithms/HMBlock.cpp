@@ -15,7 +15,7 @@ HMBlock::~HMBlock()
     //dtor
 }
 
-void HMBlock::setHeight(int height)
+void HMBlock::setHeight(float height)
 {
     if(!bHeightSet)
     {
@@ -27,5 +27,5 @@ void HMBlock::setHeight(int height)
         // std::cout << "Terrain block " << iGlobalX << " " << iGlobalY << " has already been declared once - cancelling overwrite.\n";
     }
 }
-int HMBlock::getHeight()           { return iHeight; }
+float HMBlock::getHeight()           { return iHeight; }
 bool HMBlock::isHeightSet()        { return bHeightSet; }
