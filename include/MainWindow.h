@@ -22,6 +22,9 @@ private:
     OgreWidget* mOgreWidget;
     QActionGroup* mToolGroup;
 
+    virtual void keyPressEvent(QKeyEvent *);
+    virtual void keyReleaseEvent(QKeyEvent *);
+
 public slots:
     void fileNew();
     void fileOpen();

@@ -219,7 +219,10 @@ void THIS::mousePressEvent(QMouseEvent * event)
             }
         break;
     case Qt::RightButton:
-        currentState = IS_ROTATING_CAMERA;
+        if(!bCtrlPressed)
+            currentState = IS_ROTATING_CAMERA;
+        else
+            currentState = IS_MOVING_CAMERA;
         break;
 
     case Qt::MiddleButton:
@@ -365,4 +368,28 @@ Ogre::RenderSystem* THIS::chooseRenderer( Ogre::RenderSystemList *renderers )
     // It would probably be wise to do something more friendly
     // that just use the first available renderer
     return *renderers->begin();
+}
+
+/**
+ * @brief Save a screenshot of the current viewport to a file
+ * @author Rory Dungan
+ */
+void THIS::saveScreenshotToFile(QString filename)
+{
+    // Render to texture.
+    // Note that we can't just use mOgreWindow->writeContentsToFile() since that just takes whatever is onscreen
+    // at the time on the area Ogre is rendering to, so if part of the render window is obscured by another window
+    // it will also show up on the file. Rendering to a texture first prevents this.
+    Ogre::TexturePtr rtt_texture = Ogre::TextureManager::getSingleton().createManual("RttTex", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, Ogre::TEX_TYPE_2D, mOgreWindow->getWidth(), mOgreWindow->getHeight(), 0, Ogre::PF_R8G8B8, Ogre::TU_RENDERTARGET);
+    Ogre::RenderTexture *renderTexture = rtt_texture->getBuffer()->getRenderTarget();
+
+    // Set to camera viewport
+    renderTexture->addViewport(mCamera);
+    renderTexture->getViewport(0)->setOverlaysEnabled(false);
+
+    // Update the texture once
+    renderTexture->update();
+
+    // Now save the contents
+    renderTexture->writeContentsToFile(filename.toStdString());
 }

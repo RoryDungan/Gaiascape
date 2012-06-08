@@ -2,6 +2,7 @@
 #include "ui_MainWindow.h"
 #include <QTimer>
 #include <QFileDialog>
+#include <QDebug>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -114,5 +115,30 @@ void MainWindow::viewWireframe()
 void MainWindow::screenshot()
 {
     mOgreWidget->saveScreenshotToFile(QFileDialog::getSaveFileName(this, tr("Save Image"),
-                                             "", tr("JPEG Image (*.jpg *.jpeg)")));
+                                             "", tr("JPEG Image (*.jpg *.jpeg);;PNG image (*.png);;Targa image (*.tga);;Bitmap image (*.bmp)")));
+}
+
+
+void MainWindow::keyPressEvent(QKeyEvent * event)
+{
+    switch(event->key())
+    {
+    case Qt::Key_Control:
+        mOgreWidget->bCtrlPressed = true;
+        break;
+    default:
+        break;
+    }
+}
+
+void MainWindow::keyReleaseEvent(QKeyEvent * event)
+{
+    switch(event->key())
+    {
+    case Qt::Key_Control:
+        mOgreWidget->bCtrlPressed = false;
+        break;
+    default:
+        break;
+    }
 }
