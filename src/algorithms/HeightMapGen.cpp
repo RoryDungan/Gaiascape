@@ -1,5 +1,5 @@
 #include <iostream>
-#include "include/algorithms/HeightMapGen.h"
+#include "algorithms/HeightMapGen.h"
 #include <math.h>
 
 HeightMapGen::HeightMapGen(unsigned int size)

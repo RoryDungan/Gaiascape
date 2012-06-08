@@ -1,6 +1,7 @@
 #include "MainWindow.h"
 #include "ui_MainWindow.h"
 #include <QTimer>
+#include <QFileDialog>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -108,4 +109,10 @@ void MainWindow::viewTextured()
 void MainWindow::viewWireframe()
 {
     mOgreWidget->setViewMode(Ogre::PM_WIREFRAME);
+}
+
+void MainWindow::screenshot()
+{
+    mOgreWidget->saveScreenshotToFile(QFileDialog::getSaveFileName(this, tr("Save Image"),
+                                             "", tr("JPEG Image (*.jpg *.jpeg)")));
 }

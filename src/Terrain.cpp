@@ -2,6 +2,10 @@
 
 Terrain::Terrain(Ogre::SceneManager* sceneManager, Ogre::Light* light)
 {
+    // Workaround by Rory - this needs to be set outside of the header file
+    iTerrainSize = 4;
+
+
     mSceneManager = sceneManager;
     mTerrainGlobals = OGRE_NEW Ogre::TerrainGlobalOptions();
 

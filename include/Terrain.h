@@ -25,7 +25,7 @@ public:
 
  private:
     // This should be defined before the terrain is generated. 4 is set as default for a small world.
-    short unsigned int iTerrainSize = 4;
+    short unsigned int iTerrainSize;// = 4;
 };
 
 #endif // TERRAIN_H

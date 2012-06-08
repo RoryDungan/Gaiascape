@@ -37,6 +37,7 @@ public slots:
     void viewWireframe();
     void viewSolid();
     void viewTextured();
+    void screenshot();
 
 };
 

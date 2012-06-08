@@ -1,5 +1,5 @@
 #include <iostream>
-#include "include/algorithms/HMBlock.h"
+#include "algorithms/HMBlock.h"
 
 HMBlock::HMBlock(unsigned int x, unsigned int y, unsigned int blockID)
 {

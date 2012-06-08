@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'MainWindow.ui'
 **
-** Created: Thu 17. May 10:52:28 2012
+** Created: Fri 8. Jun 11:40:22 2012
 **      by: Qt User Interface Compiler version 4.8.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -48,11 +48,13 @@ public:
     QAction *actionPaint;
     QAction *actionSelect;
     QAction *actionPlace_entities;
+    QAction *actionTake_screenshot;
     QWidget *centralWidget;
     QMenuBar *menuBar;
     QMenu *menu_File;
     QMenu *menu_Edit;
     QMenu *menu_View;
+    QMenu *menuTools;
     QToolBar *mainToolBar;
     QStatusBar *statusBar;
     QToolBar *toolBar;
@@ -152,6 +154,11 @@ public:
         QIcon icon9;
         icon9.addFile(QString::fromUtf8(":/media/24x24/list-add.png"), QSize(), QIcon::Normal, QIcon::Off);
         actionPlace_entities->setIcon(icon9);
+        actionTake_screenshot = new QAction(MainWindow);
+        actionTake_screenshot->setObjectName(QString::fromUtf8("actionTake_screenshot"));
+        QIcon icon10;
+        icon10.addFile(QString::fromUtf8(":/media/24x24/camera-photo.png"), QSize(), QIcon::Normal, QIcon::Off);
+        actionTake_screenshot->setIcon(icon10);
         centralWidget = new QWidget(MainWindow);
         centralWidget->setObjectName(QString::fromUtf8("centralWidget"));
         MainWindow->setCentralWidget(centralWidget);
@@ -164,6 +171,8 @@ public:
         menu_Edit->setObjectName(QString::fromUtf8("menu_Edit"));
         menu_View = new QMenu(menuBar);
         menu_View->setObjectName(QString::fromUtf8("menu_View"));
+        menuTools = new QMenu(menuBar);
+        menuTools->setObjectName(QString::fromUtf8("menuTools"));
         MainWindow->setMenuBar(menuBar);
         mainToolBar = new QToolBar(MainWindow);
         mainToolBar->setObjectName(QString::fromUtf8("mainToolBar"));
@@ -270,6 +279,7 @@ public:
         menuBar->addAction(menu_File->menuAction());
         menuBar->addAction(menu_Edit->menuAction());
         menuBar->addAction(menu_View->menuAction());
+        menuBar->addAction(menuTools->menuAction());
         menu_File->addAction(action_New);
         menu_File->addAction(action_Open);
         menu_File->addAction(actionOpen_Recent);
@@ -283,12 +293,15 @@ public:
         menu_View->addAction(action_Textured);
         menu_View->addAction(action_Solid);
         menu_View->addAction(action_Wireframe);
+        menuTools->addAction(actionTake_screenshot);
         mainToolBar->addAction(action_New);
         mainToolBar->addAction(action_Open);
         mainToolBar->addAction(action_Save);
         mainToolBar->addSeparator();
         mainToolBar->addAction(action_Undo);
         mainToolBar->addAction(action_Redo);
+        mainToolBar->addSeparator();
+        mainToolBar->addAction(actionTake_screenshot);
         toolBar->addAction(actionSelect);
         toolBar->addAction(actionPlace_entities);
         toolBar->addAction(actionPaint);
@@ -311,6 +324,7 @@ public:
         QObject::connect(action_Wireframe, SIGNAL(triggered()), MainWindow, SLOT(viewWireframe()));
         QObject::connect(action_Solid, SIGNAL(triggered()), MainWindow, SLOT(viewSolid()));
         QObject::connect(action_Textured, SIGNAL(triggered()), MainWindow, SLOT(viewTextured()));
+        QObject::connect(actionTake_screenshot, SIGNAL(triggered()), MainWindow, SLOT(screenshot()));
 
         QMetaObject::connectSlotsByName(MainWindow);
     } // setupUi
@@ -341,9 +355,12 @@ public:
         actionPaint->setText(QApplication::translate("MainWindow", "Paint", 0, QApplication::UnicodeUTF8));
         actionSelect->setText(QApplication::translate("MainWindow", "Select", 0, QApplication::UnicodeUTF8));
         actionPlace_entities->setText(QApplication::translate("MainWindow", "Place entities", 0, QApplication::UnicodeUTF8));
+        actionTake_screenshot->setText(QApplication::translate("MainWindow", "Save screenshot", 0, QApplication::UnicodeUTF8));
+        actionTake_screenshot->setShortcut(QApplication::translate("MainWindow", "F12", 0, QApplication::UnicodeUTF8));
         menu_File->setTitle(QApplication::translate("MainWindow", "&File", 0, QApplication::UnicodeUTF8));
         menu_Edit->setTitle(QApplication::translate("MainWindow", "&Edit", 0, QApplication::UnicodeUTF8));
         menu_View->setTitle(QApplication::translate("MainWindow", "&View", 0, QApplication::UnicodeUTF8));
+        menuTools->setTitle(QApplication::translate("MainWindow", "Tools", 0, QApplication::UnicodeUTF8));
         mainToolBar->setWindowTitle(QApplication::translate("MainWindow", "Home", 0, QApplication::UnicodeUTF8));
         toolBar->setWindowTitle(QApplication::translate("MainWindow", "Tools", 0, QApplication::UnicodeUTF8));
         terrainDockWidget->setWindowTitle(QApplication::translate("MainWindow", "Terrain", 0, QApplication::UnicodeUTF8));

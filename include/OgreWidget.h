@@ -3,9 +3,11 @@
 
 #include <OGRE/Ogre.h>
 #include <QGLWidget>
-#ifndef WIN32 && MACOS
-#include <QX11Info>
-#endif
+#ifndef WIN32
+    #ifndef MACOS
+        #include <QX11Info>
+    #endif // MACOS
+#endif // WIN32
 #include <QMouseEvent>
 #include "Terrain.h"
 
@@ -50,6 +52,7 @@ public:
 
     void setViewMode(Ogre::PolygonMode mode) { mCamera->setPolygonMode(mode); }
 
+    void saveScreenshotToFile(QString filename) { mOgreWindow->writeContentsToFile(filename.toStdString()); }
 protected:
     virtual void initializeGL();
     virtual void resizeGL( int, int );

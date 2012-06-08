@@ -28,13 +28,14 @@ HEADERS  += include/algorithms/TerrainBlock.h \
     include/algorithms/HMBlock.h
 
 INCLUDEPATH += include/ \
-    include/OGRE/
+    include/OGRE/ \
+    ui/
+
+UI_DIR = ui/
 
 FORMS    += ui/MainWindow.ui
 
 LIBS += -L. -lOgreMain -lOgreTerrain
-
-INCLUDEPATH += OGRE
 
 win32 {
     RC_FILE = resource.rc
