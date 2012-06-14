@@ -37,8 +37,33 @@ MainWindow::MainWindow(QWidget *parent) :
 MainWindow::~MainWindow()
 {
     delete mOgreWidget;
+    delete mRenderTimer;
     delete mToolGroup;
     delete ui;
+}
+
+void MainWindow::keyPressEvent(QKeyEvent * event)
+{
+    switch(event->key())
+    {
+    case Qt::Key_Control:
+        mOgreWidget->bCtrlPressed = true;
+        break;
+    default:
+        break;
+    }
+}
+
+void MainWindow::keyReleaseEvent(QKeyEvent * event)
+{
+    switch(event->key())
+    {
+    case Qt::Key_Control:
+        mOgreWidget->bCtrlPressed = false;
+        break;
+    default:
+        break;
+    }
 }
 
 // Slots
@@ -118,27 +143,20 @@ void MainWindow::screenshot()
                                              "", tr("JPEG Image (*.jpg *.jpeg);;PNG image (*.png);;Targa image (*.tga);;Bitmap image (*.bmp)")));
 }
 
-
-void MainWindow::keyPressEvent(QKeyEvent * event)
+void MainWindow::generateTerrain()
 {
-    switch(event->key())
-    {
-    case Qt::Key_Control:
-        mOgreWidget->bCtrlPressed = true;
-        break;
-    default:
-        break;
-    }
+    mOgreWidget->getTerrain()->clearTerrain();
+    mOgreWidget->getTerrain()->generateTerrain();
 }
 
-void MainWindow::keyReleaseEvent(QKeyEvent * event)
+void MainWindow::loadTerrain()
 {
-    switch(event->key())
-    {
-    case Qt::Key_Control:
-        mOgreWidget->bCtrlPressed = false;
-        break;
-    default:
-        break;
-    }
+    mOgreWidget->getTerrain()->clearTerrain();
+    mOgreWidget->getTerrain()->loadHeightmap();
+}
+
+void MainWindow::clearTerrain()
+{
+    mOgreWidget->getTerrain()->clearTerrain();
+    mOgreWidget->getTerrain()->createFlatTerrain();
 }

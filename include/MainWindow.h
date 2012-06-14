@@ -20,6 +20,7 @@ public:
 private:
     Ui::MainWindow *ui;
     OgreWidget* mOgreWidget;
+    QTimer* mRenderTimer;
     QActionGroup* mToolGroup;
 
     virtual void keyPressEvent(QKeyEvent *);
@@ -41,7 +42,9 @@ public slots:
     void viewSolid();
     void viewTextured();
     void screenshot();
-
+    void generateTerrain();
+    void loadTerrain();
+    void clearTerrain();
 };
 
 #endif // MAINWINDOW_H

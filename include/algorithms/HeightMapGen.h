@@ -8,12 +8,16 @@
 class HeightMapGen
 {
     public:
-        HeightMapGen(unsigned int size);
+        HeightMapGen(float talos, unsigned int size);
         std::vector<HMBlock*> retrieveBlocks();
-    private:
-        void genQuadrant(int xNW, int yNW, int xSE, int ySE, int iteration, int quadrant);
+
         HMBlock* getByID(short unsigned int ID);
         HMBlock* getByLoc(short unsigned int x, short unsigned int y);
+
+        short unsigned int retrieveDimensions();
+    private:
+        void genQuadrant(int xNW, int yNW, int xSE, int ySE, int iteration, int quadrant);
+        void erode(short int c);
 
         std::vector<HMBlock*> HMBlocks;
 
@@ -22,7 +26,7 @@ class HeightMapGen
         short unsigned int iQuadrants;
 
         float fStaggerValue;
-
+        float fTalos; // Maximum angle a slope may have
 };
 
 #endif // HEIGHTMAPGEN_H

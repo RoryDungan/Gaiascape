@@ -151,6 +151,10 @@ void THIS::initializeGL()
 
     mCamera->setAutoAspectRatio(true);
 
+    // This should really be called after initializeGL() because it takes a fair amount of time to load the resources
+    // and initializeGL() is called before the main window of the program is created. In future I would like to have
+    // it create the window immediatly, set the cursor to busy/wait and then call setupScene(), preferably in a
+    // background thread - Rory
     setupScene();
 }
 
@@ -323,7 +327,7 @@ void THIS::paintGL()
         // fire ray
         Ogre::Ray ray = mCamera->getCameraToViewportRay(Ogre::Real(mLastCursorPos.x() - mCamera->getViewport()->getActualWidth()/2), Ogre::Real(mLastCursorPos.y() - mCamera->getViewport()->getActualHeight()/2));
 
-        Ogre::TerrainGroup::RayResult rayResult = mTerrain->mTerrainGroup->rayIntersects(ray);
+        Ogre::TerrainGroup::RayResult rayResult = mTerrain->getTerrainGroup()->rayIntersects(ray);
         if(rayResult.hit) // Ray hit the terrain
         {
             qDebug() << "rayResult hit point " << rayResult.position.x << " " << rayResult.position.y << " " << rayResult.position.z;

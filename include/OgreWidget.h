@@ -28,9 +28,9 @@ public:
 
     virtual ~OgreWidget()
     {
+        if(mTerrain) delete mTerrain;
         mOgreRoot->shutdown();
-        delete mOgreRoot;
-        delete mTerrain;
+        if(mOgreRoot) delete mOgreRoot;
         destroy();
     }
 
