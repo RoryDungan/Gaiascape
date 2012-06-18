@@ -151,6 +151,10 @@ void THIS::initializeGL()
 
     mCamera->setAutoAspectRatio(true);
 
+    // This should really be called after initializeGL() because it takes a fair amount of time to load the resources
+    // and initializeGL() is called before the main window of the program is created. In future I would like to have
+    // it create the window immediatly, set the cursor to busy/wait and then call setupScene(), preferably in a
+    // background thread - Rory
     setupScene();
 }
 
@@ -219,7 +223,10 @@ void THIS::mousePressEvent(QMouseEvent * event)
             }
         break;
     case Qt::RightButton:
-        currentState = IS_ROTATING_CAMERA;
+        if(!bCtrlPressed)
+            currentState = IS_ROTATING_CAMERA;
+        else
+            currentState = IS_MOVING_CAMERA;
         break;
 
     case Qt::MiddleButton:
@@ -320,7 +327,7 @@ void THIS::paintGL()
         // fire ray
         Ogre::Ray ray = mCamera->getCameraToViewportRay(Ogre::Real(mLastCursorPos.x() - mCamera->getViewport()->getActualWidth()/2), Ogre::Real(mLastCursorPos.y() - mCamera->getViewport()->getActualHeight()/2));
 
-        Ogre::TerrainGroup::RayResult rayResult = mTerrain->mTerrainGroup->rayIntersects(ray);
+        Ogre::TerrainGroup::RayResult rayResult = mTerrain->getTerrainGroup()->rayIntersects(ray);
         if(rayResult.hit) // Ray hit the terrain
         {
             qDebug() << "rayResult hit point " << rayResult.position.x << " " << rayResult.position.y << " " << rayResult.position.z;
@@ -365,4 +372,28 @@ Ogre::RenderSystem* THIS::chooseRenderer( Ogre::RenderSystemList *renderers )
     // It would probably be wise to do something more friendly
     // that just use the first available renderer
     return *renderers->begin();
+}
+
+/**
+ * @brief Save a screenshot of the current viewport to a file
+ * @author Rory Dungan
+ */
+void THIS::saveScreenshotToFile(QString filename)
+{
+    // Render to texture.
+    // Note that we can't just use mOgreWindow->writeContentsToFile() since that just takes whatever is onscreen
+    // at the time on the area Ogre is rendering to, so if part of the render window is obscured by another window
+    // it will also show up on the file. Rendering to a texture first prevents this.
+    Ogre::TexturePtr rtt_texture = Ogre::TextureManager::getSingleton().createManual("RttTex", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, Ogre::TEX_TYPE_2D, mOgreWindow->getWidth(), mOgreWindow->getHeight(), 0, Ogre::PF_R8G8B8, Ogre::TU_RENDERTARGET);
+    Ogre::RenderTexture *renderTexture = rtt_texture->getBuffer()->getRenderTarget();
+
+    // Set to camera viewport
+    renderTexture->addViewport(mCamera);
+    renderTexture->getViewport(0)->setOverlaysEnabled(false);
+
+    // Update the texture once
+    renderTexture->update();
+
+    // Now save the contents
+    renderTexture->writeContentsToFile(filename.toStdString());
 }

@@ -11,19 +11,27 @@ class Terrain
 {
 public:
     Terrain(Ogre::SceneManager* sceneManager, Ogre::Light *light);
+    ~Terrain();
     Ogre::TerrainGroup* getTerrainGroup() { return mTerrainGroup; }
 
-//private:
+    void createFlatTerrain();
+    void loadHeightmap();
+    void generateTerrain();
+
+    void clearTerrain();
+
+private:
     Ogre::SceneManager* mSceneManager;
     Ogre::TerrainGlobalOptions* mTerrainGlobals;
     Ogre::TerrainGroup* mTerrainGroup;
+    Ogre::Light* mSun;
     bool mTerrainsImported;
 
-    void defineTerrain(long x, long y);
+    void defineTerrainFromFile(long x, long y);
     void initBlendMaps(Ogre::Terrain* terrain);
     void configureTerrainDefaults(Ogre::Light* light);
+    void configureTextures(Ogre::Terrain::LayerInstanceList& layerList);
 
- private:
     // This should be defined before the terrain is generated. 4 is set as default for a small world.
     short unsigned int iTerrainSize;// = 4;
 };

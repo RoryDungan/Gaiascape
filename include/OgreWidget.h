@@ -19,14 +19,18 @@ public:
     QGLWidget( parent ),
     mOgreWindow(NULL)
     {
+        // init variables
+        bCtrlPressed = false;
+
+        // Fire up Ogre
         init( "plugins.cfg", "resources.cfg", "ogre.cfg", "ogre.log" );
     }
 
     virtual ~OgreWidget()
     {
+        if(mTerrain) delete mTerrain;
         mOgreRoot->shutdown();
-        delete mOgreRoot;
-        delete mTerrain;
+        if(mOgreRoot) delete mOgreRoot;
         destroy();
     }
 
@@ -49,10 +53,10 @@ public:
     } interactionMode;
 
     void setInteractionMode(interactionModes i);
-
     void setViewMode(Ogre::PolygonMode mode) { mCamera->setPolygonMode(mode); }
+    void saveScreenshotToFile(QString filename);
 
-    void saveScreenshotToFile(QString filename) { mOgreWindow->writeContentsToFile(filename.toStdString()); }
+    bool bCtrlPressed;
 protected:
     virtual void initializeGL();
     virtual void resizeGL( int, int );

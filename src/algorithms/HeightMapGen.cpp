@@ -149,17 +149,10 @@ HMBlock* HeightMapGen::getByLoc(short unsigned int x, short unsigned int y)
 
 short unsigned int HeightMapGen::retrieveDimensions()
 {
-    return iDimensions;
+    return iDimensions + 1;
 }
 
 std::vector<HMBlock*> HeightMapGen::retrieveBlocks()
 {
     return HMBlocks;
-}
-
-float HeightMapGen::retrieveHeightmap()
-{
-    // A heightmap is an array of floats ranging from 0 to 1
-    // If all of the floats are ranged from the highest to the lowest, there will never be any particularly high or low points.
-    // This could cause a problem with mountains, but it might end up working in practice.
 }

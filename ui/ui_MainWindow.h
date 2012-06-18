@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'MainWindow.ui'
 **
-** Created: Fri 8. Jun 11:40:22 2012
+** Created: Sun 10. Jun 14:16:17 2012
 **      by: Qt User Interface Compiler version 4.8.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -71,7 +71,9 @@ public:
     QSlider *horizontalSlider_4;
     QLabel *label_5;
     QSlider *horizontalSlider_5;
-    QPushButton *pushButton;
+    QPushButton *generateTerrain;
+    QPushButton *loadTerrain;
+    QPushButton *clearTerrain;
     QDockWidget *texturesDockWidget;
     QWidget *dockWidgetContents_2;
     QDockWidget *skyDockWidget;
@@ -83,7 +85,7 @@ public:
     {
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName(QString::fromUtf8("MainWindow"));
-        MainWindow->resize(600, 408);
+        MainWindow->resize(800, 600);
         action_New = new QAction(MainWindow);
         action_New->setObjectName(QString::fromUtf8("action_New"));
         QIcon icon;
@@ -164,7 +166,7 @@ public:
         MainWindow->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(MainWindow);
         menuBar->setObjectName(QString::fromUtf8("menuBar"));
-        menuBar->setGeometry(QRect(0, 0, 600, 21));
+        menuBar->setGeometry(QRect(0, 0, 800, 21));
         menu_File = new QMenu(menuBar);
         menu_File->setObjectName(QString::fromUtf8("menu_File"));
         menu_Edit = new QMenu(menuBar);
@@ -186,7 +188,7 @@ public:
         MainWindow->addToolBar(Qt::LeftToolBarArea, toolBar);
         terrainDockWidget = new QDockWidget(MainWindow);
         terrainDockWidget->setObjectName(QString::fromUtf8("terrainDockWidget"));
-        terrainDockWidget->setMinimumSize(QSize(150, 188));
+        terrainDockWidget->setMinimumSize(QSize(150, 246));
         dockWidgetContents = new QWidget();
         dockWidgetContents->setObjectName(QString::fromUtf8("dockWidgetContents"));
         formLayout = new QFormLayout(dockWidgetContents);
@@ -200,7 +202,6 @@ public:
 
         horizontalSlider = new QSlider(dockWidgetContents);
         horizontalSlider->setObjectName(QString::fromUtf8("horizontalSlider"));
-        horizontalSlider->setMinimum(-99);
         horizontalSlider->setSliderPosition(0);
         horizontalSlider->setOrientation(Qt::Horizontal);
 
@@ -250,10 +251,20 @@ public:
 
         formLayout->setWidget(4, QFormLayout::FieldRole, horizontalSlider_5);
 
-        pushButton = new QPushButton(dockWidgetContents);
-        pushButton->setObjectName(QString::fromUtf8("pushButton"));
+        generateTerrain = new QPushButton(dockWidgetContents);
+        generateTerrain->setObjectName(QString::fromUtf8("generateTerrain"));
 
-        formLayout->setWidget(5, QFormLayout::SpanningRole, pushButton);
+        formLayout->setWidget(5, QFormLayout::SpanningRole, generateTerrain);
+
+        loadTerrain = new QPushButton(dockWidgetContents);
+        loadTerrain->setObjectName(QString::fromUtf8("loadTerrain"));
+
+        formLayout->setWidget(6, QFormLayout::SpanningRole, loadTerrain);
+
+        clearTerrain = new QPushButton(dockWidgetContents);
+        clearTerrain->setObjectName(QString::fromUtf8("clearTerrain"));
+
+        formLayout->setWidget(7, QFormLayout::SpanningRole, clearTerrain);
 
         terrainDockWidget->setWidget(dockWidgetContents);
         MainWindow->addDockWidget(static_cast<Qt::DockWidgetArea>(2), terrainDockWidget);
@@ -325,6 +336,9 @@ public:
         QObject::connect(action_Solid, SIGNAL(triggered()), MainWindow, SLOT(viewSolid()));
         QObject::connect(action_Textured, SIGNAL(triggered()), MainWindow, SLOT(viewTextured()));
         QObject::connect(actionTake_screenshot, SIGNAL(triggered()), MainWindow, SLOT(screenshot()));
+        QObject::connect(generateTerrain, SIGNAL(clicked()), MainWindow, SLOT(generateTerrain()));
+        QObject::connect(loadTerrain, SIGNAL(clicked()), MainWindow, SLOT(loadTerrain()));
+        QObject::connect(clearTerrain, SIGNAL(clicked()), MainWindow, SLOT(clearTerrain()));
 
         QMetaObject::connectSlotsByName(MainWindow);
     } // setupUi
@@ -372,7 +386,9 @@ public:
         label_3->setText(QApplication::translate("MainWindow", "Hill size", 0, QApplication::UnicodeUTF8));
         label_4->setText(QApplication::translate("MainWindow", "Hill height", 0, QApplication::UnicodeUTF8));
         label_5->setText(QApplication::translate("MainWindow", "Varience", 0, QApplication::UnicodeUTF8));
-        pushButton->setText(QApplication::translate("MainWindow", "Generate new terrain", 0, QApplication::UnicodeUTF8));
+        generateTerrain->setText(QApplication::translate("MainWindow", "Generate new terrain", 0, QApplication::UnicodeUTF8));
+        loadTerrain->setText(QApplication::translate("MainWindow", "Load terrain from file", 0, QApplication::UnicodeUTF8));
+        clearTerrain->setText(QApplication::translate("MainWindow", "Clear terrain", 0, QApplication::UnicodeUTF8));
         texturesDockWidget->setWindowTitle(QApplication::translate("MainWindow", "Textures", 0, QApplication::UnicodeUTF8));
         skyDockWidget->setWindowTitle(QApplication::translate("MainWindow", "Sky", 0, QApplication::UnicodeUTF8));
         foliageDockWidget->setWindowTitle(QApplication::translate("MainWindow", "Foliage", 0, QApplication::UnicodeUTF8));
