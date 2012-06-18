@@ -15,6 +15,7 @@ class HeightMapGen
         HMBlock* getByLoc(short unsigned int x, short unsigned int y);
 
         short unsigned int retrieveDimensions();
+        float retrieveHeightmap();
     private:
         void genQuadrant(int xNW, int yNW, int xSE, int ySE, int iteration, int quadrant);
         void erode(short int c);
