@@ -4,21 +4,11 @@
 
 HeightMapGen::HeightMapGen(float talos, unsigned int size)
 {
-    iNumberOfBlocks = pow(pow(4.0, size * 0.5), 2) + 1;
-    fTalos = talos; // A good default is 4/iNumberOfBlocks, however this will change depending on how eroded the terrain should be.
-    // Rows and columns start at 0, which is unintuitive now but makes the code a hell of a lot easier to read later.
-    // In this circumstance iRows and iColumns will always be the same. When this code is converted to its own
-    // heightmap generator class, there may be some situation where the dimensions are different.
-    iDimensions = pow(4.0, size * 0.5);
-
-    // iQuadrants is the number of quadrants that are going to be generated
-    // Or in other terms, the number of subdivisions.
-    // iQuadrants = 1 will have 9 vertices, iQuadrants = 2 will have 25 vertices [I THINK]
-    iQuadrants = size;
-    fStaggerValue = iNumberOfBlocks / 20;
+    // Moved to retrieveHeightmap()
+    // Everything remaining has been commented out in case we go back, so this is sort of a recycling bin.
 
     // The active ID that all blocks are assigned. Incremented later in the for loop.
-    int iBlockID = 0;
+    /*int iBlockID = 0;
 
     for(short unsigned int y = 0; y < (iDimensions + 1); y++)
     {
@@ -28,28 +18,7 @@ HeightMapGen::HeightMapGen(float talos, unsigned int size)
             HMBlocks.push_back(tempPointer); // Program each column along the row
             iBlockID++;
         }
-    }
-
-    // ------------------------------
-    // Start the heightmap generator
-    // ------------------------------
-
-    // NW corner
-    getByLoc(0, 0)->setHeight(Random::getSingleton().getRand(5, 10));
-
-    // NE corner
-    getByLoc(iDimensions, 0)->setHeight(Random::getSingleton().getRand(5, 10));
-
-    // SE corner
-    getByLoc(iDimensions, iDimensions)->setHeight(Random::getSingleton().getRand(5, 10));
-
-    // SW corner
-    getByLoc(0, iDimensions)->setHeight(Random::getSingleton().getRand(5, 10));
-
-    // ToDo: Enable multithreading. This may require a small amount of hard coding.
-    // The easiest way to do this is to essentially copy all that is in the genQuadrant function, and when calling
-    // the next set of functions, assign a seperate thread for each of the four functions.
-    genQuadrant(0, 0, iDimensions, iDimensions, 1, iQuadrants);
+    }*/
 }
 
 void HeightMapGen::genQuadrant(int xNW, int yNW, int xSE, int ySE, int iteration, int quadrant)
@@ -57,8 +26,12 @@ void HeightMapGen::genQuadrant(int xNW, int yNW, int xSE, int ySE, int iteration
     // Generate a quadrant by giving each of the corners
     // Relative x and y are integers which give the x and y coordinates confined to that quadrant.
     // Therefore (iRelativeX/2) + xNW = Halfway along x
-    int iRelativeX = xSE - xNW;
-    int iRelativeY = ySE - yNW;
+    // x values are already multiplied by iDimensions
+
+    // int iRelativeX = xSE - xNW; Probably obsolete, but compile first
+    int iHalfRelativeX = (xSE - xNW)/2 + xNW; // This is never not used, but it is pausible that vanilla iRelativeX/2
+    // int iRelativeY = ySE - yNW;
+    int iHalfRelativeY = (ySE - yNW)/2 + yNW; // Same with iHalfRelativeX
 
     // Calculating the midpoints, i.e.
     /*
@@ -69,6 +42,9 @@ void HeightMapGen::genQuadrant(int xNW, int yNW, int xSE, int ySE, int iteration
       --+--
       where all + signs are calculated.
       */
+
+    // OLD VERSION BELOW
+    /*
 
     // Center
     getByLoc((iRelativeX/2) + xNW, (iRelativeY/2) + yNW)->setHeight(((getByLoc(xNW, yNW)->getHeight() + getByLoc(xSE, yNW)->getHeight() + getByLoc(xSE, ySE)->getHeight() + getByLoc(xNW, ySE)->getHeight())/4)
@@ -108,6 +84,50 @@ void HeightMapGen::genQuadrant(int xNW, int yNW, int xSE, int ySE, int iteration
 
         // SW
         genQuadrant(xNW, (iRelativeY/2) + yNW, (iRelativeX/2) + xNW, ySE, iteration + 1, quadrant - 1);
+    }*/
+
+    // How to access a two dimensional array pointer
+    // To get array[8][7] where we have array[x][y], x would equal 8 and y would equal 7.
+    // For a pointer, this is essentially element 87, or *(pArray + iDimensions*x + y)
+
+    // Center
+    *(pHMBlocks + iHalfRelativeX + (iHalfRelativeY + yNW)) = (*(pHMBlocks + xNW + yNW) + *(pHMBlocks + xSE + yNW) + *(pHMBlocks + xSE + ySE) + *(pHMBlocks + xNW + ySE))/4
+                                    + Random::getSingleton().getRand(-fStaggerValue/iteration, fStaggerValue/iteration);
+    // N
+    *(pHMBlocks + iHalfRelativeX + yNW) = (*(pHMBlocks + xNW + yNW) + *(pHMBlocks + xSE + yNW) + *(pHMBlocks + iHalfRelativeX + iHalfRelativeY))/3
+                                    + Random::getSingleton().getRand(-fStaggerValue/iteration, fStaggerValue/iteration);
+
+    // E
+    *(pHMBlocks + xSE + iHalfRelativeY) = (*(pHMBlocks + xSE + yNW) + *(pHMBlocks + xSE + ySE) + *(pHMBlocks + iHalfRelativeX + iHalfRelativeY))/3
+                                    + Random::getSingleton().getRand(-fStaggerValue/iteration, fStaggerValue/iteration);
+
+    // S
+    *(pHMBlocks + iHalfRelativeX + ySE) = (*(pHMBlocks + xNW + ySE) + *(pHMBlocks + iHalfRelativeX + iHalfRelativeY) + *(pHMBlocks + xSE + ySE))/3
+                                    + Random::getSingleton().getRand(-fStaggerValue/iteration, fStaggerValue/iteration);
+
+    // W
+    *(pHMBlocks + xNW + iHalfRelativeY) = (*(pHMBlocks + xNW + yNW) + *(pHMBlocks + xNW + ySE) + *(pHMBlocks + iHalfRelativeX + iHalfRelativeY))/3
+                                    + Random::getSingleton().getRand(-fStaggerValue/iteration, fStaggerValue/iteration);
+
+    if (quadrant != 1)
+    {
+        // This then carries on the process of generating quadrants, providing there are still quadrants to generate.
+        // Because quadrants count down, we know we do not need to continue to the loop if we are on the last
+        // quadrant.
+        // Essentially, you simply repeat the process found here in which you find the midpoints by using the midpoints
+        // generated here as the corners in the next call of this function.
+
+        // NW
+        genQuadrant(xNW, yNW, iHalfRelativeX, iHalfRelativeY, iteration + 1, quadrant - 1);
+
+        // NE
+        genQuadrant(iHalfRelativeX, yNW, xSE, iHalfRelativeY, iteration + 1, quadrant - 1);
+
+        // SE
+        genQuadrant(iHalfRelativeX , iHalfRelativeY, xSE, ySE, iteration + 1, quadrant - 1);
+
+        // SW
+        genQuadrant(xNW, iHalfRelativeY, iHalfRelativeX, ySE, iteration + 1, quadrant - 1);
     }
 }
 
@@ -131,12 +151,12 @@ void erode(short int c)
     //
 }
 
-HMBlock* HeightMapGen::getByID(short unsigned int ID)
+/*float* HeightMapGen::getByID(short unsigned int ID)
 {
-    return HMBlocks[ID];
+    return (pHMBlocks + ID);
 }
 
-HMBlock* HeightMapGen::getByLoc(short unsigned int x, short unsigned int y)
+float* HeightMapGen::getByLoc(short unsigned int x, short unsigned int y)
 {
     for(unsigned int i = 0; i < HMBlocks.size(); i++)
     {
@@ -145,14 +165,103 @@ HMBlock* HeightMapGen::getByLoc(short unsigned int x, short unsigned int y)
                 return HMBlocks[i];
     }
     return NULL;
-}
+}*/
 
 short unsigned int HeightMapGen::retrieveDimensions()
 {
-    return iDimensions + 1;
+    return iDimensions;
 }
 
-std::vector<HMBlock*> HeightMapGen::retrieveBlocks()
+/*std::vector<HMBlock*> HeightMapGen::retrieveBlocks()
 {
     return HMBlocks;
+}*/
+
+void HeightMapGen::retrieveHeightmap(float talos, unsigned int size, float* heightmapArray)
+{
+    iNumberOfBlocks = pow(pow(4.0, size * 0.5), 2) + 1;
+    fTalos = talos; // A good default is 4/iNumberOfBlocks, however this will change depending on how eroded the terrain should be.
+    // Rows and columns start at 0, which is unintuitive now but makes the code a hell of a lot easier to read later.
+    // In this circumstance iRows and iColumns will always be the same. When this code is converted to its own
+    // heightmap generator class, there may be some situation where the dimensions are different.
+    iDimensions = pow(4.0, size * 0.5) + 1;
+
+    // iQuadrants is the number of quadrants that are going to be generated
+    // Or in other terms, the number of subdivisions.
+    // iQuadrants = 1 will have 9 vertices, iQuadrants = 2 will have 25 vertices [I THINK]
+    iQuadrants = size;
+    fStaggerValue = iNumberOfBlocks / 20;
+
+    pHMBlocks = heightmapArray;
+
+    // ------------------------------
+    // Start the heightmap generator - OLD
+    // ------------------------------
+    /*
+
+    // NW corner
+    getByLoc(0, 0)->setHeight(Random::getSingleton().getRand(5, 10));
+
+    // NE corner
+    getByLoc(iDimensions, 0)->setHeight(Random::getSingleton().getRand(5, 10));
+
+    // SE corner
+    getByLoc(iDimensions, iDimensions)->setHeight(Random::getSingleton().getRand(5, 10));
+
+    // SW corner
+    getByLoc(0, iDimensions)->setHeight(Random::getSingleton().getRand(5, 10));
+
+    // ToDo: Enable multithreading. This may require a small amount of hard coding.
+    // The easiest way to do this is to essentially copy all that is in the genQuadrant function, and when calling
+    // the next set of functions, assign a seperate thread for each of the four functions.
+    genQuadrant(0, 0, iDimensions, iDimensions, 1, iQuadrants);*/
+
+    // FinalX is the far right x point, in terms of a pointer.
+    int iFinalX = (iDimensions - 1)*iDimensions;
+
+    // NW corner
+    *pHMBlocks = Random::getSingleton().getRand(5, 10);
+
+    // NE corner
+    *(pHMBlocks + iFinalX) = Random::getSingleton().getRand(5, 10);
+
+    // SE corner
+    *(pHMBlocks + iFinalX + iDimensions - 1) = Random::getSingleton().getRand(5, 10);
+
+    // SW corner
+    *(pHMBlocks + iDimensions - 1) = Random::getSingleton().getRand(5, 10);
+
+    genQuadrant(0, 0, iFinalX, iDimensions - 1, 1, iQuadrants);
+
+    // -----------------------
+    // Set up the return value
+    // -----------------------
+
+    // A heightmap requires values ranging from 0 and 1. For now, everything is rated in proportion to the largest height
+    // in the vector, so the highest point will be 1 and the lowest point will be 0
+    // Step 1 = Get the largest and smallest height
+    short signed int iMaxHeight;
+    short signed int iMinHeight;
+
+    // Setting a default iMaxHeight and iMinHeight to the northwest corner
+    iMaxHeight = *pHMBlocks;
+    iMinHeight = *pHMBlocks;
+
+    // Go through the blocks and find out what is the highest and what is the lowest block
+    for(short unsigned int i = 0; i < (iDimensions + 1); i++)
+    {
+        if(*(pHMBlocks + i) < iMinHeight)
+            iMinHeight = *(pHMBlocks + i);
+        if(*(pHMBlocks + i) > iMaxHeight)
+            iMaxHeight = *(pHMBlocks + i);
+    }
+
+    // Advised for CPU optimisation
+    short signed int iRelativeMaxHeight = iMaxHeight - iMinHeight;
+
+    // Go through the blocks and scale them relative to the maximum or minimum
+    // The percentage range can be found by first subtracting the miminum from the number
+    // And then dividing that by iRelativeMaxHeight
+    for(short unsigned int i = 0; i < (iDimensions + 1); i++)
+        *(pHMBlocks + i) = (*(pHMBlocks + i) - iMinHeight)/iRelativeMaxHeight;
 }

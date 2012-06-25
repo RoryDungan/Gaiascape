@@ -1,4 +1,5 @@
 #include "Terrain.h"
+#include <math.h> // Needed only temporarily so that dimensions can be calculated without going through the heightmap generator
 
 Terrain::Terrain(Ogre::SceneManager* sceneManager, Ogre::Light* light)
 {
@@ -85,14 +86,21 @@ void Terrain::generateTerrain()
     // The reason why this looks weird is that all HMgen classes must start with what they are calculating,
     // in this case, a HM.
     HeightMapGen HMHMgen(0.0f, iTerrainSize);
+    // Set the array to be filled with zeroes, and be flat.
+    // Set up the dimensions of the array
+    short unsigned int iDimensions = pow(4.0, iTerrainSize * 0.5) + 1;
+    float array[iDimensions][iDimensions];
+    for(short unsigned int x = 0; x < iDimensions - 1; x++)
+        for(short unsigned int y = 0; y < iDimensions - 1; y++)
+            array[x][y] = 0;
+    HMHMgen.retrieveHeightmap(1, iTerrainSize, &array[0][0]); // Talos is set to something random for a defualt until erosion is added
 
-    std::cout << "HMHMgen.retrieveDimensions(): " << HMHMgen.retrieveDimensions() << std::endl;
+    // std::cout << "HMHMgen.retrieveDimensions(): " << HMHMgen.retrieveDimensions() << std::endl;
 
-    // Convert the array of TerrainBlocks to an array of floats
-    float array[HMHMgen.retrieveDimensions()][HMHMgen.retrieveDimensions()];
-    for(short unsigned int x; x <= HMHMgen.retrieveDimensions(); x++)
-        for(short unsigned int y; y <= HMHMgen.retrieveDimensions(); y++)
-            array[x][y] = HMHMgen.getByLoc(x, y)->getHeight();
+    // How generating the terrain will work
+    //  Because we cannot conveniently return an array, instead the array is created here.
+    //  We then pass a pointer of that array to the function which generates the terrain
+    //
 
     // construct terrain group
     mTerrainGroup = new Ogre::TerrainGroup(mSceneManager, Ogre::Terrain::ALIGN_X_Z, HMHMgen.retrieveDimensions(), 12000.0f);
@@ -116,10 +124,10 @@ void Terrain::generateTerrain()
     Ogre::Terrain::ImportData& defaultimp = mTerrainGroup->getDefaultImportSettings();
     defaultimp.terrainSize = HMHMgen.retrieveDimensions();
     defaultimp.worldSize = 12000.0f;
-    defaultimp.inputScale = 600; // due terrain.png is 8bpp
+    defaultimp.inputScale = 10; // due terrain.png is 8bpp
     defaultimp.minBatchSize = 33;
     defaultimp.maxBatchSize = 65;
-    //defaultimp.inputFloat = &array[0][0];
+    defaultimp.inputFloat = &array[0][0];
 
     // Add textures
     defaultimp.layerList.resize(3);
@@ -133,13 +141,13 @@ void Terrain::generateTerrain()
     defaultimp.layerList[2].textureNames.push_back("growth_weirdfungus-03_diffusespecular.dds");
     defaultimp.layerList[2].textureNames.push_back("growth_weirdfungus-03_normalheight.dds");
 
-    float* ptr = &array[0][0];
+    //float* ptr = &array[0][0];
 
     // define our terrains and instruct the TerrainGroup to load them all
     for(long x = 0; x <= 0; ++x)
         for(long y = 0; y <= 0; ++y)
         {
-            mTerrainGroup->defineTerrain(x, y, ptr);
+            mTerrainGroup->defineTerrain(x, y, &array[0][0]);
             mTerrainsImported = true;
         }
 

@@ -9,18 +9,19 @@ class HeightMapGen
 {
     public:
         HeightMapGen(float talos, unsigned int size);
-        std::vector<HMBlock*> retrieveBlocks();
+        // std::vector<HMBlock*> retrieveBlocks();
 
-        HMBlock* getByID(short unsigned int ID);
-        HMBlock* getByLoc(short unsigned int x, short unsigned int y);
+        // Not necessary since we don't even use HMBlock anymore
+        /*HMBlock* getByID(short unsigned int ID);
+        HMBlock* getByLoc(short unsigned int x, short unsigned int y);*/
 
         short unsigned int retrieveDimensions();
-        float retrieveHeightmap();
+        void retrieveHeightmap(float talos, unsigned int size, float *heightmapArray);
     private:
         void genQuadrant(int xNW, int yNW, int xSE, int ySE, int iteration, int quadrant);
         void erode(short int c);
 
-        std::vector<HMBlock*> HMBlocks;
+        float* pHMBlocks;
 
         short unsigned int iNumberOfBlocks;
         short unsigned int iDimensions;
