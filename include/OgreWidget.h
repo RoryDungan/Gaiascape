@@ -30,6 +30,7 @@ public:
     {
         if(mTerrain) delete mTerrain;
         mOgreRoot->shutdown();
+        delete mOgreRoot;
         destroy();
     }
 

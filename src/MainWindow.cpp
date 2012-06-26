@@ -38,15 +38,15 @@ MainWindow::MainWindow(QWidget *parent) :
     mToolGroup->addAction(ui->actionIntrude);
 
     // set up timer to get the Ogre widget to render at 60fps
-    QTimer* timer = new QTimer(this);
-    connect(timer, SIGNAL(timeout()), mOgreWidget, SLOT(updateGL()));
-    timer->start(1000.0f/60.0f);
+    mRenderTimer = new QTimer(this);
+    connect(mRenderTimer, SIGNAL(timeout()), mOgreWidget, SLOT(updateGL()));
+    mRenderTimer->start(1000.0f/60.0f);
 }
 
 MainWindow::~MainWindow()
 {
-    delete mOgreWidget;
     delete mRenderTimer;
+    delete mOgreWidget;
     delete mToolGroup;
     delete ui;
 }
