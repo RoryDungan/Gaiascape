@@ -8,19 +8,21 @@ Terrain::Terrain(Ogre::SceneManager* sceneManager, Ogre::Light* light)
 
     mSceneManager = sceneManager;
     mSun = light;
-    mTerrainGlobals = new Ogre::TerrainGlobalOptions();
+    //mTerrainGlobals = new Ogre::TerrainGlobalOptions();
 
     createFlatTerrain();
 }
 
 Terrain::~Terrain()
 {
-    delete mTerrainGroup;
-    delete mTerrainGlobals;
+    if(mTerrainGroup)   delete mTerrainGroup;
+    if(mTerrainGlobals) delete mTerrainGlobals;
 }
 
 void Terrain::createFlatTerrain()
 {
+    mTerrainGlobals = new Ogre::TerrainGlobalOptions();
+
     // construct terrain group
     mTerrainGroup = new Ogre::TerrainGroup(mSceneManager, Ogre::Terrain::ALIGN_X_Z, 513, 12000.0f);
     mTerrainGroup->setFilenameConvention(Ogre::String("Terrain"), Ogre::String("dat"));
@@ -50,6 +52,8 @@ void Terrain::createFlatTerrain()
 
 void Terrain::loadHeightmap()
 {
+    mTerrainGlobals = new Ogre::TerrainGlobalOptions();
+
     // construct terrain group
     mTerrainGroup = new Ogre::TerrainGroup(mSceneManager, Ogre::Terrain::ALIGN_X_Z, 513, 12000.0f);
     mTerrainGroup->setFilenameConvention(Ogre::String("Terrain"), Ogre::String("dat"));
@@ -66,7 +70,7 @@ void Terrain::loadHeightmap()
     mTerrainGroup->loadAllTerrains(true);
 
     // Now, if we just imported our terrains, we would like our blendmaps to be calculated:
-    /*if(mTerrainsImported)
+    if(mTerrainsImported)
     {
         Ogre::TerrainGroup::TerrainIterator ti = mTerrainGroup->getTerrainIterator();
         while(ti.hasMoreElements())
@@ -74,7 +78,7 @@ void Terrain::loadHeightmap()
             Ogre::Terrain* t = ti.getNext()->instance;
             initBlendMaps(t);
         }
-    }*/
+    }
 
     // Now, all there is left to do is clean up after the initial terrain creation:
     mTerrainGroup->freeTemporaryResources();
@@ -82,6 +86,8 @@ void Terrain::loadHeightmap()
 
 void Terrain::generateTerrain()
 {
+    mTerrainGlobals = new Ogre::TerrainGlobalOptions();
+
     // Firstly, generate the terrain data we're going to be working with
     // The reason why this looks weird is that all HMgen classes must start with what they are calculating,
     // in this case, a HM.
@@ -104,7 +110,7 @@ void Terrain::generateTerrain()
 
     // construct terrain group
     mTerrainGroup = new Ogre::TerrainGroup(mSceneManager, Ogre::Terrain::ALIGN_X_Z, HMHMgen.retrieveDimensions(), 12000.0f);
-    mTerrainGroup->setFilenameConvention(Ogre::String("Terrain"), Ogre::String("dat"));
+    //mTerrainGroup->setFilenameConvention(Ogre::String("Terrain"), Ogre::String("dat"));
     mTerrainGroup->setOrigin(Ogre::Vector3::ZERO);
 
     //configureTerrainDefaults(mSun);
@@ -124,7 +130,7 @@ void Terrain::generateTerrain()
     Ogre::Terrain::ImportData& defaultimp = mTerrainGroup->getDefaultImportSettings();
     defaultimp.terrainSize = HMHMgen.retrieveDimensions();
     defaultimp.worldSize = 12000.0f;
-    defaultimp.inputScale = 10; // due terrain.png is 8bpp
+    defaultimp.inputScale = 10;
     defaultimp.minBatchSize = 33;
     defaultimp.maxBatchSize = 65;
     defaultimp.inputFloat = &array[0][0];
@@ -141,7 +147,13 @@ void Terrain::generateTerrain()
     defaultimp.layerList[2].textureNames.push_back("growth_weirdfungus-03_diffusespecular.dds");
     defaultimp.layerList[2].textureNames.push_back("growth_weirdfungus-03_normalheight.dds");
 
-    //float* ptr = &array[0][0];
+    for(int y = 0; y < HMHMgen.retrieveDimensions(); y++)
+    {
+        for(int x = 0; x < HMHMgen.retrieveDimensions(); x++)
+            std::cout << array[x][y] << ' ';
+        std::cout << std::endl;
+    }
+    std::cout << std::endl;
 
     // define our terrains and instruct the TerrainGroup to load them all
     for(long x = 0; x <= 0; ++x)
@@ -174,6 +186,7 @@ void Terrain::clearTerrain()
     // delete all terrain data
     //mTerrainGroup->removeAllTerrains();
     delete mTerrainGroup;
+    delete mTerrainGlobals;
 }
 
 void Terrain::defineTerrainFromFile(long x, long y)

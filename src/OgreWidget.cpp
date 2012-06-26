@@ -42,6 +42,8 @@ void THIS::init( std::string plugins_file,
     mOgreRoot->saveConfig();
     mOgreRoot->initialise(false); // don't create a window
 
+    mCameraMovement = Ogre::Vector3(0.0f, 0.0f, 0.0f);
+
     // Set up resources
     Ogre::ConfigFile cf;
     cf.load(resources_file);
@@ -214,12 +216,17 @@ void THIS::mousePressEvent(QMouseEvent * event)
             case IM_EXTRUDE:
                 currentState = IS_EXTRUDING;
                 qDebug() << "IS_EXTRUDING";
+                break;
             case IM_INTRUDE:
                 currentState = IS_EXTRUDING;
+                break;
             case IM_PAINT:
                 currentState = IS_PAINTING;
+                break;
             case IM_PLACEOBJ:
                 currentState = IS_PLACING_OBJECTS;
+                break;
+            default: break;
             }
         break;
     case Qt::RightButton:
@@ -295,7 +302,7 @@ void THIS::setupScene()
     mCamera->lookAt(Ogre::Vector3(1963, 50, 1660));
 
     // Set up skybox
-    //mSceneMgr->setSkyBox(true, "irrSky"); For some reason this crashes, I have no idea why. - Rory
+    //mSceneMgr->setSkyBox(true, "irrSky"); //For some reason this crashes, I have no idea why. - Rory
 
     // Set up light
     Ogre::Vector3 lightdir(0.55, -0.3, 0.75);
@@ -349,6 +356,9 @@ void THIS::paintGL()
         }
     }
 
+    // Update camera
+    mCamera->moveRelative(mCameraMovement);
+
     assert( mOgreWindow );
     mOgreRoot->renderOneFrame();
 }
@@ -396,4 +406,17 @@ void THIS::saveScreenshotToFile(QString filename)
 
     // Now save the contents
     renderTexture->writeContentsToFile(filename.toStdString());
+}
+
+/**
+ * @brief Camera movement with the keyboard
+ * @author Rory Dungan
+ */
+void THIS::setCameraMovementDirection(bool forward, bool back, bool left, bool right, bool up, bool down, bool sprint)
+{
+    float movementSpeed = sprint ? -10.0f : -5.0f;
+
+    mCameraMovement = Ogre::Vector3((left ? movementSpeed : 0.0f) - (right ? movementSpeed : 0.0f),
+                                    (up ? movementSpeed : 0.0f) - (down ? movementSpeed : 0.0f),
+                                    (forward ? movementSpeed : 0.0f) - (back ? movementSpeed : 0.0f));
 }

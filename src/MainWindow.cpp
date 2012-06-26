@@ -8,6 +8,15 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
+    // init variables
+    bWPressed = false;
+    bAPressed = false;
+    bSPressed = false;
+    bDPressed = false;
+    bQPressed = false;
+    bEPressed = false;
+    bShiftPressed = false;
+
     ui->setupUi(this);
     mOgreWidget = new OgreWidget;
     setCentralWidget(mOgreWidget);
@@ -49,9 +58,31 @@ void MainWindow::keyPressEvent(QKeyEvent * event)
     case Qt::Key_Control:
         mOgreWidget->bCtrlPressed = true;
         break;
+    case Qt::Key_W:
+        bWPressed = true;
+        break;
+    case Qt::Key_A:
+        bAPressed = true;
+        break;
+    case Qt::Key_S:
+        bSPressed = true;
+        break;
+    case Qt::Key_D:
+        bDPressed = true;
+        break;
+    case Qt::Key_Q:
+        bQPressed = true;
+        break;
+    case Qt::Key_E:
+        bEPressed = true;
+        break;
+    case Qt::Key_Shift:
+        bShiftPressed = true;
+        break;
     default:
         break;
     }
+    mOgreWidget->setCameraMovementDirection(bWPressed, bSPressed, bAPressed, bDPressed, bQPressed, bEPressed, bShiftPressed);
 }
 
 void MainWindow::keyReleaseEvent(QKeyEvent * event)
@@ -61,9 +92,31 @@ void MainWindow::keyReleaseEvent(QKeyEvent * event)
     case Qt::Key_Control:
         mOgreWidget->bCtrlPressed = false;
         break;
+    case Qt::Key_W:
+        bWPressed = false;
+        break;
+    case Qt::Key_A:
+        bAPressed = false;
+        break;
+    case Qt::Key_S:
+        bSPressed = false;
+        break;
+    case Qt::Key_D:
+        bDPressed = false;
+        break;
+    case Qt::Key_Q:
+        bQPressed = false;
+        break;
+    case Qt::Key_E:
+        bEPressed = false;
+        break;
+    case Qt::Key_Shift:
+        bShiftPressed = false;
+        break;
     default:
         break;
     }
+    mOgreWidget->setCameraMovementDirection(bWPressed, bSPressed, bAPressed, bDPressed, bQPressed, bEPressed, bShiftPressed);
 }
 
 // Slots

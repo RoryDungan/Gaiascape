@@ -30,11 +30,14 @@ public:
     {
         if(mTerrain) delete mTerrain;
         mOgreRoot->shutdown();
-        if(mOgreRoot) delete mOgreRoot;
         destroy();
     }
 
     void setupScene();
+
+    // Camera movement with the keyboard
+    void setCameraMovementDirection(bool forward, bool back, bool left, bool right, bool up, bool down, bool sprint);
+    Ogre::Vector3 mCameraMovement;
 
     // Ogre::Real is actually just a typedef of float so it's ok to assign it as one
     void setBrushSize(float size) { mBrushSize = size; }

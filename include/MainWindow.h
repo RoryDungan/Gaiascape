@@ -23,6 +23,14 @@ private:
     QTimer* mRenderTimer;
     QActionGroup* mToolGroup;
 
+    bool bWPressed;
+    bool bAPressed;
+    bool bSPressed;
+    bool bDPressed;
+    bool bQPressed;
+    bool bEPressed;
+    bool bShiftPressed;
+
     virtual void keyPressEvent(QKeyEvent *);
     virtual void keyReleaseEvent(QKeyEvent *);
 

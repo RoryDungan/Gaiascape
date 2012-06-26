@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'MainWindow.ui'
 **
-** Created: Mon 25. Jun 12:10:05 2012
+** Created: Tue 26. Jun 12:32:14 2012
 **      by: Qt User Interface Compiler version 4.8.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -345,7 +345,7 @@ public:
 
     void retranslateUi(QMainWindow *MainWindow)
     {
-        MainWindow->setWindowTitle(QApplication::translate("MainWindow", "Terrain Editor", 0, QApplication::UnicodeUTF8));
+        MainWindow->setWindowTitle(QApplication::translate("MainWindow", "Gaiascape", 0, QApplication::UnicodeUTF8));
         action_New->setText(QApplication::translate("MainWindow", "&New...", 0, QApplication::UnicodeUTF8));
         action_New->setShortcut(QApplication::translate("MainWindow", "Ctrl+N", 0, QApplication::UnicodeUTF8));
         action_Open->setText(QApplication::translate("MainWindow", "&Open...", 0, QApplication::UnicodeUTF8));
@@ -385,7 +385,7 @@ public:
         label_2->setText(QApplication::translate("MainWindow", "Number of hills", 0, QApplication::UnicodeUTF8));
         label_3->setText(QApplication::translate("MainWindow", "Hill size", 0, QApplication::UnicodeUTF8));
         label_4->setText(QApplication::translate("MainWindow", "Hill height", 0, QApplication::UnicodeUTF8));
-        label_5->setText(QApplication::translate("MainWindow", "Varience", 0, QApplication::UnicodeUTF8));
+        label_5->setText(QApplication::translate("MainWindow", "Variance", 0, QApplication::UnicodeUTF8));
         generateTerrain->setText(QApplication::translate("MainWindow", "Generate new terrain", 0, QApplication::UnicodeUTF8));
         loadTerrain->setText(QApplication::translate("MainWindow", "Load terrain from file", 0, QApplication::UnicodeUTF8));
         clearTerrain->setText(QApplication::translate("MainWindow", "Clear terrain", 0, QApplication::UnicodeUTF8));
