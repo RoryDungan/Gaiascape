@@ -52,21 +52,22 @@ void HeightMapGen::genQuadrant(int xNW, int yNW, int xSE, int ySE, int iteration
     *(pHMBlocks + iHalfRelativeX + iHalfRelativeY) = (*(pHMBlocks + xNW + yNW) + *(pHMBlocks + xSE + yNW) + *(pHMBlocks + xSE + ySE) + *(pHMBlocks + xNW + ySE))/4
                                     + Random::getSingleton().getRand(-fStaggerValue/iteration, fStaggerValue/iteration);
 
+    // TODO: Check to make sure these haven't already been assigned, as there would be no point to assigning them again
     // N
-    *(pHMBlocks + iHalfRelativeX + yNW) = (*(pHMBlocks + xNW + yNW) + *(pHMBlocks + xSE + yNW) + *(pHMBlocks + iHalfRelativeX + iHalfRelativeY))/3
-                                    + Random::getSingleton().getRand(-fStaggerValue/iteration, fStaggerValue/iteration);
+    *(pHMBlocks + iHalfRelativeX + yNW) = (*(pHMBlocks + xNW + yNW) + *(pHMBlocks + xSE + yNW))/2;
+                                        //+ Random::getSingleton().getRand(-fStaggerValue/iteration, fStaggerValue/iteration);
 
     // E
-    *(pHMBlocks + xSE + iHalfRelativeY) = (*(pHMBlocks + xSE + yNW) + *(pHMBlocks + xSE + ySE) + *(pHMBlocks + iHalfRelativeX + iHalfRelativeY))/3
-                                    + Random::getSingleton().getRand(-fStaggerValue/iteration, fStaggerValue/iteration);
+    *(pHMBlocks + xSE + iHalfRelativeY) = (*(pHMBlocks + xSE + yNW) + *(pHMBlocks + xSE + ySE))/2;
+                                        //+ Random::getSingleton().getRand(-fStaggerValue/iteration, fStaggerValue/iteration);
 
     // S
-    *(pHMBlocks + iHalfRelativeX + ySE) = (*(pHMBlocks + xNW + ySE) + *(pHMBlocks + iHalfRelativeX + iHalfRelativeY) + *(pHMBlocks + xSE + ySE))/3
-                                    + Random::getSingleton().getRand(-fStaggerValue/iteration, fStaggerValue/iteration);
+    *(pHMBlocks + iHalfRelativeX + ySE) = (*(pHMBlocks + xNW + ySE) + *(pHMBlocks + xSE + ySE))/2;
+                                        //+ Random::getSingleton().getRand(-fStaggerValue/iteration, fStaggerValue/iteration);
 
     // W
-    *(pHMBlocks + xNW + iHalfRelativeY) = (*(pHMBlocks + xNW + yNW) + *(pHMBlocks + xNW + ySE) + *(pHMBlocks + iHalfRelativeX + iHalfRelativeY))/3
-                                    + Random::getSingleton().getRand(-fStaggerValue/iteration, fStaggerValue/iteration);
+    *(pHMBlocks + xNW + iHalfRelativeY) = (*(pHMBlocks + xNW + yNW) + *(pHMBlocks + xNW + ySE))/2;
+                                        //+ Random::getSingleton().getRand(-fStaggerValue/iteration, fStaggerValue/iteration);
 
     if (quadrant != 1)
     {
@@ -75,18 +76,20 @@ void HeightMapGen::genQuadrant(int xNW, int yNW, int xSE, int ySE, int iteration
         // quadrant.
         // Essentially, you simply repeat the process found here in which you find the midpoints by using the midpoints
         // generated here as the corners in the next call of this function.
+        // Increase iteration for the new set of quadrants
+        iteration = iteration*2;
 
         // NW
-        genQuadrant(xNW, yNW, iHalfRelativeX, iHalfRelativeY, iteration + 1, quadrant - 1);
+        genQuadrant(xNW, yNW, iHalfRelativeX, iHalfRelativeY, iteration, quadrant - 1);
 
         // NE
-        genQuadrant(iHalfRelativeX, yNW, xSE, iHalfRelativeY, iteration + 1, quadrant - 1);
+        genQuadrant(iHalfRelativeX, yNW, xSE, iHalfRelativeY, iteration, quadrant - 1);
 
         // SE
-        genQuadrant(iHalfRelativeX , iHalfRelativeY, xSE, ySE, iteration + 1, quadrant - 1);
+        genQuadrant(iHalfRelativeX , iHalfRelativeY, xSE, ySE, iteration, quadrant - 1);
 
         // SW
-        genQuadrant(xNW, iHalfRelativeY, iHalfRelativeX, ySE, iteration + 1, quadrant - 1);
+        genQuadrant(xNW, iHalfRelativeY, iHalfRelativeX, ySE, iteration, quadrant - 1);
     }
 }
 
@@ -128,7 +131,7 @@ void HeightMapGen::retrieveHeightmap(float talos, unsigned int size, float* heig
     // Or in other terms, the number of subdivisions.
     // iQuadrants = 1 will have 9 vertices, iQuadrants = 2 will have 25 vertices [I THINK]
     iQuadrants = size;
-    fStaggerValue = iNumberOfBlocks / 20;
+    fStaggerValue = iNumberOfBlocks*255;
 
     pHMBlocks = heightmapArray;
 
@@ -186,7 +189,7 @@ void HeightMapGen::retrieveHeightmap(float talos, unsigned int size, float* heig
     for(long unsigned int i = 0; i <= iFinalX + iDimensions - 1; i++)
     {
         // Scale it up to the point we want (by making it between 0 and 1 and then multiplying it by the range we want
-        *(pHMBlocks + i) = ((*(pHMBlocks + i) - iMinHeight)/iRelativeMaxHeight)*1;
+        *(pHMBlocks + i) = ((*(pHMBlocks + i) - iMinHeight)/iRelativeMaxHeight)*255;
     }
 
     QByteArray data((const char*)(iFinalX + iDimensions - 1));

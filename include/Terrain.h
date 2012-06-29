@@ -4,6 +4,7 @@
 #include <OGRE/Ogre.h>
 #include <OGRE/Terrain/OgreTerrain.h>
 #include <OGRE/Terrain/OgreTerrainGroup.h>
+#include <OGRE/OgreImage.h>
 
 #include <algorithms/HeightMapGen.h>
 

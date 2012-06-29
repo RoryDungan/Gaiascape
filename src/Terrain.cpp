@@ -95,26 +95,36 @@ void Terrain::generateTerrain()
     // Set the array to be filled with zeroes, and be flat.
     // Set up the dimensions of the array
     short unsigned int iDimensions = pow(4.0, iTerrainSize * 0.5) + 1;
-    float array[iDimensions][iDimensions];
-    for(short unsigned int x = 0; x < iDimensions - 1; x++)
-        for(short unsigned int y = 0; y < iDimensions - 1; y++)
-            array[x][y] = 0;
-    HMHMgen.retrieveHeightmap(1, iTerrainSize, &array[0][0]); // Talos is set to something random for a defualt until erosion is added
+    float array[iDimensions*iDimensions];
+    for(long unsigned int i = 0; i < iDimensions*iDimensions; i++)
+        array[i] = 0;
 
-    // std::cout << "HMHMgen.retrieveDimensions(): " << HMHMgen.retrieveDimensions() << std::endl;
+    HMHMgen.retrieveHeightmap(1, iTerrainSize, &array[0]); // Talos is set to something random for a defualt until erosion is added
+
+    Ogre::uchar stream[iDimensions*iDimensions];
+    long unsigned int iFinalX = (iDimensions - 1)*iDimensions;
+    float* pArray = &array[0];
+    for(long unsigned int i = 0; i < iFinalX + iDimensions - 1; ++i)
+    {
+        stream[i] = (Ogre::uchar)*(pArray + i); // Probably just put in the above if statement if it works
+        // ::cout << "pArray + " << i << " = " << (Ogre::uchar)*(pArray + i) << "\n";
+    }
+    Ogre::uchar* pStream = &stream[0];
+
+    Ogre::Image img;
+    img.loadDynamicImage(pStream, iDimensions, iDimensions, Ogre::PF_L8); // PF_L8 = 8-pit pixel format, all luminance
+    img.save("map.bmp");
 
     // How generating the terrain will work
     //  Because we cannot conveniently return an array, instead the array is created here.
     //  We then pass a pointer of that array to the function which generates the terrain
-    //
 
     // construct terrain group
-    mTerrainGroup = new Ogre::TerrainGroup(mSceneManager, Ogre::Terrain::ALIGN_X_Z, HMHMgen.retrieveDimensions(), 12000.0f);
+    mTerrainGroup = new Ogre::TerrainGroup(mSceneManager, Ogre::Terrain::ALIGN_X_Z, iDimensions, 12000.0f);
     //mTerrainGroup->setFilenameConvention(Ogre::String("Terrain"), Ogre::String("dat"));
     mTerrainGroup->setOrigin(Ogre::Vector3::ZERO);
 
-    //configureTerrainDefaults(mSun);
-
+    configureTerrainDefaults(mSun);
 
     // Configure global
     mTerrainGlobals->setMaxPixelError(8);
@@ -128,12 +138,12 @@ void Terrain::generateTerrain()
 
     // Configure default import settings for if we use imported image
     Ogre::Terrain::ImportData& defaultimp = mTerrainGroup->getDefaultImportSettings();
-    defaultimp.terrainSize = HMHMgen.retrieveDimensions();
+    defaultimp.terrainSize = iDimensions;
     defaultimp.worldSize = 12000.0f;
-    defaultimp.inputScale = 10;
-    defaultimp.minBatchSize = 33;
-    defaultimp.maxBatchSize = 65;
-    defaultimp.inputFloat = &array[0][0];
+    defaultimp.inputScale = 1800;
+    defaultimp.minBatchSize = 129;
+    defaultimp.maxBatchSize = 129;
+    // defaultimp.inputFloat = &array[0];
 
     // Add textures
     defaultimp.layerList.resize(3);
@@ -147,19 +157,11 @@ void Terrain::generateTerrain()
     defaultimp.layerList[2].textureNames.push_back("growth_weirdfungus-03_diffusespecular.dds");
     defaultimp.layerList[2].textureNames.push_back("growth_weirdfungus-03_normalheight.dds");
 
-    for(int y = 0; y < HMHMgen.retrieveDimensions(); y++)
-    {
-        for(int x = 0; x < HMHMgen.retrieveDimensions(); x++)
-            std::cout << array[x][y] << ' ';
-        std::cout << std::endl;
-    }
-    std::cout << std::endl;
-
     // define our terrains and instruct the TerrainGroup to load them all
     for(long x = 0; x <= 0; ++x)
         for(long y = 0; y <= 0; ++y)
         {
-            mTerrainGroup->defineTerrain(x, y, &array[0][0]);
+            mTerrainGroup->defineTerrain(x, y, &img);
             mTerrainsImported = true;
         }
 
