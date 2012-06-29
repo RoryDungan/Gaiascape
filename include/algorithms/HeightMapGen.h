@@ -2,7 +2,7 @@
 #define HEIGHTMAPGEN_H
 
 #include <vector>
-#include "algorithms/random.h"
+#include "random.h"
 #include "HMBlock.h"
 
 class HeightMapGen
@@ -20,6 +20,7 @@ class HeightMapGen
     private:
         void genQuadrant(int xNW, int yNW, int xSE, int ySE, int iteration, int quadrant);
         void erode(short int c);
+        void writeMap();
 
         float* pHMBlocks;
 
@@ -29,6 +30,7 @@ class HeightMapGen
 
         float fStaggerValue;
         float fTalos; // Maximum angle a slope may have
+
 };
 
 #endif // HEIGHTMAPGEN_H

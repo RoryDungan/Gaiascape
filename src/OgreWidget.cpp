@@ -414,7 +414,7 @@ void THIS::saveScreenshotToFile(QString filename)
  */
 void THIS::setCameraMovementDirection(bool forward, bool back, bool left, bool right, bool up, bool down, bool sprint)
 {
-    float movementSpeed = sprint ? -10.0f : -5.0f;
+    float movementSpeed = sprint ? -30.0f : -15.0f;
 
     mCameraMovement = Ogre::Vector3((left ? movementSpeed : 0.0f) - (right ? movementSpeed : 0.0f),
                                     (up ? movementSpeed : 0.0f) - (down ? movementSpeed : 0.0f),
