@@ -106,7 +106,7 @@ void Terrain::generateTerrain()
     float* pArray = &array[0];
     for(long unsigned int i = 0; i < iFinalX + iDimensions - 1; ++i)
     {
-        stream[i] = (Ogre::uchar)*(pArray + i); // Probably just put in the above if statement if it works
+        stream[i] = (Ogre::uchar)(*(pArray + i)*255); // Probably just put in the above if statement if it works
         // ::cout << "pArray + " << i << " = " << (Ogre::uchar)*(pArray + i) << "\n";
     }
     Ogre::uchar* pStream = &stream[0];
