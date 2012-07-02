@@ -272,7 +272,7 @@ void THIS::mouseMoveEvent(QMouseEvent * event)
         updateGL();
         break;
     case IS_MOVING_CAMERA:
-        mCamera->moveRelative(Ogre::Vector3(dx-dx*2, dy, 0)); // dx movement is inverted
+        mCamera->moveRelative(Ogre::Vector3(-dx, dy, 0)); // dx movement is inverted
         updateGL();
         break;
     default:
@@ -329,10 +329,11 @@ void THIS::paintGL()
     // If the current state is a state in which the user is interacting with the terrain via the mouse
     if(currentState == IS_EXTRUDING || currentState == IS_INTRUDING || currentState == IS_PAINTING || currentState == IS_PLACING_OBJECTS)
     {
-        qDebug() << mLastCursorPos.x()- mCamera->getViewport()->getActualWidth()/2 << " " << mLastCursorPos.y() - mCamera->getViewport()->getActualHeight()/2;
+        qDebug() << mLastCursorPos.x() << " " << mLastCursorPos.y();
         // Get the 3d point that the cursor is over
         // fire ray
-        Ogre::Ray ray = mCamera->getCameraToViewportRay(Ogre::Real(mLastCursorPos.x() - mCamera->getViewport()->getActualWidth()/2), Ogre::Real(mLastCursorPos.y() - mCamera->getViewport()->getActualHeight()/2));
+        //Ogre::Ray ray = mCamera->getCameraToViewportRay(Ogre::Real(mLastCursorPos.x() - mCamera->getViewport()->getActualWidth()/2), Ogre::Real(mLastCursorPos.y() - mCamera->getViewport()->getActualHeight()/2));
+        Ogre::Ray ray = mCamera->getCameraToViewportRay(Ogre::Real(mLastCursorPos.x()), Ogre::Real(mLastCursorPos.y()));
 
         Ogre::TerrainGroup::RayResult rayResult = mTerrain->getTerrainGroup()->rayIntersects(ray);
         if(rayResult.hit) // Ray hit the terrain
@@ -354,6 +355,20 @@ void THIS::paintGL()
                 break;
             }
         }
+    }
+
+    // Notify of texture update
+    if (mTerrain->getTerrainGroup()->isDerivedDataUpdateInProgress())
+    {
+        if(updatingTextures == false)
+            emit textureUpdateInProgress();
+        updatingTextures = true;
+    }
+    else
+    {
+        if(updatingTextures == true)
+            emit textureUpdateFinished();
+        updatingTextures = false;
     }
 
     // Update camera
@@ -390,6 +405,10 @@ Ogre::RenderSystem* THIS::chooseRenderer( Ogre::RenderSystemList *renderers )
  */
 void THIS::saveScreenshotToFile(QString filename)
 {
+    // Cancel if there is no filename to write to
+    if(filename == 0)
+        return;
+
     // Render to texture.
     // Note that we can't just use mOgreWindow->writeContentsToFile() since that just takes whatever is onscreen
     // at the time on the area Ogre is rendering to, so if part of the render window is obscured by another window

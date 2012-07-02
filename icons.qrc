@@ -25,5 +25,18 @@
         <file>media/cursor-select-1.png</file>
         <file>media/16x16/camera-photo.png</file>
         <file>media/24x24/camera-photo.png</file>
+        <file>media/16x16/image.png</file>
+        <file>media/24x24/document-properties.png</file>
+        <file>media/24x24/view-zoom-in.png</file>
+        <file>media/24x24/view-zoom-out.png</file>
+        <file>media/24x24/view-zoom-reset.png</file>
+        <file>media/16x16/dice-random.png</file>
+        <file>media/16x16/help-browser.png</file>
+        <file>media/22x22/document-new.png</file>
+        <file>media/22x22/document-open.png</file>
+        <file>media/22x22/process-stop.png</file>
+        <file>media/16x16/preferences-system.png</file>
+        <file>media/16x16/edit-clear.png</file>
+        <file>media/16x16/view-refresh.png</file>
     </qresource>
 </RCC>

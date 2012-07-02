@@ -19,6 +19,12 @@ public:
     void loadHeightmap();
     void generateTerrain();
 
+    enum textureCatagory { TEX_GRASS, TEX_DIRT, TEX_ROCK, TEX_GENERIC };
+    enum textureType { TT_NORMALMAP, TT_DIFFUSE };
+
+    void setTexture(textureType texType, textureCatagory texCat, std::string filepath);
+    void setTexturePlacementHeight(textureCatagory texCat, int newHeight);
+
     void clearTerrain();
 
 private:

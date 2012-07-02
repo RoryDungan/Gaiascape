@@ -13,7 +13,8 @@
 
 class OgreWidget : public QGLWidget
 {
-//Q_OBJECT;
+    Q_OBJECT
+
 public:
     OgreWidget( QWidget *parent=0 ):
     QGLWidget( parent ),
@@ -61,6 +62,11 @@ public:
     void saveScreenshotToFile(QString filename);
 
     bool bCtrlPressed;
+
+signals:
+    void textureUpdateInProgress();
+    void textureUpdateFinished();
+
 protected:
     virtual void initializeGL();
     virtual void resizeGL( int, int );
@@ -101,6 +107,8 @@ private:
 
     // Stores the last position of the cursor
     QPoint mLastCursorPos;
+
+    bool updatingTextures;
 };
 
 #endif // OGREWIDGET_H

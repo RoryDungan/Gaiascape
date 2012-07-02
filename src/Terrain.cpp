@@ -201,7 +201,7 @@ void Terrain::defineTerrainFromFile(long x, long y)
     {
         // get terrain image
         Ogre::Image img;
-        img.load("terrain.png", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+        img.load("terrain1.png", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
         if(x % 2 != 0)
             img.flipAroundY();
         if(y % 2 != 0)
@@ -277,9 +277,20 @@ void Terrain::configureTerrainDefaults(Ogre::Light *light)
     defaultimp.layerList[2].worldSize = 200;
     defaultimp.layerList[2].textureNames.push_back("growth_weirdfungus-03_diffusespecular.dds");
     defaultimp.layerList[2].textureNames.push_back("growth_weirdfungus-03_normalheight.dds");
+    //defaultimp.layerList[2].textureNames.push_back("grass-01_diffusespecular.png");
 }
 
 void Terrain::configureTextures(Ogre::Terrain::LayerInstanceList& layerList)
 {
 
+}
+
+void Terrain::setTexture(textureType newTexture, textureCatagory texCat, std::string filepath)
+{
+    // Change one of the textures
+}
+
+void Terrain::setTexturePlacementHeight(textureCatagory texCat, int newHeight)
+{
+    // Recalculate blendmaps, changing the placement height for one texture
 }

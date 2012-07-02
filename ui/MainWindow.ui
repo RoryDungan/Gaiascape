@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
-    <height>600</height>
+    <width>868</width>
+    <height>680</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,7 +19,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>800</width>
+     <width>868</width>
      <height>21</height>
     </rect>
    </property>
@@ -47,7 +47,8 @@
     <property name="title">
      <string>&amp;View</string>
     </property>
-    <addaction name="action_Textured"/>
+    <addaction name="actionShow_heightmap_image"/>
+    <addaction name="separator"/>
     <addaction name="action_Solid"/>
     <addaction name="action_Wireframe"/>
    </widget>
@@ -56,18 +57,35 @@
      <string>Tools</string>
     </property>
     <addaction name="actionTake_screenshot"/>
+    <addaction name="separator"/>
+    <addaction name="actionOptions"/>
+   </widget>
+   <widget class="QMenu" name="menuHelp">
+    <property name="title">
+     <string>Help</string>
+    </property>
+    <addaction name="actionUser_guide"/>
+    <addaction name="separator"/>
+    <addaction name="actionAbout_Gaiascape"/>
    </widget>
    <addaction name="menu_File"/>
    <addaction name="menu_Edit"/>
    <addaction name="menu_View"/>
    <addaction name="menuTools"/>
+   <addaction name="menuHelp"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <property name="windowTitle">
     <string>Home</string>
    </property>
+   <property name="iconSize">
+    <size>
+     <width>24</width>
+     <height>24</height>
+    </size>
+   </property>
    <property name="toolButtonStyle">
-    <enum>Qt::ToolButtonTextUnderIcon</enum>
+    <enum>Qt::ToolButtonTextBesideIcon</enum>
    </property>
    <attribute name="toolBarArea">
     <enum>TopToolBarArea</enum>
@@ -101,131 +119,130 @@
    <addaction name="actionExtrude"/>
    <addaction name="actionIntrude"/>
   </widget>
-  <widget class="QDockWidget" name="terrainDockWidget">
-   <property name="minimumSize">
-    <size>
-     <width>150</width>
-     <height>246</height>
-    </size>
-   </property>
-   <property name="windowTitle">
-    <string>Terrain</string>
-   </property>
-   <attribute name="dockWidgetArea">
-    <number>2</number>
-   </attribute>
-   <widget class="QWidget" name="dockWidgetContents">
-    <layout class="QFormLayout" name="formLayout">
-     <item row="0" column="0">
-      <widget class="QLabel" name="label">
-       <property name="text">
-        <string>Ruggedness</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="1">
-      <widget class="QSlider" name="horizontalSlider">
-       <property name="toolTip">
-        <string>How rugged the terrain will be, ranging from 0 (completely smooth) to 100 (very rugged)</string>
-       </property>
-       <property name="sliderPosition">
-        <number>0</number>
-       </property>
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="0">
-      <widget class="QLabel" name="label_2">
-       <property name="text">
-        <string>Number of hills</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="1">
-      <widget class="QSlider" name="horizontalSlider_2">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="0">
-      <widget class="QLabel" name="label_3">
-       <property name="text">
-        <string>Hill size</string>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="1">
-      <widget class="QSlider" name="horizontalSlider_3">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="0">
-      <widget class="QLabel" name="label_4">
-       <property name="text">
-        <string>Hill height</string>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="1">
-      <widget class="QSlider" name="horizontalSlider_4">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-      </widget>
-     </item>
-     <item row="4" column="0">
-      <widget class="QLabel" name="label_5">
-       <property name="text">
-        <string>Variance</string>
-       </property>
-      </widget>
-     </item>
-     <item row="4" column="1">
-      <widget class="QSlider" name="horizontalSlider_5">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-      </widget>
-     </item>
-     <item row="5" column="0" colspan="2">
-      <widget class="QPushButton" name="generateTerrain">
-       <property name="text">
-        <string>Generate new terrain</string>
-       </property>
-      </widget>
-     </item>
-     <item row="6" column="0" colspan="2">
-      <widget class="QPushButton" name="loadTerrain">
-       <property name="text">
-        <string>Load terrain from file</string>
-       </property>
-      </widget>
-     </item>
-     <item row="7" column="0" colspan="2">
-      <widget class="QPushButton" name="clearTerrain">
-       <property name="text">
-        <string>Clear terrain</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </widget>
-  </widget>
   <widget class="QDockWidget" name="texturesDockWidget">
+   <property name="features">
+    <set>QDockWidget::DockWidgetFloatable|QDockWidget::DockWidgetMovable</set>
+   </property>
    <property name="windowTitle">
     <string>Textures</string>
    </property>
    <attribute name="dockWidgetArea">
     <number>2</number>
    </attribute>
-   <widget class="QWidget" name="dockWidgetContents_2"/>
+   <widget class="QWidget" name="dockWidgetContents_2">
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <property name="spacing">
+      <number>0</number>
+     </property>
+     <property name="margin">
+      <number>0</number>
+     </property>
+     <item>
+      <widget class="QTreeWidget" name="texturesTreeWidget">
+       <property name="alternatingRowColors">
+        <bool>true</bool>
+       </property>
+       <attribute name="headerDefaultSectionSize">
+        <number>100</number>
+       </attribute>
+       <attribute name="headerHighlightSections">
+        <bool>true</bool>
+       </attribute>
+       <column>
+        <property name="text">
+         <string>Property</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>Value</string>
+        </property>
+       </column>
+       <item>
+        <property name="text">
+         <string>Grass</string>
+        </property>
+        <item>
+         <property name="text">
+          <string>Diffuse</string>
+         </property>
+         <property name="text">
+          <string>growth_weirdfungus-03_diffusespecular.dds</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Normal map</string>
+         </property>
+         <property name="text">
+          <string>growth_weirdfungus-03_normalheight.dds</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Placement height</string>
+         </property>
+         <property name="text">
+          <string>200</string>
+         </property>
+        </item>
+       </item>
+       <item>
+        <property name="text">
+         <string>Dirt</string>
+        </property>
+        <item>
+         <property name="text">
+          <string>Diffuse</string>
+         </property>
+         <property name="text">
+          <string>dirt_grayrocky_diffusespecular.dds</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Normal map</string>
+         </property>
+         <property name="text">
+          <string>dirt_grayrocky_normalheight.dds</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Placement height</string>
+         </property>
+         <property name="text">
+          <string>100</string>
+         </property>
+        </item>
+       </item>
+      </widget>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_2">
+       <item>
+        <widget class="QPushButton" name="updateTexturesButton">
+         <property name="text">
+          <string>Update terrain</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="resetTexturesButton">
+         <property name="text">
+          <string>Reset</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </widget>
   </widget>
   <widget class="QDockWidget" name="skyDockWidget">
+   <property name="features">
+    <set>QDockWidget::DockWidgetFloatable|QDockWidget::DockWidgetMovable</set>
+   </property>
    <property name="windowTitle">
     <string>Sky</string>
    </property>
@@ -235,6 +252,9 @@
    <widget class="QWidget" name="dockWidgetContents_3"/>
   </widget>
   <widget class="QDockWidget" name="foliageDockWidget">
+   <property name="features">
+    <set>QDockWidget::DockWidgetFloatable|QDockWidget::DockWidgetMovable</set>
+   </property>
    <property name="windowTitle">
     <string>Foliage</string>
    </property>
@@ -243,7 +263,233 @@
    </attribute>
    <widget class="QWidget" name="dockWidgetContents_4"/>
   </widget>
+  <widget class="QDockWidget" name="terrainDockWidget">
+   <property name="minimumSize">
+    <size>
+     <width>263</width>
+     <height>305</height>
+    </size>
+   </property>
+   <property name="features">
+    <set>QDockWidget::DockWidgetFloatable|QDockWidget::DockWidgetMovable</set>
+   </property>
+   <property name="windowTitle">
+    <string>Terrain</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>2</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents">
+    <layout class="QVBoxLayout" name="verticalLayout_2">
+     <item>
+      <widget class="QTabWidget" name="tabWidget">
+       <property name="currentIndex">
+        <number>0</number>
+       </property>
+       <widget class="QWidget" name="tab">
+        <attribute name="title">
+         <string>Basic terrain options</string>
+        </attribute>
+        <layout class="QFormLayout" name="formLayout_3">
+         <item row="1" column="0">
+          <widget class="QLabel" name="label_2">
+           <property name="text">
+            <string>Terrain scale</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QSlider" name="terrainScaleSlider">
+           <property name="maximum">
+            <number>100</number>
+           </property>
+           <property name="value">
+            <number>50</number>
+           </property>
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="label_3">
+           <property name="text">
+            <string>Random factor</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QSlider" name="ramdomFactorSlider">
+           <property name="maximum">
+            <number>100</number>
+           </property>
+           <property name="value">
+            <number>50</number>
+           </property>
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="0">
+          <widget class="QLabel" name="label_4">
+           <property name="text">
+            <string>Terrain size</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QSpinBox" name="spinBox">
+           <property name="minimum">
+            <number>2</number>
+           </property>
+           <property name="maximum">
+            <number>98</number>
+           </property>
+           <property name="singleStep">
+            <number>2</number>
+           </property>
+           <property name="value">
+            <number>8</number>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="0">
+          <widget class="QLabel" name="label_5">
+           <property name="text">
+            <string>Erroson</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="1">
+          <widget class="QSlider" name="horizontalSlider">
+           <property name="maximum">
+            <number>100</number>
+           </property>
+           <property name="sliderPosition">
+            <number>50</number>
+           </property>
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="tab_2">
+        <attribute name="title">
+         <string>Advanced</string>
+        </attribute>
+        <layout class="QFormLayout" name="formLayout_2">
+         <property name="fieldGrowthPolicy">
+          <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+         </property>
+         <item row="0" column="0">
+          <widget class="QLabel" name="label">
+           <property name="text">
+            <string>Random seed</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <layout class="QHBoxLayout" name="horizontalLayout">
+           <item>
+            <widget class="QSpinBox" name="randomSeedBox">
+             <property name="maximum">
+              <number>2147483647</number>
+             </property>
+             <property name="value">
+              <number>1</number>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QToolButton" name="randomiseToolButton">
+             <property name="toolTip">
+              <string>Randomise</string>
+             </property>
+             <property name="text">
+              <string>...</string>
+             </property>
+             <property name="icon">
+              <iconset resource="../icons.qrc">
+               <normaloff>:/media/16x16/dice-random.png</normaloff>:/media/16x16/dice-random.png</iconset>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </widget>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCommandLinkButton" name="generateTerrain">
+       <property name="text">
+        <string>Generate new terrain</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../icons.qrc">
+         <normaloff>:/media/22x22/document-new.png</normaloff>:/media/22x22/document-new.png</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>22</width>
+         <height>22</height>
+        </size>
+       </property>
+       <property name="description">
+        <string>Create a terrain according to the specified parameters</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCommandLinkButton" name="loadTerrain">
+       <property name="text">
+        <string>Import terrain from file</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../icons.qrc">
+         <normaloff>:/media/22x22/document-open.png</normaloff>:/media/22x22/document-open.png</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>22</width>
+         <height>22</height>
+        </size>
+       </property>
+       <property name="description">
+        <string>Create a terrain from an existing file</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCommandLinkButton" name="clearTerrain">
+       <property name="text">
+        <string>Clear terrain</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../icons.qrc">
+         <normaloff>:/media/22x22/process-stop.png</normaloff>:/media/22x22/process-stop.png</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>22</width>
+         <height>22</height>
+        </size>
+       </property>
+       <property name="description">
+        <string>Flatten the entire terrain</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
   <action name="action_New">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset resource="../icons.qrc">
      <normaloff>:/media/24x24/document-new.png</normaloff>:/media/24x24/document-new.png</iconset>
@@ -256,6 +502,9 @@
    </property>
   </action>
   <action name="action_Open">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset resource="../icons.qrc">
      <normaloff>:/media/24x24/document-open.png</normaloff>:/media/24x24/document-open.png</iconset>
@@ -268,14 +517,20 @@
    </property>
   </action>
   <action name="actionOpen_Recent">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Open &amp;Recent</string>
    </property>
   </action>
   <action name="action_Save">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset resource="../icons.qrc">
-     <normaloff>:/media/24x24/document-save-as.png</normaloff>:/media/24x24/document-save-as.png</iconset>
+     <normaloff>:/media/24x24/document-save.png</normaloff>:/media/24x24/document-save.png</iconset>
    </property>
    <property name="text">
     <string>&amp;Save</string>
@@ -285,6 +540,13 @@
    </property>
   </action>
   <action name="actionSave_As">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../icons.qrc">
+     <normaloff>:/media/16x16/document-save-as.png</normaloff>:/media/16x16/document-save-as.png</iconset>
+   </property>
    <property name="text">
     <string>Save &amp;As...</string>
    </property>
@@ -293,6 +555,10 @@
    </property>
   </action>
   <action name="actionE_xit">
+   <property name="icon">
+    <iconset resource="../icons.qrc">
+     <normaloff>:/media/16x16/exit.png</normaloff>:/media/16x16/exit.png</iconset>
+   </property>
    <property name="text">
     <string>E&amp;xit</string>
    </property>
@@ -400,6 +666,9 @@
    <property name="checkable">
     <bool>true</bool>
    </property>
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset resource="../icons.qrc">
      <normaloff>:/media/24x24/list-add.png</normaloff>:/media/24x24/list-add.png</iconset>
@@ -414,10 +683,45 @@
      <normaloff>:/media/24x24/camera-photo.png</normaloff>:/media/24x24/camera-photo.png</iconset>
    </property>
    <property name="text">
-    <string>Save screenshot</string>
+    <string>&amp;Save screenshot...</string>
    </property>
    <property name="shortcut">
     <string>F12</string>
+   </property>
+  </action>
+  <action name="actionShow_heightmap_image">
+   <property name="icon">
+    <iconset resource="../icons.qrc">
+     <normaloff>:/media/16x16/image.png</normaloff>:/media/16x16/image.png</iconset>
+   </property>
+   <property name="text">
+    <string>Show heightmap image</string>
+   </property>
+  </action>
+  <action name="actionUser_guide">
+   <property name="icon">
+    <iconset resource="../icons.qrc">
+     <normaloff>:/media/16x16/help-browser.png</normaloff>:/media/16x16/help-browser.png</iconset>
+   </property>
+   <property name="text">
+    <string>User guide</string>
+   </property>
+   <property name="shortcut">
+    <string>F1</string>
+   </property>
+  </action>
+  <action name="actionAbout_Gaiascape">
+   <property name="text">
+    <string>About Gaiascape</string>
+   </property>
+  </action>
+  <action name="actionOptions">
+   <property name="icon">
+    <iconset resource="../icons.qrc">
+     <normaloff>:/media/16x16/preferences-system.png</normaloff>:/media/16x16/preferences-system.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Options...</string>
    </property>
   </action>
  </widget>
@@ -651,22 +955,6 @@
    </hints>
   </connection>
   <connection>
-   <sender>action_Textured</sender>
-   <signal>triggered()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>viewTextured()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>299</x>
-     <y>203</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>actionTake_screenshot</sender>
    <signal>triggered()</signal>
    <receiver>MainWindow</receiver>
@@ -683,18 +971,50 @@
    </hints>
   </connection>
   <connection>
+   <sender>texturesTreeWidget</sender>
+   <signal>itemDoubleClicked(QTreeWidgetItem*,int)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>texturePropertyChanged(QTreeWidgetItem*,int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>710</x>
+     <y>129</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>299</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionShow_heightmap_image</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>showHeightmapImage()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>299</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
    <sender>generateTerrain</sender>
    <signal>clicked()</signal>
    <receiver>MainWindow</receiver>
    <slot>generateTerrain()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>510</x>
-     <y>239</y>
+     <x>671</x>
+     <y>193</y>
     </hint>
     <hint type="destinationlabel">
-     <x>299</x>
-     <y>203</y>
+     <x>399</x>
+     <y>299</y>
     </hint>
    </hints>
   </connection>
@@ -705,12 +1025,12 @@
    <slot>loadTerrain()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>510</x>
-     <y>268</y>
+     <x>671</x>
+     <y>253</y>
     </hint>
     <hint type="destinationlabel">
-     <x>299</x>
-     <y>203</y>
+     <x>399</x>
+     <y>299</y>
     </hint>
    </hints>
   </connection>
@@ -721,8 +1041,56 @@
    <slot>clearTerrain()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>710</x>
-     <y>297</y>
+     <x>671</x>
+     <y>311</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>299</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>randomiseToolButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>randomiseTerrainSeed()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>778</x>
+     <y>97</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>299</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionOptions</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>options()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>299</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionAbout_Gaiascape</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>showAboutBox()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
     </hint>
     <hint type="destinationlabel">
      <x>399</x>
@@ -750,5 +1118,10 @@
   <slot>generateTerrain()</slot>
   <slot>loadTerrain()</slot>
   <slot>clearTerrain()</slot>
+  <slot>texturePropertyChanged(QTreeWidgetItem*,int)</slot>
+  <slot>showHeightmapImage()</slot>
+  <slot>randomiseTerrainSeed()</slot>
+  <slot>options()</slot>
+  <slot>showAboutBox()</slot>
  </slots>
 </ui>

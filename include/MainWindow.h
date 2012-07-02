@@ -3,6 +3,8 @@
 
 #include <QMainWindow>
 #include <QActionGroup>
+#include <QTreeWidgetItem>
+#include <QProgressBar>
 #include "OgreWidget.h"
 
 namespace Ui {
@@ -22,6 +24,7 @@ private:
     OgreWidget* mOgreWidget;
     QTimer* mRenderTimer;
     QActionGroup* mToolGroup;
+    QProgressBar* mStatusProgressBar;
 
     bool bWPressed;
     bool bAPressed;
@@ -48,11 +51,17 @@ public slots:
     void intrudeTool();
     void viewWireframe();
     void viewSolid();
-    void viewTextured();
     void screenshot();
     void generateTerrain();
     void loadTerrain();
     void clearTerrain();
+    void texturePropertyChanged(QTreeWidgetItem*, int);
+    void showHeightmapImage();
+    void randomiseTerrainSeed();
+    void showAboutBox();
+    void options();
+    void statusTextureUpdateInProgress();
+    void statusTextreUpdateFinished();
 };
 
 #endif // MAINWINDOW_H
