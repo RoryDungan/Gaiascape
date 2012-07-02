@@ -19,12 +19,15 @@ class HeightMapGen
         void retrieveHeightmap(float talos, unsigned int size, float *heightmapArray);
     private:
         void genQuadrant(int xNW, int yNW, int xSE, int ySE, int iteration, int quadrant);
-        void erode(short int c);
+        void erode(float c);
+        void erodeBlock(float c, long unsigned int block);
         void writeMap();
 
         float* pHMBlocks;
 
         short unsigned int iNumberOfBlocks;
+        long unsigned int iFinalX;
+        long unsigned int iFinalPoint;
         short unsigned int iDimensions;
         short unsigned int iQuadrants;
 

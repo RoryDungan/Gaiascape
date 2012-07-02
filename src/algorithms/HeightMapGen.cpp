@@ -7,21 +7,7 @@
 
 HeightMapGen::HeightMapGen(float talos, unsigned int size)
 {
-    // Moved to retrieveHeightmap()
-    // Everything remaining has been commented out in case we go back, so this is sort of a recycling bin.
 
-    // The active ID that all blocks are assigned. Incremented later in the for loop.
-    /*int iBlockID = 0;
-
-    for(short unsigned int y = 0; y < (iDimensions + 1); y++)
-    {
-        for (short unsigned int x = 0; x < (iDimensions + 1); x++)
-        {
-            HMBlock* tempPointer = new HMBlock(x,y,iBlockID);
-            HMBlocks.push_back(tempPointer); // Program each column along the row
-            iBlockID++;
-        }
-    }*/
 }
 
 void HeightMapGen::genQuadrant(int xNW, int yNW, int xSE, int ySE, int iteration, int quadrant)
@@ -54,20 +40,24 @@ void HeightMapGen::genQuadrant(int xNW, int yNW, int xSE, int ySE, int iteration
 
     // TODO: Check to make sure these haven't already been assigned, as there would be no point to assigning them again
     // N
-    *(pHMBlocks + iHalfRelativeX + yNW) = (*(pHMBlocks + xNW + yNW) + *(pHMBlocks + xSE + yNW))/2;
-                                        //+ Random::getSingleton().getRand(-fStaggerValue/iteration, fStaggerValue/iteration);
+    if(*(pHMBlocks + iHalfRelativeX + yNW) == 0)
+        *(pHMBlocks + iHalfRelativeX + yNW) = (*(pHMBlocks + xNW + yNW) + *(pHMBlocks + xSE + yNW))/2
+                                            + Random::getSingleton().getRand(-fStaggerValue/iteration, fStaggerValue/iteration);
 
     // E
-    *(pHMBlocks + xSE + iHalfRelativeY) = (*(pHMBlocks + xSE + yNW) + *(pHMBlocks + xSE + ySE))/2;
-                                        //+ Random::getSingleton().getRand(-fStaggerValue/iteration, fStaggerValue/iteration);
+    if(*(pHMBlocks + xSE + iHalfRelativeY) == 0)
+        *(pHMBlocks + xSE + iHalfRelativeY) = (*(pHMBlocks + xSE + yNW) + *(pHMBlocks + xSE + ySE))/2
+                                            + Random::getSingleton().getRand(-fStaggerValue/iteration, fStaggerValue/iteration);
 
     // S
-    *(pHMBlocks + iHalfRelativeX + ySE) = (*(pHMBlocks + xNW + ySE) + *(pHMBlocks + xSE + ySE))/2;
-                                        //+ Random::getSingleton().getRand(-fStaggerValue/iteration, fStaggerValue/iteration);
+    if(*(pHMBlocks + iHalfRelativeX + ySE) == 0)
+        *(pHMBlocks + iHalfRelativeX + ySE) = (*(pHMBlocks + xNW + ySE) + *(pHMBlocks + xSE + ySE))/2
+                                            + Random::getSingleton().getRand(-fStaggerValue/iteration, fStaggerValue/iteration);
 
     // W
-    *(pHMBlocks + xNW + iHalfRelativeY) = (*(pHMBlocks + xNW + yNW) + *(pHMBlocks + xNW + ySE))/2;
-                                        //+ Random::getSingleton().getRand(-fStaggerValue/iteration, fStaggerValue/iteration);
+    if(*(pHMBlocks + xNW + iHalfRelativeY) == 0)
+        *(pHMBlocks + xNW + iHalfRelativeY) = (*(pHMBlocks + xNW + yNW) + *(pHMBlocks + xNW + ySE))/2
+                                            + Random::getSingleton().getRand(-fStaggerValue/iteration, fStaggerValue/iteration);
 
     if (quadrant != 1)
     {
@@ -77,7 +67,7 @@ void HeightMapGen::genQuadrant(int xNW, int yNW, int xSE, int ySE, int iteration
         // Essentially, you simply repeat the process found here in which you find the midpoints by using the midpoints
         // generated here as the corners in the next call of this function.
         // Increase iteration for the new set of quadrants
-        iteration = iteration*2;
+        iteration *= 2;
 
         // NW
         genQuadrant(xNW, yNW, iHalfRelativeX, iHalfRelativeY, iteration, quadrant - 1);
@@ -93,7 +83,7 @@ void HeightMapGen::genQuadrant(int xNW, int yNW, int xSE, int ySE, int iteration
     }
 }
 
-void erode(short int c)
+void HeightMapGen::erode(float c)
 {
     // Talos = The maximum angle allowed for slopes to be before thermal erosion begins taking place.
     // In most cases, we want this to be 4/N, where N = the number of blocks in the terrain set.
@@ -108,9 +98,108 @@ void erode(short int c)
     // is the difference in height between inspected block 1 and the inspected block.
     // If the tile is higher than its neighbour, it will be positive, otherwise negative.
 
-    // Grab the first terrain block in the array
-    // If the neighbour at NW exists
-    //
+    // Use a for statement to call erodeBlock on every block in the array in order
+    for(long unsigned int i = 0; i <= iFinalPoint; i++)
+        erodeBlock(c, i);
+
+}
+
+void HeightMapGen::erodeBlock(float c, long unsigned int block)
+{
+    // Erode an individual block, and if this passes material down, then calculate erosion for that as well.
+    // dNW, dNE etc. = difference in heights at point NW, NE etc. Set as 0 so if the points don't exist they don't cause
+    // errors later.
+    float dNW = 0;
+    float dNE = 0;
+    float dSW = 0;
+    float dSE = 0;
+    // dTotal = The total of all the d's that are above Talus.
+    float dTotal = 0;
+    // dMax = The highest d value
+    float dMax = 0;
+    // Define height values
+    // Check if the point exists by seeing if is above the max or below the min
+    // NW
+    if(block - iDimensions - 1 >= 0 && block - iDimensions - 1 <= iFinalPoint)
+    {
+        // di = h - hi
+        dNW = *(pHMBlocks + block) - *(pHMBlocks + block - iDimensions - 1);
+        if(dNW > fTalos)
+        {
+            // Skipping the calculations because we know this if we are at this point dTotal and dMax haven't been set
+            dTotal = dNW;
+            dMax = dNW;
+        }
+        else
+            dNW = 0; // Which later means we will not change this block
+    }
+    // NE
+    if(block + iDimensions - 1 >= 0 && block + iDimensions - 1 <= iFinalPoint)
+    {
+        // di = h - hi
+        dNE = *(pHMBlocks + block) - *(pHMBlocks + block + iDimensions - 1);
+        if(dNE > fTalos)
+        {
+            dTotal += dNE;
+            if(dNE > dMax)
+                dMax = dNE;
+        }
+        else
+            dNE = 0; // Which later means we will not change this block
+    }
+    // SE
+    if(block + iDimensions + 1 >= 0 && block + iDimensions + 1 <= iFinalPoint)
+    {
+        // di = h - hi
+        dSE = *(pHMBlocks + block) - *(pHMBlocks + block + iDimensions + 1);
+        if(dSE > fTalos)
+        {
+            dTotal += dSE;
+            if(dSE > dMax)
+                dMax = dSE;
+        }
+        else
+            dSE = 0; // Which later means we will not change this block
+    }
+    // SW
+    if(block - iDimensions + 1 >= 0 && block - iDimensions + 1 <= iFinalPoint)
+    {
+        // di = h - hi
+        dSW = *(pHMBlocks + block) - *(pHMBlocks + block - iDimensions + 1);
+        if(dSW > fTalos)
+        {
+            dTotal += dSW;
+            if(dSW > dMax)
+                dMax = dSW;
+        }
+        else
+            dSW = 0; // Which later means we will not change this block
+    }
+
+    // Go to each of the corners and apply the equation
+    // hi += c(dmax - talos) * di/dtotal
+    // NW
+    if(dNW != 0)
+        *(pHMBlocks + block - iDimensions - 1) += c * (dMax - fTalos) * (dNW/dTotal);
+    // NE
+    if(dNE != 0)
+        *(pHMBlocks + block + iDimensions - 1) += c * (dMax - fTalos) * (dNE/dTotal);
+    // SE
+    if(dSE != 0)
+        *(pHMBlocks + block + iDimensions + 1) += c * (dMax - fTalos) * (dSE/dTotal);
+    // SW
+    if(dSW != 0)
+        *(pHMBlocks + block - iDimensions + 1) += c * (dMax - fTalos) * (dSW/dTotal);
+    // ToDo; remove material transported?
+    // Now that the heights have been calculated, we can now check to see if those points now have overflowing angles
+    /*if(dNW != 0)
+        erodeBlock(c, block - iDimensions - 1);
+    if(dNE != 0)
+        erodeBlock(c, block + iDimensions - 1);
+    if(dSE != 0)
+        erodeBlock(c, block + iDimensions + 1);
+    if(dSW != 0)
+        erodeBlock(c, block - iDimensions + 1);*/
 }
 
 short unsigned int HeightMapGen::retrieveDimensions()
@@ -136,7 +225,8 @@ void HeightMapGen::retrieveHeightmap(float talos, unsigned int size, float* heig
     pHMBlocks = heightmapArray;
 
     // FinalX is the far right x point, in terms of a pointer.
-    long unsigned int iFinalX = (iDimensions - 1)*iDimensions;
+    iFinalX = (iDimensions - 1)*iDimensions;
+    iFinalPoint = iFinalX + iDimensions - 1;
 
     // NW corner
     *pHMBlocks = Random::getSingleton().getRand(5, 10);
@@ -189,27 +279,22 @@ void HeightMapGen::retrieveHeightmap(float talos, unsigned int size, float* heig
     for(long unsigned int i = 0; i <= iFinalX + iDimensions - 1; i++)
     {
         // Scale it up to the point we want (by making it between 0 and 1 and then multiplying it by the range we want
-        *(pHMBlocks + i) = ((*(pHMBlocks + i) - iMinHeight)/iRelativeMaxHeight)*255;
+        // Scaling disabled temporarily
+        *(pHMBlocks + i) = ((*(pHMBlocks + i) - iMinHeight)/iRelativeMaxHeight);
     }
 
-    QByteArray data((const char*)(iFinalX + iDimensions - 1));
+    // -------
+    // Erosion
+    // -------
+    erode(-0.5);
 
-    for(unsigned int i = 0; i < iFinalX + iDimensions - 1; ++i)
+    // Scale it up for the image
+    /*for(long unsigned int i = 0; i <= iFinalX + iDimensions - 1; i++)
     {
-        data[i] = (unsigned char)(*(pHMBlocks + i)); // Probably just put in the above if statement if it works
-    }
-
-    QVector<QRgb> grayscale;
-
-    for(long unsigned int i = 0; i < 256; ++i)
-        grayscale.append(qRgb(i, i, i));
-
-    QImage image((uchar*)(data.constData()), iDimensions, iDimensions, QImage::Format_Indexed8);
-    image.setColorTable(grayscale);
-
-
-    QString filename = "map.bmp";
-    image.save(filename, 0, -1);
+        // Scale it up to the point we want (by making it between 0 and 1 and then multiplying it by the range we want
+        // Scaling disabled temporarily
+        *(pHMBlocks + i) *= 255;
+    }*/
 
     writeMap();
 }
