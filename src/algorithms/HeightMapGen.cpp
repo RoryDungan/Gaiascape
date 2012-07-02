@@ -117,6 +117,11 @@ void HeightMapGen::erodeBlock(float c, long unsigned int block)
     float dTotal = 0;
     // dMax = The highest d value
     float dMax = 0;
+    // tNW, tNE etc. = the transported material at point NW, NE etc.
+    float tNW = 0;
+    float tNE = 0;
+    float tSE = 0;
+    float tSW = 0;
     // Define height values
     // Check if the point exists by seeing if is above the max or below the min
     // NW
@@ -180,26 +185,108 @@ void HeightMapGen::erodeBlock(float c, long unsigned int block)
     // hi += c(dmax - talos) * di/dtotal
     // NW
     if(dNW != 0)
-        *(pHMBlocks + block - iDimensions - 1) += c * (dMax - fTalos) * (dNW/dTotal);
+    {
+        tNW = c * (dMax - fTalos) * (dNW/dTotal);
+        *(pHMBlocks + block - iDimensions - 1) += tNW;
+    }
     // NE
     if(dNE != 0)
-        *(pHMBlocks + block + iDimensions - 1) += c * (dMax - fTalos) * (dNE/dTotal);
+    {
+        tNE = c * (dMax - fTalos) * (dNE/dTotal);
+        *(pHMBlocks + block + iDimensions - 1) += tNE;
+    }
     // SE
     if(dSE != 0)
-        *(pHMBlocks + block + iDimensions + 1) += c * (dMax - fTalos) * (dSE/dTotal);
+    {
+        tSE = c * (dMax - fTalos) * (dSE/dTotal);
+        *(pHMBlocks + block + iDimensions + 1) += tSE;
+    }
     // SW
     if(dSW != 0)
-        *(pHMBlocks + block - iDimensions + 1) += c * (dMax - fTalos) * (dSW/dTotal);
+    {
+        tSW = c * (dMax - fTalos) * (dSW/dTotal);
+        *(pHMBlocks + block - iDimensions + 1) += tSW;
+    }
     // ToDo; remove material transported?
-    // Now that the heights have been calculated, we can now check to see if those points now have overflowing angles
-    /*if(dNW != 0)
-        erodeBlock(c, block - iDimensions - 1);
-    if(dNE != 0)
-        erodeBlock(c, block + iDimensions - 1);
-    if(dSE != 0)
-        erodeBlock(c, block + iDimensions + 1);
-    if(dSW != 0)
-        erodeBlock(c, block - iDimensions + 1);*/
+
+    // Move the transported material to lower pastures
+    if(tNW != 0)
+        transportMaterial(tNW, block - iDimensions - 1);
+    if(tNE != 0)
+        transportMaterial(tNE, block + iDimensions - 1);
+    if(tSE != 0)
+        transportMaterial(tSE, block + iDimensions + 1);
+    if(tSW != 0)
+        transportMaterial(tSW, block - iDimensions + 1);
+}
+
+void HeightMapGen::transportMaterial(float material, unsigned long int block)
+{
+    // Get the difference in heights of all neighbours
+    // Send the material to the lowest neighbour
+    // If no neighbours are below this one (i.e. they are all positive) then add the material to the block.
+    // dNW, dNE etc. = difference in heights at point NW, NE etc. Set as 0 so if the points don't exist they don't cause
+    // errors later.
+    float dNW = 0;
+    float dNE = 0;
+    float dSW = 0;
+    float dSE = 0;
+    // dMax = The largest d value
+    float dMax = -1; // Otherwise anything negative would never overtake this, apart from NW
+    // Define height values
+    // Check if the point exists by seeing if is above the max or below the min
+    // NW
+    if(block - iDimensions - 1 >= 0 && block - iDimensions - 1 <= iFinalPoint)
+    {
+        // di = h - hi
+        dNW = *(pHMBlocks + block) - *(pHMBlocks + block - iDimensions - 1);
+        dMax = dNW;
+    }
+    // NE
+    if(block + iDimensions - 1 >= 0 && block + iDimensions - 1 <= iFinalPoint)
+    {
+        // di = h - hi
+        dNE = *(pHMBlocks + block) - *(pHMBlocks + block + iDimensions - 1);
+        if(dNE > dMax)
+            dMax = dNE;
+    }
+    // SE
+    if(block + iDimensions + 1 >= 0 && block + iDimensions + 1 <= iFinalPoint)
+    {
+        // di = h - hi
+        dSE = *(pHMBlocks + block) - *(pHMBlocks + block + iDimensions + 1);
+        if(dSE > dMax)
+            dMax = dSE;
+    }
+    // SW
+    if(block - iDimensions + 1 >= 0 && block - iDimensions + 1 <= iFinalPoint)
+    {
+        // di = h - hi
+        dSW = *(pHMBlocks + block) - *(pHMBlocks + block - iDimensions + 1);
+        if(dSW > dMax)
+            dMax = dSW;
+    }
+    // If the biggest d value we have is negative, we are the lowest of our neighbours, so add material to our height.
+    if(dMax < 0)
+        *(pHMBlocks + block) += material;
+    else
+    {
+        // Otherwise send the material further down, to the lowest point nearby.
+        if(dNW == dMax)
+            transportMaterial(material, block - iDimensions - 1);
+        else if(dNE == dMax)
+            transportMaterial(material, block + iDimensions - 1);
+        else if(dSE == dMax)
+            transportMaterial(material, block + iDimensions + 1);
+        else if (dSW == dMax)
+            transportMaterial(material, block - iDimensions + 1);
+        else
+        {
+            // We shouldn't be here. Why are we here?
+            // Something has gone horribly wrong.
+            std::cout << "Uh... something has gone horribly wrong inside transportMaterial....\n";
+        }
+    }
 }
 
 short unsigned int HeightMapGen::retrieveDimensions()

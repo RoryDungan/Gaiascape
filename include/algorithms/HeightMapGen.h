@@ -21,6 +21,7 @@ class HeightMapGen
         void genQuadrant(int xNW, int yNW, int xSE, int ySE, int iteration, int quadrant);
         void erode(float c);
         void erodeBlock(float c, long unsigned int block);
+        void transportMaterial(float material, long unsigned int block);
         void writeMap();
 
         float* pHMBlocks;
