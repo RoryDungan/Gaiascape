@@ -95,19 +95,18 @@ void Terrain::generateTerrain()
     // Set the array to be filled with zeroes, and be flat.
     // Set up the dimensions of the array
     short unsigned int iDimensions = pow(4.0, iTerrainSize * 0.5) + 1;
-    float array[iDimensions*iDimensions];
+    float heightMap[iDimensions*iDimensions];
     for(long unsigned int i = 0; i < iDimensions*iDimensions; i++)
-        array[i] = 0;
+        heightMap[i] = 0;
 
-    HMHMgen.retrieveHeightmap(1, iTerrainSize, &array[0]); // Talos is set to something random for a defualt until erosion is added
+    HMHMgen.retrieveHeightmap(1, iTerrainSize, &heightMap[0]); // Talos is set to something random for a defualt until erosion is added
 
     Ogre::uchar stream[iDimensions*iDimensions];
     long unsigned int iFinalX = (iDimensions - 1)*iDimensions;
-    float* pArray = &array[0];
+    float* pHeightMap = &heightMap[0];
     for(long unsigned int i = 0; i < iFinalX + iDimensions - 1; ++i)
     {
-        stream[i] = (Ogre::uchar)(*(pArray + i)*255); // Probably just put in the above if statement if it works
-        // ::cout << "pArray + " << i << " = " << (Ogre::uchar)*(pArray + i) << "\n";
+        stream[i] = (Ogre::uchar)(*(pHeightMap + i)*255); // Probably just put in the above if statement if it works
     }
     Ogre::uchar* pStream = &stream[0];
 
@@ -181,6 +180,75 @@ void Terrain::generateTerrain()
 
     // Now, all there is left to do is clean up after the initial terrain creation:
     mTerrainGroup->freeTemporaryResources();
+
+    // -----------------
+    // Create Vegetation
+    // -----------------
+    // This could be put before here depending on how texturing based on the slopemap will work.
+    // Generate a slopemap based on heightMap
+    // For each point in heightMap
+    //  Create a probability of a tree spawning there based on:
+    //      Altitude
+    //      Proximity to other trees
+    //      Slope
+    float slopeMap[iDimensions*iDimensions];
+    HMHMgen.retrieveSlopemap(&slopeMap[0], &heightMap[0], iDimensions);
+    short unsigned int iProbability = 0; // Probability a tree will spawn. If random returns equal to or below this number, it spawns.
+
+    floraTree* addedTree = new floraTree("tree", mSceneManager, Ogre::Vector3(0, 0, 0));
+    std::cout << "addFlora = " << floraManager::getSingletonPtr()->addFlora(*addedTree) << "\n";
+
+    /*for(long unsigned int i = 0; i < iFinalX + iDimensions - 1; ++i)
+    {
+        // Treat 128, 0, 128 as the center of terrain
+        // and 129 = terrainCenter or tC for short
+        // Therefore at any point, the Vector3 position is tC + ((i%256) - 128), 0, tC + (floor(i/256) - 128)
+        // @ i = 0, the Vector3 position would be 128 - 128, 0, 128 - 128
+        // Then at i = 257, the Vector3 position would be 128 - 127, 0, 128 - 127
+        Ogre::Vector3(0, 0, 0); // Replace with the vector for the tile we are inspecting
+        // --------------------------
+        // Height probability changes
+        // --------------------------
+        // 0-10% = 50% prob
+        // 11-30% = 40% prob
+        // 31-50% = 30% prob
+        // 51-90% = 10% prob
+        if(heightMap[i] <= 0.9) // Put an else iProbability = -1 if you want nothing to spawn above 90%
+            iProbability += 1;
+        if(heightMap[i] <= 0.5f)
+            iProbability += 2;
+        if(heightMap[i] <= 0.3f)
+            iProbability += 1;
+        if(heightMap[i] <= 0.1f)
+            iProbability += 1; // DISABLE if water spawns at a certain level, since we don't want vegetation on sand
+
+        // Proximity to trees
+        // < 3 = 0% prob
+        // 3.1-10 = +30% prob
+        if(iProbability != -1 && floraManager::getSingletonPtr()->getFloraClosestToPoint() <= 3) // 3 is arbitrary and needs to be adjusted to the scale of the model!
+            iProbability = -1;
+        if(iProbability != -1 && floraManager::getSingletonPtr()->getFloraClosestToPoint() <= 10) // Plants tend to gather together due to factors we don't calculate, so simullate this
+            iProbability += 3;
+
+        // Slope
+        if(slopeMap[i] >= 0.1f)
+        {
+            iProbability = -1;
+        }
+    }*/
+
+    // Generate an image of slopeMap for diagnostic purposes
+    Ogre::uchar stream2[iDimensions*iDimensions];
+    float* pSlopeMap = &slopeMap[0];
+    for(long unsigned int i = 0; i < iFinalX + iDimensions - 1; ++i)
+    {
+        stream2[i] = (Ogre::uchar)(*(pSlopeMap + i)*255); // Probably just put in the above if statement if it works
+    }
+    Ogre::uchar* pStream2 = &stream2[0];
+
+    Ogre::Image img2;
+    img2.loadDynamicImage(pStream2, iDimensions, iDimensions, Ogre::PF_L8); // PF_L8 = 8-pit pixel format, all luminance
+    img2.save("slopeMap.bmp");
 }
 
 void Terrain::clearTerrain()

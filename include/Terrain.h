@@ -7,6 +7,8 @@
 #include <OGRE/OgreImage.h>
 
 #include <algorithms/HeightMapGen.h>
+#include "floramanager.h"
+#include "floraTree.h" // Probably just have this included in floraMain and include that instead
 
 class Terrain
 {

@@ -17,11 +17,12 @@ class HeightMapGen
 
         short unsigned int retrieveDimensions();
         void retrieveHeightmap(float talos, unsigned int size, float *heightmapArray);
+        void retrieveSlopemap(float *slopemapArray, float *heightmapArray, short unsigned int dimensions);
     private:
         void genQuadrant(int xNW, int yNW, int xSE, int ySE, int iteration, int quadrant);
-        void erode(float c);
         void erodeBlock(float c, long unsigned int block);
         void transportMaterial(float material, long unsigned int block);
+        float getHeightDifference(unsigned long inspectedBlock, unsigned long neighbourBlock);
         void writeMap();
 
         float* pHMBlocks;

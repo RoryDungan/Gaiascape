@@ -83,25 +83,16 @@ void HeightMapGen::genQuadrant(int xNW, int yNW, int xSE, int ySE, int iteration
     }
 }
 
-void HeightMapGen::erode(float c)
+// Checks to see if the neigbhourBlock exists, and then calculates the difference between the two blocks.
+float HeightMapGen::getHeightDifference(long unsigned int inspectedBlock, long unsigned int neighbourBlock)
 {
-    // Talos = The maximum angle allowed for slopes to be before thermal erosion begins taking place.
-    // In most cases, we want this to be 4/N, where N = the number of blocks in the terrain set.
-    // c = A variable I don't fully understand.
-
-    // This uses Thermal Erosion
-    // In the future, should probably modify it so that we can also have Rainfall erosion.
-    // First we travel through all of the different HMBlocks and calculate the difference in height to
-    // all of their neighbours, if they exist.
-    // d1 = h - h1
-    // where h = the height of the inspected block, h1 = the height of the neigbouring block at position 1, and d1
-    // is the difference in height between inspected block 1 and the inspected block.
-    // If the tile is higher than its neighbour, it will be positive, otherwise negative.
-
-    // Use a for statement to call erodeBlock on every block in the array in order
-    for(long unsigned int i = 0; i <= iFinalPoint; i++)
-        erodeBlock(c, i);
-
+    if(neighbourBlock >= 0 && neighbourBlock <= iFinalPoint)
+    {
+        float fReturnValue = *(pHMBlocks + inspectedBlock) - *(pHMBlocks + neighbourBlock);
+        return fReturnValue;
+    }
+    else
+        return 0.0f; // For transportMaterial, since if we get to the edge material goes into the void.
 }
 
 void HeightMapGen::erodeBlock(float c, long unsigned int block)
@@ -125,61 +116,48 @@ void HeightMapGen::erodeBlock(float c, long unsigned int block)
     // Define height values
     // Check if the point exists by seeing if is above the max or below the min
     // NW
-    if(block - iDimensions - 1 >= 0 && block - iDimensions - 1 <= iFinalPoint)
+    dNW = getHeightDifference(block, block - iDimensions - 1);
+    if(dNW > fTalos)
     {
-        // di = h - hi
-        dNW = *(pHMBlocks + block) - *(pHMBlocks + block - iDimensions - 1);
-        if(dNW > fTalos)
-        {
-            // Skipping the calculations because we know this if we are at this point dTotal and dMax haven't been set
-            dTotal = dNW;
-            dMax = dNW;
-        }
-        else
-            dNW = 0; // Which later means we will not change this block
+        // Skipping the calculations because we know this if we are at this point dTotal and dMax haven't been set
+        dTotal = dNW;
+        dMax = dNW;
     }
+    else
+        dNW = 0; // Which later means we will not change this block
+
     // NE
-    if(block + iDimensions - 1 >= 0 && block + iDimensions - 1 <= iFinalPoint)
+    dNE = getHeightDifference(block, block + iDimensions - 1);
+    if(dNE > fTalos)
     {
-        // di = h - hi
-        dNE = *(pHMBlocks + block) - *(pHMBlocks + block + iDimensions - 1);
-        if(dNE > fTalos)
-        {
-            dTotal += dNE;
-            if(dNE > dMax)
-                dMax = dNE;
-        }
-        else
-            dNE = 0; // Which later means we will not change this block
+        dTotal += dNE;
+        if(dNE > dMax)
+            dMax = dNE;
     }
+    else
+        dNE = 0; // Which later means we will not change this block
+
     // SE
-    if(block + iDimensions + 1 >= 0 && block + iDimensions + 1 <= iFinalPoint)
+    dSE = getHeightDifference(block, block + iDimensions + 1);
+    if(dSE > fTalos)
     {
-        // di = h - hi
-        dSE = *(pHMBlocks + block) - *(pHMBlocks + block + iDimensions + 1);
-        if(dSE > fTalos)
-        {
-            dTotal += dSE;
-            if(dSE > dMax)
-                dMax = dSE;
-        }
-        else
-            dSE = 0; // Which later means we will not change this block
+        dTotal += dSE;
+        if(dSE > dMax)
+            dMax = dSE;
     }
+    else
+        dSE = 0; // Which later means we will not change this block
+
     // SW
-    if(block - iDimensions + 1 >= 0 && block - iDimensions + 1 <= iFinalPoint)
+    dSW = getHeightDifference(block, block - iDimensions + 1);
+    if(dSW > fTalos)
     {
-        // di = h - hi
-        dSW = *(pHMBlocks + block) - *(pHMBlocks + block - iDimensions + 1);
-        if(dSW > fTalos)
-        {
-            dTotal += dSW;
-            if(dSW > dMax)
-                dMax = dSW;
-        }
-        else
-            dSW = 0; // Which later means we will not change this block
+        dTotal += dSW;
+        if(dSW > dMax)
+            dMax = dSW;
     }
+    else
+        dSW = 0; // Which later means we will not change this block
 
     // Go to each of the corners and apply the equation
     // hi += c(dmax - talos) * di/dtotal
@@ -236,36 +214,21 @@ void HeightMapGen::transportMaterial(float material, unsigned long int block)
     // Define height values
     // Check if the point exists by seeing if is above the max or below the min
     // NW
-    if(block - iDimensions - 1 >= 0 && block - iDimensions - 1 <= iFinalPoint)
-    {
-        // di = h - hi
-        dNW = *(pHMBlocks + block) - *(pHMBlocks + block - iDimensions - 1);
-        dMax = dNW;
-    }
+    dNW = getHeightDifference(block, block - iDimensions - 1);
+    dMax = dNW;
     // NE
-    if(block + iDimensions - 1 >= 0 && block + iDimensions - 1 <= iFinalPoint)
-    {
-        // di = h - hi
-        dNE = *(pHMBlocks + block) - *(pHMBlocks + block + iDimensions - 1);
-        if(dNE > dMax)
-            dMax = dNE;
-    }
+    dNE = getHeightDifference(block, block + iDimensions - 1);
+    if(dNE > dMax)
+        dMax = dNE;
     // SE
-    if(block + iDimensions + 1 >= 0 && block + iDimensions + 1 <= iFinalPoint)
-    {
-        // di = h - hi
-        dSE = *(pHMBlocks + block) - *(pHMBlocks + block + iDimensions + 1);
-        if(dSE > dMax)
-            dMax = dSE;
-    }
+    dSE = getHeightDifference(block, block + iDimensions + 1);
+    if(dSE > dMax)
+        dMax = dSE;
     // SW
-    if(block - iDimensions + 1 >= 0 && block - iDimensions + 1 <= iFinalPoint)
-    {
-        // di = h - hi
-        dSW = *(pHMBlocks + block) - *(pHMBlocks + block - iDimensions + 1);
-        if(dSW > dMax)
-            dMax = dSW;
-    }
+    dSW = getHeightDifference(block, block - iDimensions + 1);
+    if(dSW > dMax)
+        dMax = dSW;
+
     // If the biggest d value we have is negative, we are the lowest of our neighbours, so add material to our height.
     if(dMax < 0)
         *(pHMBlocks + block) += material;
@@ -373,17 +336,48 @@ void HeightMapGen::retrieveHeightmap(float talos, unsigned int size, float* heig
     // -------
     // Erosion
     // -------
-    erode(-0.5);
+    // Talos = The maximum angle allowed for slopes to be before thermal erosion begins taking place.
+    // In most cases, we want this to be 4/N, where N = the number of blocks in the terrain set.
+    // c = A variable I don't fully understand.
 
-    // Scale it up for the image
-    /*for(long unsigned int i = 0; i <= iFinalX + iDimensions - 1; i++)
-    {
-        // Scale it up to the point we want (by making it between 0 and 1 and then multiplying it by the range we want
-        // Scaling disabled temporarily
-        *(pHMBlocks + i) *= 255;
-    }*/
+    // This uses Thermal Erosion
+    // In the future, should probably modify it so that we can also have Rainfall erosion.
+    // First we travel through all of the different HMBlocks and calculate the difference in height to
+    // all of their neighbours, if they exist.
+    // d1 = h - h1
+    // where h = the height of the inspected block, h1 = the height of the neigbouring block at position 1, and d1
+    // is the difference in height between inspected block 1 and the inspected block.
+    // If the tile is higher than its neighbour, it will be positive, otherwise negative.
+
+    // Use a for statement to call erodeBlock on every block in the array in order
+    for(long unsigned int i = 0; i <= iFinalPoint; i++)
+        erodeBlock(-0.5, i);
 
     writeMap();
+}
+
+void HeightMapGen::retrieveSlopemap(float *slopemapArray, float *heightmapArray, unsigned short dimensions)
+{
+    iDimensions = dimensions;
+    pHMBlocks = heightmapArray;
+
+    // FinalX is the far right x point, in terms of a pointer.
+    iFinalX = (iDimensions - 1)*iDimensions;
+    iFinalPoint = iFinalX + iDimensions - 1;
+
+    // -------------------
+    // Generate a slopemap
+    // -------------------
+    // This is necessary for vegetation, structures and textures, as trees and grass won't grow on cliffs, etc.
+    for(long unsigned int i = 0; i <= iFinalPoint; i++)
+    {
+        // Add the total of all the differences and put it into the slopemapArray
+        // which is NW, NE, SE, and SW
+        *(slopemapArray + i) = getHeightDifference(i, i - iDimensions - 1)
+                             + getHeightDifference(i, i + iDimensions - 1)
+                             + getHeightDifference(i, i + iDimensions + 1)
+                             + getHeightDifference(i, i - iDimensions + 1);
+    }
 }
 
 void HeightMapGen::writeMap()

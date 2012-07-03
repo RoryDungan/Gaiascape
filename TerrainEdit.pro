@@ -17,7 +17,10 @@ SOURCES += src/main.cpp\
     src/MainWindow.cpp \
     src/algorithms/HeightMapGen.cpp \
     src/algorithms/HMBlock.cpp \
-    src/ImageViewer.cpp
+    src/ImageViewer.cpp \
+    src/ogre/floramanager.cpp \
+    src/ogre/floramain.cpp \
+    src/ogre/floratree.cpp
 
 HEADERS  += include/algorithms/TerrainBlock.h \
     include/algorithms/Random.h \
@@ -26,7 +29,10 @@ HEADERS  += include/algorithms/TerrainBlock.h \
     include/MainWindow.h \
     include/algorithms/HeightMapGen.h \
     include/algorithms/HMBlock.h \
-    include/ImageViewer.h
+    include/ImageViewer.h \
+    include/floramanager.h \
+    floramain.h \
+    include/floratree.h
 
 INCLUDEPATH += include/ \
     include/OGRE/ \
