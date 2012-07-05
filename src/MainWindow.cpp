@@ -2,17 +2,23 @@
 #include "ui_MainWindow.h"
 #include "ImageViewer.h"
 #include "algorithms/random.h"
+#include "OptionsDialog.h"
 #include <QTimer>
 #include <QFileDialog>
 #include <QInputDialog>
 #include <QDebug>
 #include <QDialogButtonBox>
 #include <QComboBox>
+#include <QCheckBox>
+#include <QDir>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
+    // Show loading dialog
+
+
     // init variables
     bWPressed = false;
     bAPressed = false;
@@ -23,9 +29,15 @@ MainWindow::MainWindow(QWidget *parent) :
     bShiftPressed = false;
 
     ui->setupUi(this);
+
+    // Load user preferences
+    mSettings = new QSettings("settings.ini", QSettings::IniFormat, this);
+
     mOgreWidget = new OgreWidget;
     setCentralWidget(mOgreWidget);
     mOgreWidget->setInteractionMode(OgreWidget::IM_SELECT);
+    mOgreWidget->setCameraInverted(mSettings->value("Renderer/CameraInverted", false).toBool());
+    //mOgreWidget->setFOVy(mSettings->value("Renderer/FOV", 45).toInt());
 
     // tabify dock widgets
     setTabPosition(Qt::AllDockWidgetAreas, QTabWidget::East);
@@ -37,12 +49,16 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->texturesTreeWidget->expandAll();
 
     // Set up action group for tool buttons
-    mToolGroup = new QActionGroup(this);
-    mToolGroup->addAction(ui->actionSelect);
-    mToolGroup->addAction(ui->actionPlace_entities);
-    mToolGroup->addAction(ui->actionPaint);
-    mToolGroup->addAction(ui->actionExtrude);
-    mToolGroup->addAction(ui->actionIntrude);
+    QActionGroup* toolGroup = new QActionGroup(this);
+    toolGroup->addAction(ui->actionSelect);
+    toolGroup->addAction(ui->actionPlace_entities);
+    toolGroup->addAction(ui->actionPaint);
+    toolGroup->addAction(ui->actionExtrude);
+    toolGroup->addAction(ui->actionIntrude);
+
+    QActionGroup* viewModeGroup = new QActionGroup(this);
+    viewModeGroup->addAction(ui->action_Solid);
+    viewModeGroup->addAction(ui->action_Wireframe);
 
     // Set up multiple resolutions for icons
     // The designer .ui file does not support having multiple resolution icons for a single
@@ -72,6 +88,10 @@ MainWindow::MainWindow(QWidget *parent) :
     screenshotIcon.addFile(":/media/16x16/camera-photo.png");
     screenshotIcon.addFile(":/media/24x24/camera-photo.png");
     ui->actionTake_screenshot->setIcon(screenshotIcon);
+    QIcon imageIcon;
+    imageIcon.addFile(":/media/16x16/image.png");
+    imageIcon.addFile(":/media/24x24/image.png");
+    ui->actionShow_heightmap_image->setIcon(imageIcon);
 
     // Set up progress bar
     mStatusProgressBar = new QProgressBar(this);
@@ -89,13 +109,17 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // Ready for work
     statusBar()->showMessage(tr("Ready"));
+
+    if(mSettings->value("MainWindow/Maximized", false).toBool()) this->showMaximized();
 }
 
 MainWindow::~MainWindow()
 {
+    mSettings->setValue("MainWindow/Maximized", this->isMaximized());
+
+    // Q_OBJECTs are deleted automaticly
     delete mRenderTimer;
     delete mOgreWidget;
-    delete mToolGroup;
     delete mStatusProgressBar;
     delete ui;
 }
@@ -171,7 +195,9 @@ void MainWindow::keyReleaseEvent(QKeyEvent * event)
 // Slots
 void MainWindow::fileNew()
 {
-
+    // TODO: Ask the user if they want to save changes
+    clearTerrain();
+    // Delete all other data
 }
 
 void MainWindow::fileOpen()
@@ -226,11 +252,15 @@ void MainWindow::intrudeTool()
 
 void MainWindow::viewSolid()
 {
+    //ui->action_Wireframe->setChecked(false);
+    //ui->action_Solid->setChecked(true);
     mOgreWidget->setViewMode(Ogre::PM_SOLID);
 }
 
 void MainWindow::viewWireframe()
 {
+    //ui->action_Wireframe->setChecked(true);
+    //ui->action_Solid->setChecked(false);
     mOgreWidget->setViewMode(Ogre::PM_WIREFRAME);
 }
 
@@ -276,18 +306,24 @@ void MainWindow::texturePropertyChanged(QTreeWidgetItem* item, int itemNum)
 
         if(item->text(0) == "Diffuse")
         {
-            QString filename = QFileDialog::getOpenFileName(this, tr("Open texture file"), item->text(1), tr("Images (*.jpg *.jpeg *.jpe *.png *.tga *.bmp, *.raw, *.gif, *.dds);;JPEG image (*.jpg *.jpeg *.jpe);;PNG image (*.png);;Targa image (*.tga);;Bitmap image (*.bmp);;RAW image (*.raw);;GIF image (*.gif);;DirectDraw surface (*.dds)"));
+            QString filename = QFileDialog::getOpenFileName(this, tr("Open texture file"), item->text(1), tr("Images (*.jpg *.jpeg *.jpe *.png *.tga *.bmp *.raw *.gif *.dds);;JPEG image (*.jpg *.jpeg *.jpe);;PNG image (*.png);;Targa image (*.tga);;Bitmap image (*.bmp);;RAW image (*.raw);;GIF image (*.gif);;DirectDraw surface (*.dds)"));
             if(filename != 0)
             {
+                // Convert path to relative
+                filename = QDir::current().relativeFilePath(filename);
+                // Set texture
                 mOgreWidget->getTerrain()->setTexture(Terrain::TT_DIFFUSE, texCat, filename.toStdString());
                 item->setText(1, filename);
             }
         }
         else if(item->text(0) == "Normal map")
         {
-            QString filename = QFileDialog::getOpenFileName(this, tr("Open texture file"), item->text(1), tr("Images (*.jpg *.jpeg *.jpe *.png *.tga *.bmp, *.raw, *.gif, *.dds);;JPEG image (*.jpg *.jpeg *.jpe);;PNG image (*.png);;Targa image (*.tga);;Bitmap image (*.bmp);;RAW image (*.raw);;GIF image (*.gif);;DirectDraw surface (*.dds)"));
+            QString filename = QFileDialog::getOpenFileName(this, tr("Open texture file"), item->text(1), tr("Images (*.jpg *.jpeg *.jpe *.png *.tga *.bmp *.raw *.gif *.dds);;JPEG image (*.jpg *.jpeg *.jpe);;PNG image (*.png);;Targa image (*.tga);;Bitmap image (*.bmp);;RAW image (*.raw);;GIF image (*.gif);;DirectDraw surface (*.dds)"));
             if(filename != 0)
             {
+                // Convert path to relative
+                filename = QDir::current().relativeFilePath(filename);
+                // Set texture
                 mOgreWidget->getTerrain()->setTexture(Terrain::TT_DIFFUSE, texCat, filename.toStdString());
                 item->setText(1, filename);
             }
@@ -321,43 +357,11 @@ void MainWindow::randomiseTerrainSeed()
 // Show configuration window
 void MainWindow::options()
 {
-    QDialog* Dialog = new QDialog;
-    Dialog->setWindowTitle(tr("Preferences"));
+    OptionsDialog* dialog = new OptionsDialog(this, mSettings);
+    dialog->show();
+    dialog->setModal(true);
 
-    QFormLayout *formLayout = new QFormLayout(Dialog);
-
-    QLabel *label = new QLabel(Dialog);
-    label->setText(tr("Rendering subsystem"));
-    formLayout->setWidget(0, QFormLayout::LabelRole, label);
-
-    QComboBox *renderingSubsystemBox = new QComboBox(Dialog);
-    renderingSubsystemBox->insertItems(0, QStringList()
-#ifdef _WIN32
-                                       << tr("Direct3D9")
-#endif
-                                       << tr("OpenGL"));
-    formLayout->setWidget(0, QFormLayout::FieldRole, renderingSubsystemBox);
-
-    QLabel *label_2 = new QLabel(Dialog);
-    label_2->setText(tr("Anti-aliasing"));
-    formLayout->setWidget(1, QFormLayout::LabelRole, label_2);
-
-    QComboBox *antialiasingBox = new QComboBox(Dialog);
-    antialiasingBox->insertItems(0, QStringList() << tr("0 (off)") << "2" << "4" << "8" << "16");
-    formLayout->setWidget(1, QFormLayout::FieldRole, antialiasingBox);
-
-    QDialogButtonBox *buttonBox = new QDialogButtonBox(Dialog);
-    buttonBox->setOrientation(Qt::Horizontal);
-    buttonBox->setStandardButtons(QDialogButtonBox::Cancel|QDialogButtonBox::Ok);
-    formLayout->setWidget(2, QFormLayout::SpanningRole, buttonBox);
-
-    QObject::connect(buttonBox, SIGNAL(accepted()), Dialog, SLOT(accept()));
-    QObject::connect(buttonBox, SIGNAL(rejected()), Dialog, SLOT(reject()));
-
-    Dialog->setFixedSize(Dialog->sizeHint());
-    Dialog->setWindowFlags(Dialog->windowFlags() & ~Qt::WindowContextHelpButtonHint);
-    Dialog->show();
-    Dialog->setModal(true);
+    connect(dialog, SIGNAL(settingsUpdated()), this, SLOT(updateSettings()));
 }
 
 // Show about box wit informaton on copyright and credits
@@ -387,7 +391,7 @@ void MainWindow::showAboutBox()
                       "<html><head><meta name=\"qrichtext\" content=\"1\" /></head><body>\n"
                       "<h1>Gaiascape</h1>\n"
                       "<p>Written by Rory Dungan &lt;<a href=\"mailto:rorydungan@gmail.com\">rorydungan@gmail.com</a>&gt; and Dylan Ford &lt;<a href=\"mailto:dylan@fordfam.com\">dylan@fordfam.com</a>&gt;</p>\n"
-                      "<p>Artwork by Daniel Galbraith &lt;<a href=\"mailto:dgalbraih2@gmail.com\">dgalbraith2@gmail.com</a>&gt;, Daniel Docherty &lt;<a href=\"mailto:ddocherty.z1@gmail.com\">ddocherty.z1@gmail.com</a>&gt; and Joshua Dauth &lt;<a href=\"mailto:kalthar@hotmail.com\">kalthar@hotmail.com</a>&gt;</p>\n"
+                      "<p>Artwork by Daniel Galbraith &lt;<a href=\"mailto:dgalbraih2@gmail.com\">dgalbraith2@gmail.com</a>&gt;and Daniel Docherty &lt;<a href=\"mailto:ddocherty.z1@gmail.com\">ddocherty.z1@gmail.com</a>&gt;</p>\n"/* and Joshua Dauth &lt;<a href=\"mailto:kalthar@hotmail.com\">kalthar@hotmail.com</a>&gt;*/
                       "<p>Thanks also to Kito Berg-Taylor for the Qt Ogre intregation code. </p>\n"
                       "<p>Portions Copyright (C) 2010 Nokia Corporation and/or its subsidiary(-ies).  All rights reserved.  Contact: Nokia Corporation (qt-info@nokia.com).  This software contains Qt v.4.7.2.  Qt is licensed under the GNU Lesser General Public License v.2.1, which can be found at http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt. </p>"
                       "<p>Portions Copyright (C) 2000-2011 Torus Knot Software Ltd. OGRE is licensed under the MIT License. "
@@ -406,10 +410,75 @@ void MainWindow::statusTextureUpdateInProgress()
     mStatusProgressBar->setVisible(true);
     mStatusProgressBar->setMinimum(0);
     mStatusProgressBar->setMaximum(0);
+
+    QApplication::setOverrideCursor(QCursor(Qt::BusyCursor));
+
+    // Creating a new terrain while the program is updating the textures causes it to freeze and stop responding untl he texture updae has finished
+    // This can givethe impression that the program has crashed, so it is prevented by disabling the buttons to create new terrains temporarily
+    ui->generateTerrain->setEnabled(false);
+    ui->loadTerrain->setEnabled(false);
+    ui->clearTerrain->setEnabled(false);
 }
 
 void MainWindow::statusTextreUpdateFinished()
 {
-    statusBar()->clearMessage();
+    statusBar()->showMessage(tr("Finished generating terrain."));
     mStatusProgressBar->setVisible(false);
+    ui->generateTerrain->setEnabled(true);
+    ui->loadTerrain->setEnabled(true);
+    ui->clearTerrain->setEnabled(true);
+    QApplication::restoreOverrideCursor();
+}
+
+void MainWindow::updateSettings()
+{
+    mOgreWidget->setCameraInverted(mSettings->value("Renderer/CameraInverted", false).toBool());
+    mOgreWidget->setFOVy(mSettings->value("Renderer/FOV", 45).toInt());
+}
+
+void MainWindow::updateTextures()
+{
+
+}
+
+void MainWindow::resetDefaultTextures()
+{
+
+}
+
+void MainWindow::updateSkybox()
+{
+
+}
+
+void MainWindow::resetDefaultSkybox()
+{
+
+}
+
+void MainWindow::loadSkyboxImage()
+{
+    // Get file path
+    QString filePath = QFileDialog::getOpenFileName(this, tr("Open texture file"), QString(), tr("Images (*.jpg *.jpeg *.jpe *.png *.tga *.bmp *.raw *.gif *.dds);;JPEG image (*.jpg *.jpeg *.jpe);;PNG image (*.png);;Targa image (*.tga);;Bitmap image (*.bmp);;RAW image (*.raw);;GIF image (*.gif);;DirectDraw surface (*.dds)"));
+
+    // Return if no file was selected
+    if(filePath == 0) return;
+
+    // Convert path to relative
+    filePath = QDir::current().relativeFilePath(filePath);
+
+    // Find the appropriate lineEdit box and update it with the new file
+    if(sender() == ui->skyboxBackButton)
+        ui->skyboxBackLineEdit->setText(filePath);
+    else if(sender() == ui->skyboxDownButton)
+        ui->skyboxDownLineEdit->setText(filePath);
+    else if(sender() == ui->skyboxFrontButton)
+        ui->skyboxFrontLineEdit->setText(filePath);
+    else if(sender() == ui->skyboxLeftButton)
+        ui->skyboxLeftLineEdit->setText(filePath);
+    else if(sender() == ui->skyboxRightButton)
+        ui->skyboxRightLineEdit->setText(filePath);
+    else if(sender() == ui->skyboxUpButton)
+        ui->skyboxUpLineEdit->setText(filePath);
+
 }

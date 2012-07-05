@@ -148,16 +148,27 @@ void THIS::initializeGL()
     else
         mCamera->setFarClipDistance(50000);
 
-    Ogre::Viewport *mViewport = mOgreWindow->addViewport( mCamera );
+    mViewport = mOgreWindow->addViewport( mCamera );
     mViewport->setBackgroundColour( Ogre::ColourValue( 0.8,0.8,1 ) );
 
     mCamera->setAutoAspectRatio(true);
+    //mCamera->setFOVy(mCamFOV);
 
     // This should really be called after initializeGL() because it takes a fair amount of time to load the resources
     // and initializeGL() is called before the main window of the program is created. In future I would like to have
     // it create the window immediatly, set the cursor to busy/wait and then call setupScene(), preferably in a
     // background thread - Rory
     setupScene();
+}
+
+/**
+ * @brief Set the vertical field of view
+ * @author Rory Dungan
+ */
+void THIS::setFOVy(float fov)
+{
+    if(mOgreWindow->isActive()) mCamera->setFOVy(Ogre::Degree(fov));
+    else mCamFOV = Ogre::Degree(10.0f);
 }
 
 /**
@@ -191,7 +202,7 @@ void THIS::modifyTerrain(Ogre::Terrain* terrain, const Ogre::Vector3 &centerPos,
             weight = 1.0f - (weight * weight);
 
             float addedHeight = weight * 250.0f * timeElapsed;
-            float newHeight = interactionMode == IM_EXTRUDE ? terrain->getHeightAtPoint(x, y) + addedHeight : terrain->getHeightAtPoint(x, y) - addedHeight;
+            float newHeight = mInteractionMode == IM_EXTRUDE ? terrain->getHeightAtPoint(x, y) + addedHeight : terrain->getHeightAtPoint(x, y) - addedHeight;
             terrain->setHeightAtPoint(x, y, newHeight);
         }
     }
@@ -210,34 +221,34 @@ void THIS::mousePressEvent(QMouseEvent * event)
     switch(event->button())
     {
     case Qt::LeftButton:
-        if(currentState == IS_IDLE)
-            switch(interactionMode)
+        if(mCurrentState == IS_IDLE)
+            switch(mInteractionMode)
             {
             case IM_EXTRUDE:
-                currentState = IS_EXTRUDING;
+                mCurrentState = IS_EXTRUDING;
                 qDebug() << "IS_EXTRUDING";
                 break;
             case IM_INTRUDE:
-                currentState = IS_EXTRUDING;
+                mCurrentState = IS_EXTRUDING;
                 break;
             case IM_PAINT:
-                currentState = IS_PAINTING;
+                mCurrentState = IS_PAINTING;
                 break;
             case IM_PLACEOBJ:
-                currentState = IS_PLACING_OBJECTS;
+                mCurrentState = IS_PLACING_OBJECTS;
                 break;
             default: break;
             }
         break;
     case Qt::RightButton:
         if(!bCtrlPressed)
-            currentState = IS_ROTATING_CAMERA;
+            mCurrentState = IS_ROTATING_CAMERA;
         else
-            currentState = IS_MOVING_CAMERA;
+            mCurrentState = IS_MOVING_CAMERA;
         break;
 
     case Qt::MiddleButton:
-        currentState = IS_MOVING_CAMERA;
+        mCurrentState = IS_MOVING_CAMERA;
         break;
 
     default:
@@ -251,7 +262,7 @@ void THIS::mousePressEvent(QMouseEvent * event)
  */
 void THIS::mouseReleaseEvent(QMouseEvent * event)
 {
-    currentState = IS_IDLE;
+    mCurrentState = IS_IDLE;
 }
 
 /**
@@ -264,11 +275,11 @@ void THIS::mouseMoveEvent(QMouseEvent * event)
     int dx = event->x() - mLastCursorPos.x();
     int dy = event->y() - mLastCursorPos.y();
 
-    switch(currentState)
+    switch(mCurrentState)
     {
     case IS_ROTATING_CAMERA:
-        mCamera->pitch(Ogre::Degree(dy));
-        mCamera->yaw(Ogre::Degree(dx));
+        mCamera->pitch(Ogre::Degree(bCameraControlsInverted ? -dy : dy));
+        mCamera->yaw(Ogre::Degree(bCameraControlsInverted ? -dx : dx));
         updateGL();
         break;
     case IS_MOVING_CAMERA:
@@ -288,7 +299,7 @@ void THIS::mouseMoveEvent(QMouseEvent * event)
  */
 void THIS::setInteractionMode(interactionModes i)
 {
-    interactionMode = i;
+    mInteractionMode = i;
 }
 
 /**
@@ -327,13 +338,15 @@ void THIS::setupScene()
 void THIS::paintGL()
 {
     // If the current state is a state in which the user is interacting with the terrain via the mouse
-    if(currentState == IS_EXTRUDING || currentState == IS_INTRUDING || currentState == IS_PAINTING || currentState == IS_PLACING_OBJECTS)
+    if(mCurrentState == IS_EXTRUDING || mCurrentState == IS_INTRUDING || mCurrentState == IS_PAINTING || mCurrentState == IS_PLACING_OBJECTS)
     {
-        qDebug() << mLastCursorPos.x() << " " << mLastCursorPos.y();
+        float relPosX = (float)mLastCursorPos.x() / (float)mCamera->getViewport()->getActualWidth();
+        float relPosY = (float)mLastCursorPos.y() / (float)mCamera->getViewport()->getActualHeight();
+        qDebug() << relPosX << " " << relPosY;
         // Get the 3d point that the cursor is over
         // fire ray
-        //Ogre::Ray ray = mCamera->getCameraToViewportRay(Ogre::Real(mLastCursorPos.x() - mCamera->getViewport()->getActualWidth()/2), Ogre::Real(mLastCursorPos.y() - mCamera->getViewport()->getActualHeight()/2));
-        Ogre::Ray ray = mCamera->getCameraToViewportRay(Ogre::Real(mLastCursorPos.x()), Ogre::Real(mLastCursorPos.y()));
+        //Ogre::Ray ray = mCamera->getCameraToViewportRay(0.5f, 0.5f);
+        Ogre::Ray ray = mCamera->getCameraToViewportRay(relPosX, relPosY);
 
         Ogre::TerrainGroup::RayResult rayResult = mTerrain->getTerrainGroup()->rayIntersects(ray);
         if(rayResult.hit) // Ray hit the terrain
@@ -345,7 +358,7 @@ void THIS::paintGL()
             Ogre::Sphere sphere(rayResult.position, brushSizeWorldSpace);
             mTerrain->getTerrainGroup()->sphereIntersects(sphere, &terrainList);
 
-            switch(currentState)
+            switch(mCurrentState)
             {
             case IS_EXTRUDING:
                 for(Ogre::TerrainGroup::TerrainList::iterator ti = terrainList.begin(); ti != terrainList.end(); ++ti)
@@ -360,15 +373,15 @@ void THIS::paintGL()
     // Notify of texture update
     if (mTerrain->getTerrainGroup()->isDerivedDataUpdateInProgress())
     {
-        if(updatingTextures == false)
+        if(bUpdatingTextures == false)
             emit textureUpdateInProgress();
-        updatingTextures = true;
+        bUpdatingTextures = true;
     }
     else
     {
-        if(updatingTextures == true)
+        if(bUpdatingTextures == true)
             emit textureUpdateFinished();
-        updatingTextures = false;
+        bUpdatingTextures = false;
     }
 
     // Update camera

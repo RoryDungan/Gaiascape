@@ -55,11 +55,13 @@ public:
         IM_INTRUDE,
         IM_PAINT,
         IM_PLACEOBJ
-    } interactionMode;
+    } mInteractionMode;
 
     void setInteractionMode(interactionModes i);
     void setViewMode(Ogre::PolygonMode mode) { mCamera->setPolygonMode(mode); }
     void saveScreenshotToFile(QString filename);
+    void setCameraInverted(bool inverted) { bCameraControlsInverted = inverted; }
+    void setFOVy(float fov);
 
     bool bCtrlPressed;
 
@@ -103,12 +105,14 @@ private:
         IS_INTRUDING,
         IS_PAINTING,
         IS_PLACING_OBJECTS
-    } currentState;
+    } mCurrentState;
 
     // Stores the last position of the cursor
     QPoint mLastCursorPos;
+    bool bCameraControlsInverted;
+    Ogre::Degree mCamFOV;
 
-    bool updatingTextures;
+    bool bUpdatingTextures;
 };
 
 #endif // OGREWIDGET_H

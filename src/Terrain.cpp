@@ -94,7 +94,7 @@ void Terrain::generateTerrain()
     HeightMapGen HMHMgen(0.0f, iTerrainSize);
     // Set the array to be filled with zeroes, and be flat.
     // Set up the dimensions of the array
-    short unsigned int iDimensions = pow(4.0, iTerrainSize * 0.5) + 1;
+    long unsigned int iDimensions = pow(4.0, iTerrainSize * 0.5) + 1;
     float heightMap[iDimensions*iDimensions];
     for(long unsigned int i = 0; i < iDimensions*iDimensions; i++)
         heightMap[i] = 0;
@@ -181,6 +181,7 @@ void Terrain::generateTerrain()
     // Now, all there is left to do is clean up after the initial terrain creation:
     mTerrainGroup->freeTemporaryResources();
 
+    /*
     // -----------------
     // Create Vegetation
     // -----------------
@@ -235,7 +236,7 @@ void Terrain::generateTerrain()
         {
             iProbability = -1;
         }
-    }*/
+    }
 
     // Generate an image of slopeMap for diagnostic purposes
     Ogre::uchar stream2[iDimensions*iDimensions];
@@ -248,7 +249,7 @@ void Terrain::generateTerrain()
 
     Ogre::Image img2;
     img2.loadDynamicImage(pStream2, iDimensions, iDimensions, Ogre::PF_L8); // PF_L8 = 8-pit pixel format, all luminance
-    img2.save("slopeMap.bmp");
+    img2.save("slopeMap.bmp");*/
 }
 
 void Terrain::clearTerrain()

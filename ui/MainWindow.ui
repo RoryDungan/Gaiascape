@@ -85,7 +85,7 @@
     </size>
    </property>
    <property name="toolButtonStyle">
-    <enum>Qt::ToolButtonTextBesideIcon</enum>
+    <enum>Qt::ToolButtonIconOnly</enum>
    </property>
    <attribute name="toolBarArea">
     <enum>TopToolBarArea</enum>
@@ -99,8 +99,6 @@
    <addaction name="separator"/>
    <addaction name="action_Undo"/>
    <addaction name="action_Redo"/>
-   <addaction name="separator"/>
-   <addaction name="actionTake_screenshot"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <widget class="QToolBar" name="toolBar">
@@ -121,7 +119,7 @@
   </widget>
   <widget class="QDockWidget" name="texturesDockWidget">
    <property name="features">
-    <set>QDockWidget::DockWidgetFloatable|QDockWidget::DockWidgetMovable</set>
+    <set>QDockWidget::NoDockWidgetFeatures</set>
    </property>
    <property name="windowTitle">
     <string>Textures</string>
@@ -131,12 +129,6 @@
    </attribute>
    <widget class="QWidget" name="dockWidgetContents_2">
     <layout class="QVBoxLayout" name="verticalLayout">
-     <property name="spacing">
-      <number>0</number>
-     </property>
-     <property name="margin">
-      <number>0</number>
-     </property>
      <item>
       <widget class="QTreeWidget" name="texturesTreeWidget">
        <property name="alternatingRowColors">
@@ -219,41 +211,287 @@
       </widget>
      </item>
      <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_2">
-       <item>
-        <widget class="QPushButton" name="updateTexturesButton">
-         <property name="text">
-          <string>Update terrain</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="resetTexturesButton">
-         <property name="text">
-          <string>Reset</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
+      <widget class="QCommandLinkButton" name="updateTexturesButton">
+       <property name="text">
+        <string>Accept</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../icons.qrc">
+         <normaloff>:/media/22x22/dialog-apply.png</normaloff>:/media/22x22/dialog-apply.png</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>22</width>
+         <height>22</height>
+        </size>
+       </property>
+       <property name="description">
+        <string>Update the terrain with the new texture proprties</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCommandLinkButton" name="resetTexturesButton">
+       <property name="text">
+        <string>Reset</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../icons.qrc">
+         <normaloff>:/media/22x22/document-revert.png</normaloff>:/media/22x22/document-revert.png</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>22</width>
+         <height>22</height>
+        </size>
+       </property>
+       <property name="description">
+        <string>Revert to the default configuration</string>
+       </property>
+      </widget>
      </item>
     </layout>
    </widget>
   </widget>
   <widget class="QDockWidget" name="skyDockWidget">
+   <property name="minimumSize">
+    <size>
+     <width>225</width>
+     <height>335</height>
+    </size>
+   </property>
    <property name="features">
-    <set>QDockWidget::DockWidgetFloatable|QDockWidget::DockWidgetMovable</set>
+    <set>QDockWidget::NoDockWidgetFeatures</set>
    </property>
    <property name="windowTitle">
     <string>Sky</string>
    </property>
    <attribute name="dockWidgetArea">
-    <number>2</number>
+    <number>1</number>
    </attribute>
-   <widget class="QWidget" name="dockWidgetContents_3"/>
+   <widget class="QWidget" name="dockWidgetContents_3">
+    <layout class="QVBoxLayout" name="verticalLayout_3">
+     <item>
+      <widget class="QGroupBox" name="groupBox">
+       <property name="title">
+        <string>Skybox</string>
+       </property>
+       <layout class="QFormLayout" name="formLayout">
+        <property name="labelAlignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+        <item row="0" column="0">
+         <widget class="QLabel" name="label_6">
+          <property name="text">
+           <string>Up</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <layout class="QHBoxLayout" name="horizontalLayout_2">
+          <property name="spacing">
+           <number>0</number>
+          </property>
+          <item>
+           <widget class="QLineEdit" name="skyboxUpLineEdit"/>
+          </item>
+          <item>
+           <widget class="QToolButton" name="skyboxUpButton">
+            <property name="icon">
+             <iconset resource="../icons.qrc">
+              <normaloff>:/media/16x16/document-open.png</normaloff>:/media/16x16/document-open.png</iconset>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="label_7">
+          <property name="text">
+           <string>Down</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <layout class="QHBoxLayout" name="horizontalLayout_3">
+          <property name="spacing">
+           <number>0</number>
+          </property>
+          <item>
+           <widget class="QLineEdit" name="skyboxDownLineEdit"/>
+          </item>
+          <item>
+           <widget class="QToolButton" name="skyboxDownButton">
+            <property name="icon">
+             <iconset resource="../icons.qrc">
+              <normaloff>:/media/16x16/document-open.png</normaloff>:/media/16x16/document-open.png</iconset>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item row="2" column="0">
+         <widget class="QLabel" name="label_8">
+          <property name="text">
+           <string>Front</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <layout class="QHBoxLayout" name="horizontalLayout_4">
+          <property name="spacing">
+           <number>0</number>
+          </property>
+          <item>
+           <widget class="QLineEdit" name="skyboxFrontLineEdit"/>
+          </item>
+          <item>
+           <widget class="QToolButton" name="skyboxFrontButton">
+            <property name="icon">
+             <iconset resource="../icons.qrc">
+              <normaloff>:/media/16x16/document-open.png</normaloff>:/media/16x16/document-open.png</iconset>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item row="3" column="0">
+         <widget class="QLabel" name="label_9">
+          <property name="text">
+           <string>Back</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="1">
+         <layout class="QHBoxLayout" name="horizontalLayout_5">
+          <property name="spacing">
+           <number>0</number>
+          </property>
+          <item>
+           <widget class="QLineEdit" name="skyboxBackLineEdit"/>
+          </item>
+          <item>
+           <widget class="QToolButton" name="skyboxBackButton">
+            <property name="icon">
+             <iconset resource="../icons.qrc">
+              <normaloff>:/media/16x16/document-open.png</normaloff>:/media/16x16/document-open.png</iconset>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item row="4" column="0">
+         <widget class="QLabel" name="label_10">
+          <property name="text">
+           <string>Left</string>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="1">
+         <layout class="QHBoxLayout" name="horizontalLayout_6">
+          <property name="spacing">
+           <number>0</number>
+          </property>
+          <item>
+           <widget class="QLineEdit" name="skyboxLeftLineEdit"/>
+          </item>
+          <item>
+           <widget class="QToolButton" name="skyboxLeftButton">
+            <property name="icon">
+             <iconset resource="../icons.qrc">
+              <normaloff>:/media/16x16/document-open.png</normaloff>:/media/16x16/document-open.png</iconset>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item row="5" column="0">
+         <widget class="QLabel" name="label_11">
+          <property name="text">
+           <string>Right</string>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="1">
+         <layout class="QHBoxLayout" name="horizontalLayout_7">
+          <property name="spacing">
+           <number>0</number>
+          </property>
+          <item>
+           <widget class="QLineEdit" name="skyboxRightLineEdit"/>
+          </item>
+          <item>
+           <widget class="QToolButton" name="skyboxRightButton">
+            <property name="icon">
+             <iconset resource="../icons.qrc">
+              <normaloff>:/media/16x16/document-open.png</normaloff>:/media/16x16/document-open.png</iconset>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item>
+      <spacer name="verticalSpacer">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>40</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QCommandLinkButton" name="updateSkyButton">
+       <property name="text">
+        <string>Accept</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../icons.qrc">
+         <normaloff>:/media/22x22/dialog-apply.png</normaloff>:/media/22x22/dialog-apply.png</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>22</width>
+         <height>22</height>
+        </size>
+       </property>
+       <property name="description">
+        <string>Update the world and load the new skybox</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCommandLinkButton" name="resetSkyButton">
+       <property name="text">
+        <string>Reset</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../icons.qrc">
+         <normaloff>:/media/22x22/document-revert.png</normaloff>:/media/22x22/document-revert.png</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>22</width>
+         <height>22</height>
+        </size>
+       </property>
+       <property name="description">
+        <string>Revert to the default configuration</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
   </widget>
   <widget class="QDockWidget" name="foliageDockWidget">
    <property name="features">
-    <set>QDockWidget::DockWidgetFloatable|QDockWidget::DockWidgetMovable</set>
+    <set>QDockWidget::NoDockWidgetFeatures</set>
    </property>
    <property name="windowTitle">
     <string>Foliage</string>
@@ -271,7 +509,7 @@
     </size>
    </property>
    <property name="features">
-    <set>QDockWidget::DockWidgetFloatable|QDockWidget::DockWidgetMovable</set>
+    <set>QDockWidget::NoDockWidgetFeatures</set>
    </property>
    <property name="windowTitle">
     <string>Terrain</string>
@@ -357,7 +595,7 @@
          <item row="3" column="0">
           <widget class="QLabel" name="label_5">
            <property name="text">
-            <string>Erroson</string>
+            <string>Erosion</string>
            </property>
           </widget>
          </item>
@@ -486,25 +724,36 @@
     </layout>
    </widget>
   </widget>
-  <action name="action_New">
-   <property name="enabled">
-    <bool>false</bool>
+  <widget class="QToolBar" name="toolBar_2">
+   <property name="windowTitle">
+    <string>toolBar_2</string>
    </property>
+   <property name="toolButtonStyle">
+    <enum>Qt::ToolButtonTextBesideIcon</enum>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionShow_heightmap_image"/>
+   <addaction name="separator"/>
+   <addaction name="actionTake_screenshot"/>
+  </widget>
+  <action name="action_New">
    <property name="icon">
     <iconset resource="../icons.qrc">
      <normaloff>:/media/24x24/document-new.png</normaloff>:/media/24x24/document-new.png</iconset>
    </property>
    <property name="text">
-    <string>&amp;New...</string>
+    <string>&amp;New</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+N</string>
    </property>
   </action>
   <action name="action_Open">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
    <property name="icon">
     <iconset resource="../icons.qrc">
      <normaloff>:/media/24x24/document-open.png</normaloff>:/media/24x24/document-open.png</iconset>
@@ -525,9 +774,6 @@
    </property>
   </action>
   <action name="action_Save">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
    <property name="icon">
     <iconset resource="../icons.qrc">
      <normaloff>:/media/24x24/document-save.png</normaloff>:/media/24x24/document-save.png</iconset>
@@ -540,9 +786,6 @@
    </property>
   </action>
   <action name="actionSave_As">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
    <property name="icon">
     <iconset resource="../icons.qrc">
      <normaloff>:/media/16x16/document-save-as.png</normaloff>:/media/16x16/document-save-as.png</iconset>
@@ -602,11 +845,20 @@
    </property>
   </action>
   <action name="action_Solid">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
    <property name="text">
     <string>&amp;Solid</string>
    </property>
   </action>
   <action name="action_Wireframe">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="text">
     <string>&amp;Wireframe</string>
    </property>
@@ -692,7 +944,7 @@
   <action name="actionShow_heightmap_image">
    <property name="icon">
     <iconset resource="../icons.qrc">
-     <normaloff>:/media/16x16/image.png</normaloff>:/media/16x16/image.png</iconset>
+     <normaloff>:/media/24x24/image.png</normaloff>:/media/24x24/image.png</iconset>
    </property>
    <property name="text">
     <string>Show heightmap image</string>
@@ -721,7 +973,7 @@
      <normaloff>:/media/16x16/preferences-system.png</normaloff>:/media/16x16/preferences-system.png</iconset>
    </property>
    <property name="text">
-    <string>&amp;Options...</string>
+    <string>&amp;Options</string>
    </property>
   </action>
  </widget>
@@ -1098,6 +1350,166 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>updateTexturesButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>updateTextures()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>730</x>
+     <y>205</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>433</x>
+     <y>339</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>resetTexturesButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>resetDefaultTextures()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>730</x>
+     <y>268</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>433</x>
+     <y>339</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>updateSkyButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>updateSkybox()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>147</x>
+     <y>547</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>433</x>
+     <y>339</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>resetSkyButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>resetDefaultSkybox()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>147</x>
+     <y>618</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>433</x>
+     <y>339</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>skyboxUpButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>loadSkyboxImage()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>228</x>
+     <y>120</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>433</x>
+     <y>339</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>skyboxDownButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>loadSkyboxImage()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>228</x>
+     <y>150</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>433</x>
+     <y>339</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>skyboxFrontButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>loadSkyboxImage()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>228</x>
+     <y>180</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>433</x>
+     <y>339</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>skyboxBackButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>loadSkyboxImage()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>228</x>
+     <y>210</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>433</x>
+     <y>339</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>skyboxLeftButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>loadSkyboxImage()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>228</x>
+     <y>240</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>433</x>
+     <y>339</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>skyboxRightButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>loadSkyboxImage()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>228</x>
+     <y>270</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>433</x>
+     <y>339</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>selectTool()</slot>
@@ -1123,5 +1535,10 @@
   <slot>randomiseTerrainSeed()</slot>
   <slot>options()</slot>
   <slot>showAboutBox()</slot>
+  <slot>updateTextures()</slot>
+  <slot>resetDefaultTextures()</slot>
+  <slot>updateSkybox()</slot>
+  <slot>resetDefaultSkybox()</slot>
+  <slot>loadSkyboxImage()</slot>
  </slots>
 </ui>

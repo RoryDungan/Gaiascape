@@ -38,5 +38,8 @@
         <file>media/16x16/preferences-system.png</file>
         <file>media/16x16/edit-clear.png</file>
         <file>media/16x16/view-refresh.png</file>
+        <file>media/22x22/dialog-apply.png</file>
+        <file>media/22x22/document-revert.png</file>
+        <file>media/24x24/image.png</file>
     </qresource>
 </RCC>
