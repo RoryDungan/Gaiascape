@@ -65,6 +65,9 @@ void THIS::init( std::string plugins_file,
                 archName, typeName, secName);
         }
     }
+
+    // Dylan - Initialize the resource groups, or else the .material files won't be parsed
+    Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
 }
 
 /**
@@ -302,7 +305,7 @@ void THIS::setupScene()
     mCamera->lookAt(Ogre::Vector3(1963, 50, 1660));
 
     // Set up skybox
-    //mSceneMgr->setSkyBox(true, "irrSky"); //For some reason this crashes, I have no idea why. - Rory
+    mSceneMgr->setSkyBox(true, "irrSky"); //For some reason this crashes, I have no idea why. - Rory
 
     // Set up light
     Ogre::Vector3 lightdir(0.55, -0.3, 0.75);

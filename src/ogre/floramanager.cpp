@@ -46,6 +46,10 @@ bool floraManager::removeFlora(floraMain *flora)
 
 void floraManager::removeAllFlora()
 {
+    for(short unsigned i = 0; i < vFlora.size(); i++)
+    {
+        delete vFlora[i];
+    }
     vFlora.clear();
 }
 
@@ -54,12 +58,14 @@ float floraManager::getFloraClosestToPoint(Ogre::Vector3 point) // Two dimension
     float fMinDistance = 100; // Default distance. Nothing should be affecting it at 100 units away.
     float fXDistance;
     float fZDistance;
-    for(unsigned int x = 0; x <= vFlora.size(); x++)
+    for(unsigned int x = 0; x < vFlora.size(); x++)
     {
         // Detect if ID is close enough to be attacked
+        Ogre::Vector3 floraPos;
+        floraPos = vFlora[x]->getPosition();
         // Calculating distance...
-        long int mXDistance = vFlora[x]->getPosition().x - point.x;
-        long int mZDistance = vFlora[x]->getPosition().z - point.z;
+        long signed int mXDistance = floraPos.x - point.x;
+        long signed int mZDistance = floraPos.z - point.z;
 
         float distance = sqrt( pow(mXDistance,2) + pow(mZDistance,2) ); // Using pythagoram's a^2 + b^2 = c^2
         if(distance < fMinDistance)

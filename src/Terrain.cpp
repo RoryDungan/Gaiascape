@@ -195,17 +195,29 @@ void Terrain::generateTerrain()
     HMHMgen.retrieveSlopemap(&slopeMap[0], &heightMap[0], iDimensions);
     short unsigned int iProbability = 0; // Probability a tree will spawn. If random returns equal to or below this number, it spawns.
 
-    floraTree* addedTree = new floraTree("tree", mSceneManager, Ogre::Vector3(0, 0, 0));
-    std::cout << "addFlora = " << floraManager::getSingletonPtr()->addFlora(*addedTree) << "\n";
+    Ogre::Vector3 enterPos; // The point the flora will be entering.
+    short unsigned int iRandomNumber; // A randomly generated number from 0 to 10. Should be changed to 0 to 100 for more depth.
+    short unsigned int treesToGenerate = 1000; // A constant that says how many iterations of the for loop we want to go through
+    long unsigned int iRandomBlock; // A randomly selected vertex from the terrain used to spawn a tree
+    floraTree* addedTree;
 
-    /*for(long unsigned int i = 0; i < iFinalX + iDimensions - 1; ++i)
+    std::cout << "1%iDimensions = " << 1%iDimensions << "\n1/iDimensions = " << 1/iDimensions << "\n";
+    mTerrainGroup->getTerrain(0, 0)->getPoint(1%iDimensions, 1/iDimensions, &enterPos);
+
+
+    for(long unsigned int i = 0; i < treesToGenerate; ++i)
     {
         // Treat 128, 0, 128 as the center of terrain
         // and 129 = terrainCenter or tC for short
         // Therefore at any point, the Vector3 position is tC + ((i%256) - 128), 0, tC + (floor(i/256) - 128)
         // @ i = 0, the Vector3 position would be 128 - 128, 0, 128 - 128
         // Then at i = 257, the Vector3 position would be 128 - 127, 0, 128 - 127
-        Ogre::Vector3(0, 0, 0); // Replace with the vector for the tile we are inspecting
+
+        // Set up variables
+        iProbability = 0;
+        iRandomBlock = Random::getSingleton().getRand(0, iFinalX + iDimensions - 1);
+        mTerrainGroup->getTerrain(0, 0)->getPoint(iRandomBlock%iDimensions, iRandomBlock/iDimensions, &enterPos);
+
         // --------------------------
         // Height probability changes
         // --------------------------
@@ -213,29 +225,44 @@ void Terrain::generateTerrain()
         // 11-30% = 40% prob
         // 31-50% = 30% prob
         // 51-90% = 10% prob
-        if(heightMap[i] <= 0.9) // Put an else iProbability = -1 if you want nothing to spawn above 90%
+        if(heightMap[iRandomBlock] <= 0.9) // Put an else iProbability = -1 if you want nothing to spawn above 90%
             iProbability += 1;
-        if(heightMap[i] <= 0.5f)
+        if(heightMap[iRandomBlock] <= 0.5f)
             iProbability += 2;
-        if(heightMap[i] <= 0.3f)
+        if(heightMap[iRandomBlock] <= 0.3f)
             iProbability += 1;
-        if(heightMap[i] <= 0.1f)
+        if(heightMap[iRandomBlock] <= 0.1f)
             iProbability += 1; // DISABLE if water spawns at a certain level, since we don't want vegetation on sand
 
-        // Proximity to trees
+        // Proximity to trees - Disabled because the for loop isn't functioning correctly
         // < 3 = 0% prob
         // 3.1-10 = +30% prob
-        if(iProbability != -1 && floraManager::getSingletonPtr()->getFloraClosestToPoint() <= 3) // 3 is arbitrary and needs to be adjusted to the scale of the model!
+        if(iProbability != -1 && floraManager::getSingletonPtr()->getFloraClosestToPoint(enterPos) <= 14) // 3 is arbitrary and needs to be adjusted to the scale of the model!
+        {
+            std::cout << "Too close!\n";
             iProbability = -1;
-        if(iProbability != -1 && floraManager::getSingletonPtr()->getFloraClosestToPoint() <= 10) // Plants tend to gather together due to factors we don't calculate, so simullate this
+        }
+        if(iProbability != -1 && floraManager::getSingletonPtr()->getFloraClosestToPoint(enterPos) <= 47) // Plants tend to gather together due to factors we don't calculate, so simullate this
+        {
+            std::cout << "Pretty close\n";
             iProbability += 3;
+        }
 
         // Slope
-        if(slopeMap[i] >= 0.1f)
+        if(slopeMap[iRandomBlock] >= 0.1f)
         {
             iProbability = -1;
         }
-    }*/
+
+        // Run the probability
+        iRandomNumber = Random::getSingleton().getRand(1, 10);
+        if(iRandomNumber <= iProbability)
+        {
+            // Create a tree at this point!
+            addedTree = new floraTree("tree" + intToStr(iRandomBlock), mSceneManager, enterPos);
+            floraManager::getSingletonPtr()->addFlora(*addedTree);
+        }
+    }
 
     // Generate an image of slopeMap for diagnostic purposes
     Ogre::uchar stream2[iDimensions*iDimensions];
@@ -249,6 +276,13 @@ void Terrain::generateTerrain()
     Ogre::Image img2;
     img2.loadDynamicImage(pStream2, iDimensions, iDimensions, Ogre::PF_L8); // PF_L8 = 8-pit pixel format, all luminance
     img2.save("slopeMap.bmp");
+}
+
+std::string Terrain::intToStr(int number)
+{
+    std::stringstream ss;
+    ss << number; // Put the integer into the magical stringstream box
+    return ss.str(); // Return the string
 }
 
 void Terrain::clearTerrain()

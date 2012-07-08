@@ -6,7 +6,10 @@
 #include <OGRE/Terrain/OgreTerrainGroup.h>
 #include <OGRE/OgreImage.h>
 
+#include <sstream> // For intToStr. Move if the function is required somewhere else.
+
 #include <algorithms/HeightMapGen.h>
+#include "algorithms/random.h"
 #include "floramanager.h"
 #include "floraTree.h" // Probably just have this included in floraMain and include that instead
 
@@ -36,6 +39,7 @@ private:
     Ogre::Light* mSun;
     bool mTerrainsImported;
 
+    std::string intToStr(int number);
     void defineTerrainFromFile(long x, long y);
     void initBlendMaps(Ogre::Terrain* terrain);
     void configureTerrainDefaults(Ogre::Light* light);

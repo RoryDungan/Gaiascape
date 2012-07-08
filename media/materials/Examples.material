@@ -1,0 +1,28 @@
+material Examples/Ninja
+{
+	technique
+	{
+		pass
+		{
+		
+			texture_unit
+			{
+				texture nskingr.jpg
+			}
+		}
+	}
+}
+
+material Flora/Shrub1
+{
+        technique
+        {
+                pass
+                {
+                        texture_unit
+                        {
+                                texture shrub1text.png
+                        }
+                }
+        }
+}
