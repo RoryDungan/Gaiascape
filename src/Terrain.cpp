@@ -199,7 +199,7 @@ void Terrain::generateTerrain()
     floraTree* addedTree = new floraTree("tree", mSceneManager, Ogre::Vector3(0, 0, 0));
     std::cout << "addFlora = " << floraManager::getSingletonPtr()->addFlora(*addedTree) << "\n";
 
-    /*for(long unsigned int i = 0; i < iFinalX + iDimensions - 1; ++i)
+    for(long unsigned int i = 0; i < iFinalX + iDimensions - 1; ++i)
     {
         // Treat 128, 0, 128 as the center of terrain
         // and 129 = terrainCenter or tC for short
@@ -254,8 +254,6 @@ void Terrain::generateTerrain()
 
 void Terrain::clearTerrain()
 {
-    // delete all terrain data
-    //mTerrainGroup->removeAllTerrains();
     delete mTerrainGroup;
     delete mTerrainGlobals;
 }

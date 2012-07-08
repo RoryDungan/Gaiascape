@@ -16,15 +16,16 @@ class OgreWidget : public QGLWidget
     Q_OBJECT
 
 public:
-    OgreWidget( QWidget *parent=0 ):
-    QGLWidget( parent ),
-    mOgreWindow(NULL)
+    OgreWidget( QWidget *parent=0 )
+        : QGLWidget( parent )
+        , mOgreWindow(NULL)
     {
-        // init variables
-        bCtrlPressed = false;
-
         // Fire up Ogre
+#ifdef _DEBUG
+        init( "plugins_d.cfg", "resources.cfg", "ogre.cfg", "ogre.log" );
+#else
         init( "plugins.cfg", "resources.cfg", "ogre.cfg", "ogre.log" );
+#endif
     }
 
     virtual ~OgreWidget()
@@ -92,6 +93,12 @@ protected:
 private:
     Terrain* mTerrain;
     Ogre::Real mBrushSize;
+    Ogre::Entity* mEditMarker;
+    Ogre::SceneNode* mEditNode;
+    Ogre::Real mHeightUpdateCountDown;
+    Ogre::Real mHeightUpdateRate;
+    Ogre::Vector3 mTerrainPos;
+    Ogre::uint8 mLayerEdit;
 
     // Corrosponds to what the user is doing right now
     enum interactionStates

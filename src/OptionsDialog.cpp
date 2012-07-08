@@ -37,3 +37,8 @@ void OptionsDialog::accept()
 
     close();
 }
+
+void OptionsDialog::closeEvent(QCloseEvent *)
+{
+    delete this;
+}

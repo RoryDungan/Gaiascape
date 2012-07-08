@@ -21,6 +21,9 @@ private:
 
     QSettings* mOptions;
 
+protected:
+    virtual void closeEvent(QCloseEvent *);
+
 signals:
     void settingsUpdated();
 

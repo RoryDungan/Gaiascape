@@ -43,10 +43,16 @@ void THIS::init( std::string plugins_file,
     mOgreRoot->initialise(false); // don't create a window
 
     mCameraMovement = Ogre::Vector3(0.0f, 0.0f, 0.0f);
+    mHeightUpdateCountDown = 0.0f;
+    mHeightUpdateRate = 0.05f; // 1/20, or 20 fps
+    bCtrlPressed = false;
+    mInteractionMode = IM_SELECT;
+    mCurrentState = IS_IDLE;
+    mBrushSize = 0.1;
 
     // Set up resources
     Ogre::ConfigFile cf;
-    cf.load(resources_file);
+    cf.load(resources_file);    
 
     // Go through all sections & settings in the file
     Ogre::ConfigFile::SectionIterator seci = cf.getSectionIterator();
@@ -65,6 +71,7 @@ void THIS::init( std::string plugins_file,
                 archName, typeName, secName);
         }
     }
+    Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
 }
 
 /**
@@ -171,44 +178,6 @@ void THIS::setFOVy(float fov)
     else mCamFOV = Ogre::Degree(10.0f);
 }
 
-/**
- * @brief Modify the terrain with one of the terrain modification tools
- * @author Rory Dungan
- */
-void THIS::modifyTerrain(Ogre::Terrain* terrain, const Ogre::Vector3 &centerPos, Ogre::Real timeElapsed)
-{
-    qDebug() << "This is where we actually modify the terrain";
-    Ogre::Vector3 tsPos;
-    terrain->getTerrainPosition(centerPos, &tsPos);
-
-    // We need point coords
-    Ogre::Real terrainSize = (terrain->getSize() -1);
-    long startx = (tsPos.x - mBrushSize) * terrainSize;
-    long starty = (tsPos.y - mBrushSize) * terrainSize;
-    long endx = (tsPos.x + mBrushSize) * terrainSize;
-    long endy = (tsPos.y + mBrushSize) * terrainSize;
-    startx = std::max(startx, 0L);
-    starty = std::max(starty, 0L);
-    endx = std::min(endx, (long)terrainSize);
-    endy = std::min(endy, (long)terrainSize);
-    for(long y = starty; y <= endy; ++y)
-    {
-        for(long x = startx; x <= endx; ++x)
-        {
-            Ogre::Real tsXdist = (x / terrainSize) - tsPos.x;
-            Ogre::Real tsYdist = (y / terrainSize) - tsPos.y;
-
-            Ogre::Real weight = std::min((Ogre::Real)1.0f, Ogre::Math::Sqrt(tsYdist * tsYdist + tsXdist * tsXdist) / Ogre::Real(0.5 * mBrushSize));
-            weight = 1.0f - (weight * weight);
-
-            float addedHeight = weight * 250.0f * timeElapsed;
-            float newHeight = mInteractionMode == IM_EXTRUDE ? terrain->getHeightAtPoint(x, y) + addedHeight : terrain->getHeightAtPoint(x, y) - addedHeight;
-            terrain->setHeightAtPoint(x, y, newHeight);
-        }
-    }
-    //if(mHeightUpdateCountDown == 0)
-    //    mHeightUpdateCountDown = mHeightUpdateRate;
-}
 
 /**
  * @brief Handle mouse input
@@ -226,7 +195,6 @@ void THIS::mousePressEvent(QMouseEvent * event)
             {
             case IM_EXTRUDE:
                 mCurrentState = IS_EXTRUDING;
-                qDebug() << "IS_EXTRUDING";
                 break;
             case IM_INTRUDE:
                 mCurrentState = IS_EXTRUDING;
@@ -313,7 +281,7 @@ void THIS::setupScene()
     mCamera->lookAt(Ogre::Vector3(1963, 50, 1660));
 
     // Set up skybox
-    //mSceneMgr->setSkyBox(true, "irrSky"); //For some reason this crashes, I have no idea why. - Rory
+    mSceneMgr->setSkyBox(true, "irrSky"); //For some reason this crashes, I have no idea why. - Rory
 
     // Set up light
     Ogre::Vector3 lightdir(0.55, -0.3, 0.75);
@@ -329,6 +297,11 @@ void THIS::setupScene()
 
     // Set up terrain
     mTerrain = new Terrain(mSceneMgr, light);
+
+    mEditMarker = mSceneMgr->createEntity("EditMarker", "sphere.mesh");
+    mEditNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+    mEditNode->attachObject(mEditMarker);
+    mEditNode->setScale(0.05, 0.05, 0.05);
 }
 
 /**
@@ -340,21 +313,22 @@ void THIS::paintGL()
     // If the current state is a state in which the user is interacting with the terrain via the mouse
     if(mCurrentState == IS_EXTRUDING || mCurrentState == IS_INTRUDING || mCurrentState == IS_PAINTING || mCurrentState == IS_PLACING_OBJECTS)
     {
+        // Get the 3d point that the cursor is over
         float relPosX = (float)mLastCursorPos.x() / (float)mCamera->getViewport()->getActualWidth();
         float relPosY = (float)mLastCursorPos.y() / (float)mCamera->getViewport()->getActualHeight();
-        qDebug() << relPosX << " " << relPosY;
-        // Get the 3d point that the cursor is over
         // fire ray
-        //Ogre::Ray ray = mCamera->getCameraToViewportRay(0.5f, 0.5f);
         Ogre::Ray ray = mCamera->getCameraToViewportRay(relPosX, relPosY);
 
         Ogre::TerrainGroup::RayResult rayResult = mTerrain->getTerrainGroup()->rayIntersects(ray);
         if(rayResult.hit) // Ray hit the terrain
         {
-            qDebug() << "rayResult hit point " << rayResult.position.x << " " << rayResult.position.y << " " << rayResult.position.z;
+            //qDebug() << "rayResult hit point " << rayResult.position.x << " " << rayResult.position.y << " " << rayResult.position.z;
+            mEditMarker->setVisible(true);
+            mEditNode->setPosition(rayResult.position);
+
             // Figue out which parts of the terrain this affects
             Ogre::TerrainGroup::TerrainList terrainList;
-            Ogre::Real brushSizeWorldSpace = /* TERRAIN_WORLD_SIZE * mBrushSize */ 2400;
+            Ogre::Real brushSizeWorldSpace = /* TERRAIN_WORLD_SIZE * mBrushSize */ 240;
             Ogre::Sphere sphere(rayResult.position, brushSizeWorldSpace);
             mTerrain->getTerrainGroup()->sphereIntersects(sphere, &terrainList);
 
@@ -362,11 +336,25 @@ void THIS::paintGL()
             {
             case IS_EXTRUDING:
                 for(Ogre::TerrainGroup::TerrainList::iterator ti = terrainList.begin(); ti != terrainList.end(); ++ti)
-                    modifyTerrain(*ti, rayResult.position, 17.0f);
+                    modifyTerrain(*ti, rayResult.position, 0.017f);
                 break;
             default:
                 break;
             }
+        }
+        else
+            mEditMarker->setVisible(false);
+    }
+
+    // Update the terrain
+    if (mHeightUpdateCountDown > 0)
+    {
+        mHeightUpdateCountDown -= 0.017f;//evt.timeSinceLastFrame; - always updates at ~60fps so this can be a constant
+        if (mHeightUpdateCountDown <= 0)
+        {
+            qDebug() << "Updating terrain";
+            mTerrain->getTerrainGroup()->update();
+            mHeightUpdateCountDown = 0;
         }
     }
 
@@ -410,6 +398,44 @@ Ogre::RenderSystem* THIS::chooseRenderer( Ogre::RenderSystemList *renderers )
     // It would probably be wise to do something more friendly
     // that just use the first available renderer
     return *renderers->begin();
+}
+
+/**
+ * @brief Modify the terrain with one of the terrain modification tools
+ * @author Rory Dungan
+ */
+void THIS::modifyTerrain(Ogre::Terrain* terrain, const Ogre::Vector3 &centerPos, Ogre::Real timeElapsed)
+{
+    Ogre::Vector3 tsPos;
+    terrain->getTerrainPosition(centerPos, &tsPos);
+
+    // We need point coords
+    Ogre::Real terrainSize = (terrain->getSize() -1);
+    long startx = (tsPos.x - mBrushSize) * terrainSize;
+    long starty = (tsPos.y - mBrushSize) * terrainSize;
+    long endx = (tsPos.x + mBrushSize) * terrainSize;
+    long endy = (tsPos.y + mBrushSize) * terrainSize;
+    startx = std::max(startx, 0L);
+    starty = std::max(starty, 0L);
+    endx = std::min(endx, (long)terrainSize);
+    endy = std::min(endy, (long)terrainSize);
+    for(long y = starty; y <= endy; ++y)
+    {
+        for(long x = startx; x <= endx; ++x)
+        {
+            Ogre::Real tsXdist = (x / terrainSize) - tsPos.x;
+            Ogre::Real tsYdist = (y / terrainSize) - tsPos.y;
+
+            Ogre::Real weight = std::min((Ogre::Real)1.0f, Ogre::Math::Sqrt(tsYdist * tsYdist + tsXdist * tsXdist) / Ogre::Real(0.5 * mBrushSize));
+            weight = 1.0f - (weight * weight);
+
+            float addedHeight = weight * 250.0f * timeElapsed;
+            float newHeight = mInteractionMode == IM_EXTRUDE ? terrain->getHeightAtPoint(x, y) + addedHeight : terrain->getHeightAtPoint(x, y) - addedHeight;
+            terrain->setHeightAtPoint(x, y, newHeight);
+        }
+    }
+    if(mHeightUpdateCountDown == 0)
+        mHeightUpdateCountDown = mHeightUpdateRate;
 }
 
 /**

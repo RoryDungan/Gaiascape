@@ -133,3 +133,8 @@ void ImageViewer::adjustScrollBar(QScrollBar *scrollBar, double factor)
     scrollBar->setValue(int(factor * scrollBar->value()
                         + ((factor - 1) * scrollBar->pageStep()/2)));
 }
+
+void ImageViewer::closeEvent(QCloseEvent *)
+{
+    delete this;
+}
