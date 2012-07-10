@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'MainWindow.ui'
 **
-** Created: Thu 5. Jul 14:52:00 2012
+** Created: Tue 10. Jul 15:22:11 2012
 **      by: Qt User Interface Compiler version 4.8.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -17,14 +17,16 @@
 #include <QtGui/QCommandLinkButton>
 #include <QtGui/QDockWidget>
 #include <QtGui/QFormLayout>
+#include <QtGui/QGroupBox>
 #include <QtGui/QHBoxLayout>
 #include <QtGui/QHeaderView>
 #include <QtGui/QLabel>
+#include <QtGui/QLineEdit>
 #include <QtGui/QMainWindow>
 #include <QtGui/QMenu>
 #include <QtGui/QMenuBar>
-#include <QtGui/QPushButton>
 #include <QtGui/QSlider>
+#include <QtGui/QSpacerItem>
 #include <QtGui/QSpinBox>
 #include <QtGui/QStatusBar>
 #include <QtGui/QTabWidget>
@@ -74,11 +76,40 @@ public:
     QWidget *dockWidgetContents_2;
     QVBoxLayout *verticalLayout;
     QTreeWidget *texturesTreeWidget;
-    QHBoxLayout *horizontalLayout_2;
-    QPushButton *updateTexturesButton;
-    QPushButton *resetTexturesButton;
+    QCommandLinkButton *updateTexturesButton;
+    QCommandLinkButton *resetTexturesButton;
     QDockWidget *skyDockWidget;
     QWidget *dockWidgetContents_3;
+    QVBoxLayout *verticalLayout_3;
+    QGroupBox *groupBox;
+    QFormLayout *formLayout;
+    QLabel *label_6;
+    QHBoxLayout *horizontalLayout_2;
+    QLineEdit *skyboxUpLineEdit;
+    QToolButton *skyboxUpButton;
+    QLabel *label_7;
+    QHBoxLayout *horizontalLayout_3;
+    QLineEdit *skyboxDownLineEdit;
+    QToolButton *skyboxDownButton;
+    QLabel *label_8;
+    QHBoxLayout *horizontalLayout_4;
+    QLineEdit *skyboxFrontLineEdit;
+    QToolButton *skyboxFrontButton;
+    QLabel *label_9;
+    QHBoxLayout *horizontalLayout_5;
+    QLineEdit *skyboxBackLineEdit;
+    QToolButton *skyboxBackButton;
+    QLabel *label_10;
+    QHBoxLayout *horizontalLayout_6;
+    QLineEdit *skyboxLeftLineEdit;
+    QToolButton *skyboxLeftButton;
+    QLabel *label_11;
+    QHBoxLayout *horizontalLayout_7;
+    QLineEdit *skyboxRightLineEdit;
+    QToolButton *skyboxRightButton;
+    QSpacerItem *verticalSpacer;
+    QCommandLinkButton *updateSkyButton;
+    QCommandLinkButton *resetSkyButton;
     QDockWidget *foliageDockWidget;
     QWidget *dockWidgetContents_4;
     QDockWidget *terrainDockWidget;
@@ -104,6 +135,7 @@ public:
     QCommandLinkButton *generateTerrain;
     QCommandLinkButton *loadTerrain;
     QCommandLinkButton *clearTerrain;
+    QToolBar *toolBar_2;
 
     void setupUi(QMainWindow *MainWindow)
     {
@@ -112,13 +144,11 @@ public:
         MainWindow->resize(868, 680);
         action_New = new QAction(MainWindow);
         action_New->setObjectName(QString::fromUtf8("action_New"));
-        action_New->setEnabled(false);
         QIcon icon;
         icon.addFile(QString::fromUtf8(":/media/24x24/document-new.png"), QSize(), QIcon::Normal, QIcon::Off);
         action_New->setIcon(icon);
         action_Open = new QAction(MainWindow);
         action_Open->setObjectName(QString::fromUtf8("action_Open"));
-        action_Open->setEnabled(false);
         QIcon icon1;
         icon1.addFile(QString::fromUtf8(":/media/24x24/document-open.png"), QSize(), QIcon::Normal, QIcon::Off);
         action_Open->setIcon(icon1);
@@ -127,13 +157,11 @@ public:
         actionOpen_Recent->setEnabled(false);
         action_Save = new QAction(MainWindow);
         action_Save->setObjectName(QString::fromUtf8("action_Save"));
-        action_Save->setEnabled(false);
         QIcon icon2;
         icon2.addFile(QString::fromUtf8(":/media/24x24/document-save.png"), QSize(), QIcon::Normal, QIcon::Off);
         action_Save->setIcon(icon2);
         actionSave_As = new QAction(MainWindow);
         actionSave_As->setObjectName(QString::fromUtf8("actionSave_As"));
-        actionSave_As->setEnabled(false);
         QIcon icon3;
         icon3.addFile(QString::fromUtf8(":/media/16x16/document-save-as.png"), QSize(), QIcon::Normal, QIcon::Off);
         actionSave_As->setIcon(icon3);
@@ -158,8 +186,11 @@ public:
         action_Textured->setObjectName(QString::fromUtf8("action_Textured"));
         action_Solid = new QAction(MainWindow);
         action_Solid->setObjectName(QString::fromUtf8("action_Solid"));
+        action_Solid->setCheckable(true);
+        action_Solid->setChecked(true);
         action_Wireframe = new QAction(MainWindow);
         action_Wireframe->setObjectName(QString::fromUtf8("action_Wireframe"));
+        action_Wireframe->setCheckable(true);
         actionExtrude = new QAction(MainWindow);
         actionExtrude->setObjectName(QString::fromUtf8("actionExtrude"));
         actionExtrude->setCheckable(true);
@@ -200,7 +231,7 @@ public:
         actionShow_heightmap_image = new QAction(MainWindow);
         actionShow_heightmap_image->setObjectName(QString::fromUtf8("actionShow_heightmap_image"));
         QIcon icon13;
-        icon13.addFile(QString::fromUtf8(":/media/16x16/image.png"), QSize(), QIcon::Normal, QIcon::Off);
+        icon13.addFile(QString::fromUtf8(":/media/24x24/image.png"), QSize(), QIcon::Normal, QIcon::Off);
         actionShow_heightmap_image->setIcon(icon13);
         actionUser_guide = new QAction(MainWindow);
         actionUser_guide->setObjectName(QString::fromUtf8("actionUser_guide"));
@@ -234,7 +265,7 @@ public:
         mainToolBar = new QToolBar(MainWindow);
         mainToolBar->setObjectName(QString::fromUtf8("mainToolBar"));
         mainToolBar->setIconSize(QSize(24, 24));
-        mainToolBar->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+        mainToolBar->setToolButtonStyle(Qt::ToolButtonIconOnly);
         MainWindow->addToolBar(Qt::TopToolBarArea, mainToolBar);
         statusBar = new QStatusBar(MainWindow);
         statusBar->setObjectName(QString::fromUtf8("statusBar"));
@@ -244,12 +275,12 @@ public:
         MainWindow->addToolBar(Qt::LeftToolBarArea, toolBar);
         texturesDockWidget = new QDockWidget(MainWindow);
         texturesDockWidget->setObjectName(QString::fromUtf8("texturesDockWidget"));
-        texturesDockWidget->setFeatures(QDockWidget::DockWidgetFloatable|QDockWidget::DockWidgetMovable);
+        texturesDockWidget->setFeatures(QDockWidget::NoDockWidgetFeatures);
         dockWidgetContents_2 = new QWidget();
         dockWidgetContents_2->setObjectName(QString::fromUtf8("dockWidgetContents_2"));
         verticalLayout = new QVBoxLayout(dockWidgetContents_2);
-        verticalLayout->setSpacing(0);
-        verticalLayout->setContentsMargins(0, 0, 0, 0);
+        verticalLayout->setSpacing(6);
+        verticalLayout->setContentsMargins(11, 11, 11, 11);
         verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
         texturesTreeWidget = new QTreeWidget(dockWidgetContents_2);
         QTreeWidgetItem *__qtreewidgetitem = new QTreeWidgetItem(texturesTreeWidget);
@@ -267,34 +298,203 @@ public:
 
         verticalLayout->addWidget(texturesTreeWidget);
 
-        horizontalLayout_2 = new QHBoxLayout();
-        horizontalLayout_2->setSpacing(6);
-        horizontalLayout_2->setObjectName(QString::fromUtf8("horizontalLayout_2"));
-        updateTexturesButton = new QPushButton(dockWidgetContents_2);
+        updateTexturesButton = new QCommandLinkButton(dockWidgetContents_2);
         updateTexturesButton->setObjectName(QString::fromUtf8("updateTexturesButton"));
+        QIcon icon16;
+        icon16.addFile(QString::fromUtf8(":/media/22x22/dialog-apply.png"), QSize(), QIcon::Normal, QIcon::Off);
+        updateTexturesButton->setIcon(icon16);
+        updateTexturesButton->setIconSize(QSize(22, 22));
 
-        horizontalLayout_2->addWidget(updateTexturesButton);
+        verticalLayout->addWidget(updateTexturesButton);
 
-        resetTexturesButton = new QPushButton(dockWidgetContents_2);
+        resetTexturesButton = new QCommandLinkButton(dockWidgetContents_2);
         resetTexturesButton->setObjectName(QString::fromUtf8("resetTexturesButton"));
+        QIcon icon17;
+        icon17.addFile(QString::fromUtf8(":/media/22x22/document-revert.png"), QSize(), QIcon::Normal, QIcon::Off);
+        resetTexturesButton->setIcon(icon17);
+        resetTexturesButton->setIconSize(QSize(22, 22));
 
-        horizontalLayout_2->addWidget(resetTexturesButton);
-
-
-        verticalLayout->addLayout(horizontalLayout_2);
+        verticalLayout->addWidget(resetTexturesButton);
 
         texturesDockWidget->setWidget(dockWidgetContents_2);
         MainWindow->addDockWidget(static_cast<Qt::DockWidgetArea>(2), texturesDockWidget);
         skyDockWidget = new QDockWidget(MainWindow);
         skyDockWidget->setObjectName(QString::fromUtf8("skyDockWidget"));
-        skyDockWidget->setFeatures(QDockWidget::DockWidgetFloatable|QDockWidget::DockWidgetMovable);
+        skyDockWidget->setMinimumSize(QSize(225, 335));
+        skyDockWidget->setFeatures(QDockWidget::NoDockWidgetFeatures);
         dockWidgetContents_3 = new QWidget();
         dockWidgetContents_3->setObjectName(QString::fromUtf8("dockWidgetContents_3"));
+        verticalLayout_3 = new QVBoxLayout(dockWidgetContents_3);
+        verticalLayout_3->setSpacing(6);
+        verticalLayout_3->setContentsMargins(11, 11, 11, 11);
+        verticalLayout_3->setObjectName(QString::fromUtf8("verticalLayout_3"));
+        groupBox = new QGroupBox(dockWidgetContents_3);
+        groupBox->setObjectName(QString::fromUtf8("groupBox"));
+        formLayout = new QFormLayout(groupBox);
+        formLayout->setSpacing(6);
+        formLayout->setContentsMargins(11, 11, 11, 11);
+        formLayout->setObjectName(QString::fromUtf8("formLayout"));
+        formLayout->setLabelAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
+        label_6 = new QLabel(groupBox);
+        label_6->setObjectName(QString::fromUtf8("label_6"));
+
+        formLayout->setWidget(0, QFormLayout::LabelRole, label_6);
+
+        horizontalLayout_2 = new QHBoxLayout();
+        horizontalLayout_2->setSpacing(0);
+        horizontalLayout_2->setObjectName(QString::fromUtf8("horizontalLayout_2"));
+        skyboxUpLineEdit = new QLineEdit(groupBox);
+        skyboxUpLineEdit->setObjectName(QString::fromUtf8("skyboxUpLineEdit"));
+
+        horizontalLayout_2->addWidget(skyboxUpLineEdit);
+
+        skyboxUpButton = new QToolButton(groupBox);
+        skyboxUpButton->setObjectName(QString::fromUtf8("skyboxUpButton"));
+        QIcon icon18;
+        icon18.addFile(QString::fromUtf8(":/media/16x16/document-open.png"), QSize(), QIcon::Normal, QIcon::Off);
+        skyboxUpButton->setIcon(icon18);
+
+        horizontalLayout_2->addWidget(skyboxUpButton);
+
+
+        formLayout->setLayout(0, QFormLayout::FieldRole, horizontalLayout_2);
+
+        label_7 = new QLabel(groupBox);
+        label_7->setObjectName(QString::fromUtf8("label_7"));
+
+        formLayout->setWidget(1, QFormLayout::LabelRole, label_7);
+
+        horizontalLayout_3 = new QHBoxLayout();
+        horizontalLayout_3->setSpacing(0);
+        horizontalLayout_3->setObjectName(QString::fromUtf8("horizontalLayout_3"));
+        skyboxDownLineEdit = new QLineEdit(groupBox);
+        skyboxDownLineEdit->setObjectName(QString::fromUtf8("skyboxDownLineEdit"));
+
+        horizontalLayout_3->addWidget(skyboxDownLineEdit);
+
+        skyboxDownButton = new QToolButton(groupBox);
+        skyboxDownButton->setObjectName(QString::fromUtf8("skyboxDownButton"));
+        skyboxDownButton->setIcon(icon18);
+
+        horizontalLayout_3->addWidget(skyboxDownButton);
+
+
+        formLayout->setLayout(1, QFormLayout::FieldRole, horizontalLayout_3);
+
+        label_8 = new QLabel(groupBox);
+        label_8->setObjectName(QString::fromUtf8("label_8"));
+
+        formLayout->setWidget(2, QFormLayout::LabelRole, label_8);
+
+        horizontalLayout_4 = new QHBoxLayout();
+        horizontalLayout_4->setSpacing(0);
+        horizontalLayout_4->setObjectName(QString::fromUtf8("horizontalLayout_4"));
+        skyboxFrontLineEdit = new QLineEdit(groupBox);
+        skyboxFrontLineEdit->setObjectName(QString::fromUtf8("skyboxFrontLineEdit"));
+
+        horizontalLayout_4->addWidget(skyboxFrontLineEdit);
+
+        skyboxFrontButton = new QToolButton(groupBox);
+        skyboxFrontButton->setObjectName(QString::fromUtf8("skyboxFrontButton"));
+        skyboxFrontButton->setIcon(icon18);
+
+        horizontalLayout_4->addWidget(skyboxFrontButton);
+
+
+        formLayout->setLayout(2, QFormLayout::FieldRole, horizontalLayout_4);
+
+        label_9 = new QLabel(groupBox);
+        label_9->setObjectName(QString::fromUtf8("label_9"));
+
+        formLayout->setWidget(3, QFormLayout::LabelRole, label_9);
+
+        horizontalLayout_5 = new QHBoxLayout();
+        horizontalLayout_5->setSpacing(0);
+        horizontalLayout_5->setObjectName(QString::fromUtf8("horizontalLayout_5"));
+        skyboxBackLineEdit = new QLineEdit(groupBox);
+        skyboxBackLineEdit->setObjectName(QString::fromUtf8("skyboxBackLineEdit"));
+
+        horizontalLayout_5->addWidget(skyboxBackLineEdit);
+
+        skyboxBackButton = new QToolButton(groupBox);
+        skyboxBackButton->setObjectName(QString::fromUtf8("skyboxBackButton"));
+        skyboxBackButton->setIcon(icon18);
+
+        horizontalLayout_5->addWidget(skyboxBackButton);
+
+
+        formLayout->setLayout(3, QFormLayout::FieldRole, horizontalLayout_5);
+
+        label_10 = new QLabel(groupBox);
+        label_10->setObjectName(QString::fromUtf8("label_10"));
+
+        formLayout->setWidget(4, QFormLayout::LabelRole, label_10);
+
+        horizontalLayout_6 = new QHBoxLayout();
+        horizontalLayout_6->setSpacing(0);
+        horizontalLayout_6->setObjectName(QString::fromUtf8("horizontalLayout_6"));
+        skyboxLeftLineEdit = new QLineEdit(groupBox);
+        skyboxLeftLineEdit->setObjectName(QString::fromUtf8("skyboxLeftLineEdit"));
+
+        horizontalLayout_6->addWidget(skyboxLeftLineEdit);
+
+        skyboxLeftButton = new QToolButton(groupBox);
+        skyboxLeftButton->setObjectName(QString::fromUtf8("skyboxLeftButton"));
+        skyboxLeftButton->setIcon(icon18);
+
+        horizontalLayout_6->addWidget(skyboxLeftButton);
+
+
+        formLayout->setLayout(4, QFormLayout::FieldRole, horizontalLayout_6);
+
+        label_11 = new QLabel(groupBox);
+        label_11->setObjectName(QString::fromUtf8("label_11"));
+
+        formLayout->setWidget(5, QFormLayout::LabelRole, label_11);
+
+        horizontalLayout_7 = new QHBoxLayout();
+        horizontalLayout_7->setSpacing(0);
+        horizontalLayout_7->setObjectName(QString::fromUtf8("horizontalLayout_7"));
+        skyboxRightLineEdit = new QLineEdit(groupBox);
+        skyboxRightLineEdit->setObjectName(QString::fromUtf8("skyboxRightLineEdit"));
+
+        horizontalLayout_7->addWidget(skyboxRightLineEdit);
+
+        skyboxRightButton = new QToolButton(groupBox);
+        skyboxRightButton->setObjectName(QString::fromUtf8("skyboxRightButton"));
+        skyboxRightButton->setIcon(icon18);
+
+        horizontalLayout_7->addWidget(skyboxRightButton);
+
+
+        formLayout->setLayout(5, QFormLayout::FieldRole, horizontalLayout_7);
+
+
+        verticalLayout_3->addWidget(groupBox);
+
+        verticalSpacer = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
+
+        verticalLayout_3->addItem(verticalSpacer);
+
+        updateSkyButton = new QCommandLinkButton(dockWidgetContents_3);
+        updateSkyButton->setObjectName(QString::fromUtf8("updateSkyButton"));
+        updateSkyButton->setIcon(icon16);
+        updateSkyButton->setIconSize(QSize(22, 22));
+
+        verticalLayout_3->addWidget(updateSkyButton);
+
+        resetSkyButton = new QCommandLinkButton(dockWidgetContents_3);
+        resetSkyButton->setObjectName(QString::fromUtf8("resetSkyButton"));
+        resetSkyButton->setIcon(icon17);
+        resetSkyButton->setIconSize(QSize(22, 22));
+
+        verticalLayout_3->addWidget(resetSkyButton);
+
         skyDockWidget->setWidget(dockWidgetContents_3);
-        MainWindow->addDockWidget(static_cast<Qt::DockWidgetArea>(2), skyDockWidget);
+        MainWindow->addDockWidget(static_cast<Qt::DockWidgetArea>(1), skyDockWidget);
         foliageDockWidget = new QDockWidget(MainWindow);
         foliageDockWidget->setObjectName(QString::fromUtf8("foliageDockWidget"));
-        foliageDockWidget->setFeatures(QDockWidget::DockWidgetFloatable|QDockWidget::DockWidgetMovable);
+        foliageDockWidget->setFeatures(QDockWidget::NoDockWidgetFeatures);
         dockWidgetContents_4 = new QWidget();
         dockWidgetContents_4->setObjectName(QString::fromUtf8("dockWidgetContents_4"));
         foliageDockWidget->setWidget(dockWidgetContents_4);
@@ -302,7 +502,7 @@ public:
         terrainDockWidget = new QDockWidget(MainWindow);
         terrainDockWidget->setObjectName(QString::fromUtf8("terrainDockWidget"));
         terrainDockWidget->setMinimumSize(QSize(263, 305));
-        terrainDockWidget->setFeatures(QDockWidget::DockWidgetFloatable|QDockWidget::DockWidgetMovable);
+        terrainDockWidget->setFeatures(QDockWidget::NoDockWidgetFeatures);
         dockWidgetContents = new QWidget();
         dockWidgetContents->setObjectName(QString::fromUtf8("dockWidgetContents"));
         verticalLayout_2 = new QVBoxLayout(dockWidgetContents);
@@ -395,9 +595,9 @@ public:
 
         randomiseToolButton = new QToolButton(tab_2);
         randomiseToolButton->setObjectName(QString::fromUtf8("randomiseToolButton"));
-        QIcon icon16;
-        icon16.addFile(QString::fromUtf8(":/media/16x16/dice-random.png"), QSize(), QIcon::Normal, QIcon::Off);
-        randomiseToolButton->setIcon(icon16);
+        QIcon icon19;
+        icon19.addFile(QString::fromUtf8(":/media/16x16/dice-random.png"), QSize(), QIcon::Normal, QIcon::Off);
+        randomiseToolButton->setIcon(icon19);
 
         horizontalLayout->addWidget(randomiseToolButton);
 
@@ -410,33 +610,37 @@ public:
 
         generateTerrain = new QCommandLinkButton(dockWidgetContents);
         generateTerrain->setObjectName(QString::fromUtf8("generateTerrain"));
-        QIcon icon17;
-        icon17.addFile(QString::fromUtf8(":/media/22x22/document-new.png"), QSize(), QIcon::Normal, QIcon::Off);
-        generateTerrain->setIcon(icon17);
+        QIcon icon20;
+        icon20.addFile(QString::fromUtf8(":/media/22x22/document-new.png"), QSize(), QIcon::Normal, QIcon::Off);
+        generateTerrain->setIcon(icon20);
         generateTerrain->setIconSize(QSize(22, 22));
 
         verticalLayout_2->addWidget(generateTerrain);
 
         loadTerrain = new QCommandLinkButton(dockWidgetContents);
         loadTerrain->setObjectName(QString::fromUtf8("loadTerrain"));
-        QIcon icon18;
-        icon18.addFile(QString::fromUtf8(":/media/22x22/document-open.png"), QSize(), QIcon::Normal, QIcon::Off);
-        loadTerrain->setIcon(icon18);
+        QIcon icon21;
+        icon21.addFile(QString::fromUtf8(":/media/22x22/document-open.png"), QSize(), QIcon::Normal, QIcon::Off);
+        loadTerrain->setIcon(icon21);
         loadTerrain->setIconSize(QSize(22, 22));
 
         verticalLayout_2->addWidget(loadTerrain);
 
         clearTerrain = new QCommandLinkButton(dockWidgetContents);
         clearTerrain->setObjectName(QString::fromUtf8("clearTerrain"));
-        QIcon icon19;
-        icon19.addFile(QString::fromUtf8(":/media/22x22/process-stop.png"), QSize(), QIcon::Normal, QIcon::Off);
-        clearTerrain->setIcon(icon19);
+        QIcon icon22;
+        icon22.addFile(QString::fromUtf8(":/media/22x22/process-stop.png"), QSize(), QIcon::Normal, QIcon::Off);
+        clearTerrain->setIcon(icon22);
         clearTerrain->setIconSize(QSize(22, 22));
 
         verticalLayout_2->addWidget(clearTerrain);
 
         terrainDockWidget->setWidget(dockWidgetContents);
         MainWindow->addDockWidget(static_cast<Qt::DockWidgetArea>(2), terrainDockWidget);
+        toolBar_2 = new QToolBar(MainWindow);
+        toolBar_2->setObjectName(QString::fromUtf8("toolBar_2"));
+        toolBar_2->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+        MainWindow->addToolBar(Qt::TopToolBarArea, toolBar_2);
 
         menuBar->addAction(menu_File->menuAction());
         menuBar->addAction(menu_Edit->menuAction());
@@ -469,13 +673,14 @@ public:
         mainToolBar->addSeparator();
         mainToolBar->addAction(action_Undo);
         mainToolBar->addAction(action_Redo);
-        mainToolBar->addSeparator();
-        mainToolBar->addAction(actionTake_screenshot);
         toolBar->addAction(actionSelect);
         toolBar->addAction(actionPlace_entities);
         toolBar->addAction(actionPaint);
         toolBar->addAction(actionExtrude);
         toolBar->addAction(actionIntrude);
+        toolBar_2->addAction(actionShow_heightmap_image);
+        toolBar_2->addSeparator();
+        toolBar_2->addAction(actionTake_screenshot);
 
         retranslateUi(MainWindow);
         QObject::connect(actionSelect, SIGNAL(triggered()), MainWindow, SLOT(selectTool()));
@@ -501,6 +706,16 @@ public:
         QObject::connect(randomiseToolButton, SIGNAL(clicked()), MainWindow, SLOT(randomiseTerrainSeed()));
         QObject::connect(actionOptions, SIGNAL(triggered()), MainWindow, SLOT(options()));
         QObject::connect(actionAbout_Gaiascape, SIGNAL(triggered()), MainWindow, SLOT(showAboutBox()));
+        QObject::connect(updateTexturesButton, SIGNAL(clicked()), MainWindow, SLOT(updateTextures()));
+        QObject::connect(resetTexturesButton, SIGNAL(clicked()), MainWindow, SLOT(resetDefaultTextures()));
+        QObject::connect(updateSkyButton, SIGNAL(clicked()), MainWindow, SLOT(updateSkybox()));
+        QObject::connect(resetSkyButton, SIGNAL(clicked()), MainWindow, SLOT(resetDefaultSkybox()));
+        QObject::connect(skyboxUpButton, SIGNAL(clicked()), MainWindow, SLOT(loadSkyboxImage()));
+        QObject::connect(skyboxDownButton, SIGNAL(clicked()), MainWindow, SLOT(loadSkyboxImage()));
+        QObject::connect(skyboxFrontButton, SIGNAL(clicked()), MainWindow, SLOT(loadSkyboxImage()));
+        QObject::connect(skyboxBackButton, SIGNAL(clicked()), MainWindow, SLOT(loadSkyboxImage()));
+        QObject::connect(skyboxLeftButton, SIGNAL(clicked()), MainWindow, SLOT(loadSkyboxImage()));
+        QObject::connect(skyboxRightButton, SIGNAL(clicked()), MainWindow, SLOT(loadSkyboxImage()));
 
         tabWidget->setCurrentIndex(0);
 
@@ -511,7 +726,7 @@ public:
     void retranslateUi(QMainWindow *MainWindow)
     {
         MainWindow->setWindowTitle(QApplication::translate("MainWindow", "Gaiascape", 0, QApplication::UnicodeUTF8));
-        action_New->setText(QApplication::translate("MainWindow", "&New...", 0, QApplication::UnicodeUTF8));
+        action_New->setText(QApplication::translate("MainWindow", "&New", 0, QApplication::UnicodeUTF8));
         action_New->setShortcut(QApplication::translate("MainWindow", "Ctrl+N", 0, QApplication::UnicodeUTF8));
         action_Open->setText(QApplication::translate("MainWindow", "&Open...", 0, QApplication::UnicodeUTF8));
         action_Open->setShortcut(QApplication::translate("MainWindow", "Ctrl+O", 0, QApplication::UnicodeUTF8));
@@ -540,7 +755,7 @@ public:
         actionUser_guide->setText(QApplication::translate("MainWindow", "User guide", 0, QApplication::UnicodeUTF8));
         actionUser_guide->setShortcut(QApplication::translate("MainWindow", "F1", 0, QApplication::UnicodeUTF8));
         actionAbout_Gaiascape->setText(QApplication::translate("MainWindow", "About Gaiascape", 0, QApplication::UnicodeUTF8));
-        actionOptions->setText(QApplication::translate("MainWindow", "&Options...", 0, QApplication::UnicodeUTF8));
+        actionOptions->setText(QApplication::translate("MainWindow", "&Options", 0, QApplication::UnicodeUTF8));
         menu_File->setTitle(QApplication::translate("MainWindow", "&File", 0, QApplication::UnicodeUTF8));
         menu_Edit->setTitle(QApplication::translate("MainWindow", "&Edit", 0, QApplication::UnicodeUTF8));
         menu_View->setTitle(QApplication::translate("MainWindow", "&View", 0, QApplication::UnicodeUTF8));
@@ -579,15 +794,28 @@ public:
         ___qtreewidgetitem8->setText(0, QApplication::translate("MainWindow", "Placement height", 0, QApplication::UnicodeUTF8));
         texturesTreeWidget->setSortingEnabled(__sortingEnabled);
 
-        updateTexturesButton->setText(QApplication::translate("MainWindow", "Update terrain", 0, QApplication::UnicodeUTF8));
+        updateTexturesButton->setText(QApplication::translate("MainWindow", "Accept", 0, QApplication::UnicodeUTF8));
+        updateTexturesButton->setDescription(QApplication::translate("MainWindow", "Update the terrain with the new texture proprties", 0, QApplication::UnicodeUTF8));
         resetTexturesButton->setText(QApplication::translate("MainWindow", "Reset", 0, QApplication::UnicodeUTF8));
+        resetTexturesButton->setDescription(QApplication::translate("MainWindow", "Revert to the default configuration", 0, QApplication::UnicodeUTF8));
         skyDockWidget->setWindowTitle(QApplication::translate("MainWindow", "Sky", 0, QApplication::UnicodeUTF8));
+        groupBox->setTitle(QApplication::translate("MainWindow", "Skybox", 0, QApplication::UnicodeUTF8));
+        label_6->setText(QApplication::translate("MainWindow", "Up", 0, QApplication::UnicodeUTF8));
+        label_7->setText(QApplication::translate("MainWindow", "Down", 0, QApplication::UnicodeUTF8));
+        label_8->setText(QApplication::translate("MainWindow", "Front", 0, QApplication::UnicodeUTF8));
+        label_9->setText(QApplication::translate("MainWindow", "Back", 0, QApplication::UnicodeUTF8));
+        label_10->setText(QApplication::translate("MainWindow", "Left", 0, QApplication::UnicodeUTF8));
+        label_11->setText(QApplication::translate("MainWindow", "Right", 0, QApplication::UnicodeUTF8));
+        updateSkyButton->setText(QApplication::translate("MainWindow", "Accept", 0, QApplication::UnicodeUTF8));
+        updateSkyButton->setDescription(QApplication::translate("MainWindow", "Update the world and load the new skybox", 0, QApplication::UnicodeUTF8));
+        resetSkyButton->setText(QApplication::translate("MainWindow", "Reset", 0, QApplication::UnicodeUTF8));
+        resetSkyButton->setDescription(QApplication::translate("MainWindow", "Revert to the default configuration", 0, QApplication::UnicodeUTF8));
         foliageDockWidget->setWindowTitle(QApplication::translate("MainWindow", "Foliage", 0, QApplication::UnicodeUTF8));
         terrainDockWidget->setWindowTitle(QApplication::translate("MainWindow", "Terrain", 0, QApplication::UnicodeUTF8));
         label_2->setText(QApplication::translate("MainWindow", "Terrain scale", 0, QApplication::UnicodeUTF8));
         label_3->setText(QApplication::translate("MainWindow", "Random factor", 0, QApplication::UnicodeUTF8));
         label_4->setText(QApplication::translate("MainWindow", "Terrain size", 0, QApplication::UnicodeUTF8));
-        label_5->setText(QApplication::translate("MainWindow", "Erroson", 0, QApplication::UnicodeUTF8));
+        label_5->setText(QApplication::translate("MainWindow", "Erosion", 0, QApplication::UnicodeUTF8));
         tabWidget->setTabText(tabWidget->indexOf(tab), QApplication::translate("MainWindow", "Basic terrain options", 0, QApplication::UnicodeUTF8));
         label->setText(QApplication::translate("MainWindow", "Random seed", 0, QApplication::UnicodeUTF8));
 #ifndef QT_NO_TOOLTIP
@@ -601,6 +829,7 @@ public:
         loadTerrain->setDescription(QApplication::translate("MainWindow", "Create a terrain from an existing file", 0, QApplication::UnicodeUTF8));
         clearTerrain->setText(QApplication::translate("MainWindow", "Clear terrain", 0, QApplication::UnicodeUTF8));
         clearTerrain->setDescription(QApplication::translate("MainWindow", "Flatten the entire terrain", 0, QApplication::UnicodeUTF8));
+        toolBar_2->setWindowTitle(QApplication::translate("MainWindow", "toolBar_2", 0, QApplication::UnicodeUTF8));
     } // retranslateUi
 
 };

@@ -215,7 +215,7 @@ void Terrain::generateTerrain()
 
         // Set up variables
         iProbability = 0;
-        iRandomBlock = Random::getSingleton().getRand(0, iFinalX + iDimensions - 1);
+        iRandomBlock = Random::getSingleton().getRand(0,iFinalX + iDimensions - 1);
         mTerrainGroup->getTerrain(0, 0)->getPoint(iRandomBlock%iDimensions, iRandomBlock/iDimensions, &enterPos);
 
         // --------------------------
@@ -237,12 +237,12 @@ void Terrain::generateTerrain()
         // Proximity to trees - Disabled because the for loop isn't functioning correctly
         // < 3 = 0% prob
         // 3.1-10 = +30% prob
-        if(iProbability != -1 && floraManager::getSingletonPtr()->getFloraClosestToPoint(enterPos) <= 14) // 3 is arbitrary and needs to be adjusted to the scale of the model!
+        if(iProbability != -1 && floraManager::getSingletonPtr()->getFloraClosestToPoint(enterPos) <= 3) // 3 is arbitrary and needs to be adjusted to the scale of the model!
         {
             std::cout << "Too close!\n";
             iProbability = -1;
         }
-        if(iProbability != -1 && floraManager::getSingletonPtr()->getFloraClosestToPoint(enterPos) <= 47) // Plants tend to gather together due to factors we don't calculate, so simullate this
+        if(iProbability != -1 && floraManager::getSingletonPtr()->getFloraClosestToPoint(enterPos) <= 10) // Plants tend to gather together due to factors we don't calculate, so simullate this
         {
             std::cout << "Pretty close\n";
             iProbability += 3;

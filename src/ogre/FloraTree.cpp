@@ -7,7 +7,8 @@ floraTree::floraTree(std::string name, Ogre::SceneManager *sceneMgr, Ogre::Vecto
     mNode = mSceneMgr->getRootSceneNode()->createChildSceneNode(sName + "_main");
 
     mEnt = mSceneMgr->createEntity(sName + "_entity", "ninja.mesh");
+    //mEnt->setMaterialName("Examples/Ninja");
     mNode->attachObject(mEnt);
-    mNode->setScale(0.05, 0.05, 0.05);
+    mNode->setScale(0.9, 0.9, 0.9);
     mNode->setPosition(location);
 }
