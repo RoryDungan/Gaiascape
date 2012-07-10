@@ -43,10 +43,16 @@ void THIS::init( std::string plugins_file,
     mOgreRoot->initialise(false); // don't create a window
 
     mCameraMovement = Ogre::Vector3(0.0f, 0.0f, 0.0f);
+    mHeightUpdateCountDown = 0.0f;
+    mHeightUpdateRate = 0.05f; // 1/20, or 20 fps
+    bCtrlPressed = false;
+    mInteractionMode = IM_SELECT;
+    mCurrentState = IS_IDLE;
+    mBrushSize = 0.1;
 
     // Set up resources
     Ogre::ConfigFile cf;
-    cf.load(resources_file);
+    cf.load(resources_file);    
 
     // Go through all sections & settings in the file
     Ogre::ConfigFile::SectionIterator seci = cf.getSectionIterator();
@@ -65,8 +71,6 @@ void THIS::init( std::string plugins_file,
                 archName, typeName, secName);
         }
     }
-
-    // Dylan - Initialize the resource groups, or else the .material files won't be parsed
     Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
 }
 
@@ -151,10 +155,11 @@ void THIS::initializeGL()
     else
         mCamera->setFarClipDistance(50000);
 
-    Ogre::Viewport *mViewport = mOgreWindow->addViewport( mCamera );
+    mViewport = mOgreWindow->addViewport( mCamera );
     mViewport->setBackgroundColour( Ogre::ColourValue( 0.8,0.8,1 ) );
 
     mCamera->setAutoAspectRatio(true);
+    //mCamera->setFOVy(mCamFOV);
 
     // This should really be called after initializeGL() because it takes a fair amount of time to load the resources
     // and initializeGL() is called before the main window of the program is created. In future I would like to have
@@ -164,43 +169,15 @@ void THIS::initializeGL()
 }
 
 /**
- * @brief Modify the terrain with one of the terrain modification tools
+ * @brief Set the vertical field of view
  * @author Rory Dungan
  */
-void THIS::modifyTerrain(Ogre::Terrain* terrain, const Ogre::Vector3 &centerPos, Ogre::Real timeElapsed)
+void THIS::setFOVy(float fov)
 {
-    qDebug() << "This is where we actually modify the terrain";
-    Ogre::Vector3 tsPos;
-    terrain->getTerrainPosition(centerPos, &tsPos);
-
-    // We need point coords
-    Ogre::Real terrainSize = (terrain->getSize() -1);
-    long startx = (tsPos.x - mBrushSize) * terrainSize;
-    long starty = (tsPos.y - mBrushSize) * terrainSize;
-    long endx = (tsPos.x + mBrushSize) * terrainSize;
-    long endy = (tsPos.y + mBrushSize) * terrainSize;
-    startx = std::max(startx, 0L);
-    starty = std::max(starty, 0L);
-    endx = std::min(endx, (long)terrainSize);
-    endy = std::min(endy, (long)terrainSize);
-    for(long y = starty; y <= endy; ++y)
-    {
-        for(long x = startx; x <= endx; ++x)
-        {
-            Ogre::Real tsXdist = (x / terrainSize) - tsPos.x;
-            Ogre::Real tsYdist = (y / terrainSize) - tsPos.y;
-
-            Ogre::Real weight = std::min((Ogre::Real)1.0f, Ogre::Math::Sqrt(tsYdist * tsYdist + tsXdist * tsXdist) / Ogre::Real(0.5 * mBrushSize));
-            weight = 1.0f - (weight * weight);
-
-            float addedHeight = weight * 250.0f * timeElapsed;
-            float newHeight = interactionMode == IM_EXTRUDE ? terrain->getHeightAtPoint(x, y) + addedHeight : terrain->getHeightAtPoint(x, y) - addedHeight;
-            terrain->setHeightAtPoint(x, y, newHeight);
-        }
-    }
-    //if(mHeightUpdateCountDown == 0)
-    //    mHeightUpdateCountDown = mHeightUpdateRate;
+    if(mOgreWindow->isActive()) mCamera->setFOVy(Ogre::Degree(fov));
+    else mCamFOV = Ogre::Degree(10.0f);
 }
+
 
 /**
  * @brief Handle mouse input
@@ -213,34 +190,33 @@ void THIS::mousePressEvent(QMouseEvent * event)
     switch(event->button())
     {
     case Qt::LeftButton:
-        if(currentState == IS_IDLE)
-            switch(interactionMode)
+        if(mCurrentState == IS_IDLE)
+            switch(mInteractionMode)
             {
             case IM_EXTRUDE:
-                currentState = IS_EXTRUDING;
-                qDebug() << "IS_EXTRUDING";
+                mCurrentState = IS_EXTRUDING;
                 break;
             case IM_INTRUDE:
-                currentState = IS_EXTRUDING;
+                mCurrentState = IS_EXTRUDING;
                 break;
             case IM_PAINT:
-                currentState = IS_PAINTING;
+                mCurrentState = IS_PAINTING;
                 break;
             case IM_PLACEOBJ:
-                currentState = IS_PLACING_OBJECTS;
+                mCurrentState = IS_PLACING_OBJECTS;
                 break;
             default: break;
             }
         break;
     case Qt::RightButton:
         if(!bCtrlPressed)
-            currentState = IS_ROTATING_CAMERA;
+            mCurrentState = IS_ROTATING_CAMERA;
         else
-            currentState = IS_MOVING_CAMERA;
+            mCurrentState = IS_MOVING_CAMERA;
         break;
 
     case Qt::MiddleButton:
-        currentState = IS_MOVING_CAMERA;
+        mCurrentState = IS_MOVING_CAMERA;
         break;
 
     default:
@@ -254,7 +230,7 @@ void THIS::mousePressEvent(QMouseEvent * event)
  */
 void THIS::mouseReleaseEvent(QMouseEvent * event)
 {
-    currentState = IS_IDLE;
+    mCurrentState = IS_IDLE;
 }
 
 /**
@@ -267,11 +243,11 @@ void THIS::mouseMoveEvent(QMouseEvent * event)
     int dx = event->x() - mLastCursorPos.x();
     int dy = event->y() - mLastCursorPos.y();
 
-    switch(currentState)
+    switch(mCurrentState)
     {
     case IS_ROTATING_CAMERA:
-        mCamera->pitch(Ogre::Degree(dy));
-        mCamera->yaw(Ogre::Degree(dx));
+        mCamera->pitch(Ogre::Degree(bCameraControlsInverted ? -dy : dy));
+        mCamera->yaw(Ogre::Degree(bCameraControlsInverted ? -dx : dx));
         updateGL();
         break;
     case IS_MOVING_CAMERA:
@@ -291,7 +267,7 @@ void THIS::mouseMoveEvent(QMouseEvent * event)
  */
 void THIS::setInteractionMode(interactionModes i)
 {
-    interactionMode = i;
+    mInteractionMode = i;
 }
 
 /**
@@ -321,6 +297,11 @@ void THIS::setupScene()
 
     // Set up terrain
     mTerrain = new Terrain(mSceneMgr, light);
+
+    mEditMarker = mSceneMgr->createEntity("EditMarker", "sphere.mesh");
+    mEditNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+    mEditNode->attachObject(mEditMarker);
+    mEditNode->setScale(0.05, 0.05, 0.05);
 }
 
 /**
@@ -330,48 +311,65 @@ void THIS::setupScene()
 void THIS::paintGL()
 {
     // If the current state is a state in which the user is interacting with the terrain via the mouse
-    if(currentState == IS_EXTRUDING || currentState == IS_INTRUDING || currentState == IS_PAINTING || currentState == IS_PLACING_OBJECTS)
+    if(mCurrentState == IS_EXTRUDING || mCurrentState == IS_INTRUDING || mCurrentState == IS_PAINTING || mCurrentState == IS_PLACING_OBJECTS)
     {
-        qDebug() << mLastCursorPos.x() << " " << mLastCursorPos.y();
         // Get the 3d point that the cursor is over
+        float relPosX = (float)mLastCursorPos.x() / (float)mCamera->getViewport()->getActualWidth();
+        float relPosY = (float)mLastCursorPos.y() / (float)mCamera->getViewport()->getActualHeight();
         // fire ray
-        //Ogre::Ray ray = mCamera->getCameraToViewportRay(Ogre::Real(mLastCursorPos.x() - mCamera->getViewport()->getActualWidth()/2), Ogre::Real(mLastCursorPos.y() - mCamera->getViewport()->getActualHeight()/2));
-        Ogre::Ray ray = mCamera->getCameraToViewportRay(Ogre::Real(mLastCursorPos.x()), Ogre::Real(mLastCursorPos.y()));
+        Ogre::Ray ray = mCamera->getCameraToViewportRay(relPosX, relPosY);
 
         Ogre::TerrainGroup::RayResult rayResult = mTerrain->getTerrainGroup()->rayIntersects(ray);
         if(rayResult.hit) // Ray hit the terrain
         {
-            qDebug() << "rayResult hit point " << rayResult.position.x << " " << rayResult.position.y << " " << rayResult.position.z;
+            //qDebug() << "rayResult hit point " << rayResult.position.x << " " << rayResult.position.y << " " << rayResult.position.z;
+            mEditMarker->setVisible(true);
+            mEditNode->setPosition(rayResult.position);
+
             // Figue out which parts of the terrain this affects
             Ogre::TerrainGroup::TerrainList terrainList;
-            Ogre::Real brushSizeWorldSpace = /* TERRAIN_WORLD_SIZE * mBrushSize */ 2400;
+            Ogre::Real brushSizeWorldSpace = /* TERRAIN_WORLD_SIZE * mBrushSize */ 240;
             Ogre::Sphere sphere(rayResult.position, brushSizeWorldSpace);
             mTerrain->getTerrainGroup()->sphereIntersects(sphere, &terrainList);
 
-            switch(currentState)
+            switch(mCurrentState)
             {
             case IS_EXTRUDING:
                 for(Ogre::TerrainGroup::TerrainList::iterator ti = terrainList.begin(); ti != terrainList.end(); ++ti)
-                    modifyTerrain(*ti, rayResult.position, 17.0f);
+                    modifyTerrain(*ti, rayResult.position, 0.017f);
                 break;
             default:
                 break;
             }
+        }
+        else
+            mEditMarker->setVisible(false);
+    }
+
+    // Update the terrain
+    if (mHeightUpdateCountDown > 0)
+    {
+        mHeightUpdateCountDown -= 0.017f;//evt.timeSinceLastFrame; - always updates at ~60fps so this can be a constant
+        if (mHeightUpdateCountDown <= 0)
+        {
+            qDebug() << "Updating terrain";
+            mTerrain->getTerrainGroup()->update();
+            mHeightUpdateCountDown = 0;
         }
     }
 
     // Notify of texture update
     if (mTerrain->getTerrainGroup()->isDerivedDataUpdateInProgress())
     {
-        if(updatingTextures == false)
+        if(bUpdatingTextures == false)
             emit textureUpdateInProgress();
-        updatingTextures = true;
+        bUpdatingTextures = true;
     }
     else
     {
-        if(updatingTextures == true)
+        if(bUpdatingTextures == true)
             emit textureUpdateFinished();
-        updatingTextures = false;
+        bUpdatingTextures = false;
     }
 
     // Update camera
@@ -400,6 +398,44 @@ Ogre::RenderSystem* THIS::chooseRenderer( Ogre::RenderSystemList *renderers )
     // It would probably be wise to do something more friendly
     // that just use the first available renderer
     return *renderers->begin();
+}
+
+/**
+ * @brief Modify the terrain with one of the terrain modification tools
+ * @author Rory Dungan
+ */
+void THIS::modifyTerrain(Ogre::Terrain* terrain, const Ogre::Vector3 &centerPos, Ogre::Real timeElapsed)
+{
+    Ogre::Vector3 tsPos;
+    terrain->getTerrainPosition(centerPos, &tsPos);
+
+    // We need point coords
+    Ogre::Real terrainSize = (terrain->getSize() -1);
+    long startx = (tsPos.x - mBrushSize) * terrainSize;
+    long starty = (tsPos.y - mBrushSize) * terrainSize;
+    long endx = (tsPos.x + mBrushSize) * terrainSize;
+    long endy = (tsPos.y + mBrushSize) * terrainSize;
+    startx = std::max(startx, 0L);
+    starty = std::max(starty, 0L);
+    endx = std::min(endx, (long)terrainSize);
+    endy = std::min(endy, (long)terrainSize);
+    for(long y = starty; y <= endy; ++y)
+    {
+        for(long x = startx; x <= endx; ++x)
+        {
+            Ogre::Real tsXdist = (x / terrainSize) - tsPos.x;
+            Ogre::Real tsYdist = (y / terrainSize) - tsPos.y;
+
+            Ogre::Real weight = std::min((Ogre::Real)1.0f, Ogre::Math::Sqrt(tsYdist * tsYdist + tsXdist * tsXdist) / Ogre::Real(0.5 * mBrushSize));
+            weight = 1.0f - (weight * weight);
+
+            float addedHeight = weight * 250.0f * timeElapsed;
+            float newHeight = mInteractionMode == IM_EXTRUDE ? terrain->getHeightAtPoint(x, y) + addedHeight : terrain->getHeightAtPoint(x, y) - addedHeight;
+            terrain->setHeightAtPoint(x, y, newHeight);
+        }
+    }
+    if(mHeightUpdateCountDown == 0)
+        mHeightUpdateCountDown = mHeightUpdateRate;
 }
 
 /**

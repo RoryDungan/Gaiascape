@@ -5,6 +5,7 @@
 #include <QActionGroup>
 #include <QTreeWidgetItem>
 #include <QProgressBar>
+#include <QSettings>
 #include "OgreWidget.h"
 
 namespace Ui {
@@ -23,8 +24,11 @@ private:
     Ui::MainWindow *ui;
     OgreWidget* mOgreWidget;
     QTimer* mRenderTimer;
-    QActionGroup* mToolGroup;
     QProgressBar* mStatusProgressBar;
+    QSettings* mSettings;
+
+    // Called when the program is first run; creates a config file with default settings
+    void createNewConfigFile();
 
     bool bWPressed;
     bool bAPressed;
@@ -56,12 +60,18 @@ public slots:
     void loadTerrain();
     void clearTerrain();
     void texturePropertyChanged(QTreeWidgetItem*, int);
+    void updateTextures();
+    void resetDefaultTextures();
     void showHeightmapImage();
     void randomiseTerrainSeed();
     void showAboutBox();
     void options();
     void statusTextureUpdateInProgress();
     void statusTextreUpdateFinished();
+    void updateSettings();
+    void loadSkyboxImage();
+    void updateSkybox();
+    void resetDefaultSkybox();
 };
 
 #endif // MAINWINDOW_H

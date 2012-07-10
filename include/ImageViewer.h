@@ -22,6 +22,7 @@ protected:
     virtual void mousePressEvent(QMouseEvent *);
     virtual void mouseReleaseEvent(QMouseEvent *);
     virtual void mouseMoveEvent(QMouseEvent *);
+    virtual void closeEvent(QCloseEvent *);
     
 private:
     Ui::ImageViewer *ui;
