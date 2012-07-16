@@ -41,5 +41,6 @@
         <file>media/22x22/dialog-apply.png</file>
         <file>media/22x22/document-revert.png</file>
         <file>media/24x24/image.png</file>
+        <file>media/16x16/colour-picker.png</file>
     </qresource>
 </RCC>

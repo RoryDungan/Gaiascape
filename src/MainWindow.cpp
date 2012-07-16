@@ -3,7 +3,9 @@
 #include "ImageViewer.h"
 #include "algorithms/random.h"
 #include "OptionsDialog.h"
+#include "AboutBox.h"
 #include <QTimer>
+#include <QElapsedTimer>
 #include <QFileDialog>
 #include <QInputDialog>
 #include <QDebug>
@@ -11,6 +13,8 @@
 #include <QComboBox>
 #include <QCheckBox>
 #include <QDir>
+#include <QDesktopServices>
+#include <QColorDialog>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -30,10 +34,34 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->setupUi(this);
 
-    // Load user preferences
-    mSettings = new QSettings("settings.ini", QSettings::IniFormat, this);
+    // Locate applications settings directory
+    mApplicationDataDir = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
+    // some platforms currently don't define this location and you don't want to write to /foo
+    if (mApplicationDataDir.isEmpty())
+        mApplicationDataDir = QDir::homePath() + "/." + QCoreApplication::applicationName();
+    mApplicationDataDir.append(QDir::separator());
+    // the first time I am saving data
+    if (!QFile::exists(mApplicationDataDir))
+    {
+        QDir dir;
+        dir.mkpath(mApplicationDataDir);
+    }
 
-    mOgreWidget = new OgreWidget;
+
+    qDebug() << mApplicationDataDir;
+
+    // Load user preferences
+    mSettings = new QSettings(mApplicationDataDir + "settings.ini", QSettings::IniFormat, this);
+
+    if(!mSettings->contains("Renderer/RenderingSubsystem"))
+#ifdef _WIN32 // Default to Direct3D on Windows, OpenGL on everything else
+        mSettings->setValue("Renderer/RenderingSubsystem", "Direct3D9");
+#else
+        mSettings->setValue("Renderer/RenderingSubsystem", "OpenGL");
+#endif
+
+    mOgreWidget = new OgreWidget(this, mApplicationDataDir + "ogre.log", mSettings->value("Renderer/RenderingSubsystem").toString());
+
     setCentralWidget(mOgreWidget);
     mOgreWidget->setInteractionMode(OgreWidget::IM_SELECT);
     mOgreWidget->setCameraInverted(mSettings->value("Renderer/CameraInverted", false).toBool());
@@ -42,11 +70,15 @@ MainWindow::MainWindow(QWidget *parent) :
     // tabify dock widgets
     setTabPosition(Qt::AllDockWidgetAreas, QTabWidget::East);
     tabifyDockWidget(ui->terrainDockWidget, ui->texturesDockWidget);
-    tabifyDockWidget(ui->texturesDockWidget, ui->skyDockWidget);
-    tabifyDockWidget(ui->skyDockWidget, ui->foliageDockWidget);
+    tabifyDockWidget(ui->texturesDockWidget, ui->environmentDockWidget);
+    tabifyDockWidget(ui->environmentDockWidget, ui->foliageDockWidget);
     ui->terrainDockWidget->raise();
 
     ui->texturesTreeWidget->expandAll();
+    QColor colour = QColor(230, 230, 230);
+    ui->fogColourLabel->setText(colour.name());
+    ui->fogColourLabel->setPalette(QPalette(colour));
+    ui->fogColourLabel->setAutoFillBackground(true);
 
     // Set up action group for tool buttons
     QActionGroup* toolGroup = new QActionGroup(this);
@@ -59,6 +91,10 @@ MainWindow::MainWindow(QWidget *parent) :
     QActionGroup* viewModeGroup = new QActionGroup(this);
     viewModeGroup->addAction(ui->action_Solid);
     viewModeGroup->addAction(ui->action_Wireframe);
+
+    // Set up toolbar
+    mToolComboBox = new QComboBox(this);
+    ui->contextToolBar->addWidget(mToolComboBox);
 
     // Set up multiple resolutions for icons
     // The designer .ui file does not support having multiple resolution icons for a single
@@ -115,12 +151,15 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
+    // Save settings
     mSettings->setValue("MainWindow/Maximized", this->isMaximized());
 
     // Q_OBJECTs are deleted automaticly
+
     delete mRenderTimer;
     delete mOgreWidget;
     delete mStatusProgressBar;
+    delete mToolComboBox;
     delete ui;
 }
 
@@ -252,15 +291,11 @@ void MainWindow::intrudeTool()
 
 void MainWindow::viewSolid()
 {
-    //ui->action_Wireframe->setChecked(false);
-    //ui->action_Solid->setChecked(true);
     mOgreWidget->setViewMode(Ogre::PM_SOLID);
 }
 
 void MainWindow::viewWireframe()
 {
-    //ui->action_Wireframe->setChecked(true);
-    //ui->action_Solid->setChecked(false);
     mOgreWidget->setViewMode(Ogre::PM_WIREFRAME);
 }
 
@@ -273,14 +308,21 @@ void MainWindow::screenshot()
 
 void MainWindow::generateTerrain()
 {
+    QApplication::setOverrideCursor(Qt::WaitCursor);
+    QElapsedTimer timer;
     mOgreWidget->getTerrain()->clearTerrain();
+    timer.start();
     mOgreWidget->getTerrain()->generateTerrain();
+    qDebug() << "Terrain genarated in" << timer.elapsed() << "milliseconds";
+    QApplication::restoreOverrideCursor();
 }
 
 void MainWindow::loadTerrain()
 {
+    QApplication::setOverrideCursor(Qt::WaitCursor);
     mOgreWidget->getTerrain()->clearTerrain();
     mOgreWidget->getTerrain()->loadHeightmap();
+    QApplication::restoreOverrideCursor();
 }
 
 void MainWindow::clearTerrain()
@@ -344,7 +386,7 @@ void MainWindow::texturePropertyChanged(QTreeWidgetItem* item, int itemNum)
 // Create a new dialog and show the heightmap image in it
 void MainWindow::showHeightmapImage()
 {
-    ImageViewer* iview = new ImageViewer(this, "map.bmp"); // Todo: make it copy the image directly from mmory rather than reading from a file
+    ImageViewer* iview = new ImageViewer(this, QDesktopServices::storageLocation(QDesktopServices::TempLocation) + QDir::separator() + "gaiascape-heightmap.bmp"); // Todo: make it copy the image directly from mmory rather than reading from a file
     iview->show();
 }
 
@@ -367,41 +409,9 @@ void MainWindow::options()
 // Show about box wit informaton on copyright and credits
 void MainWindow::showAboutBox()
 {
-    QDialog* Dialog = new QDialog;
-
-    QVBoxLayout *verticalLayout = new QVBoxLayout(Dialog);
-    QLabel *label = new QLabel(Dialog);
-    QSizePolicy sizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
-    sizePolicy.setHorizontalStretch(0);
-    sizePolicy.setVerticalStretch(0);
-    sizePolicy.setHeightForWidth(label->sizePolicy().hasHeightForWidth());
-    label->setSizePolicy(sizePolicy);
-    label->setWordWrap(true);
-
-    verticalLayout->addWidget(label);
-
-    QDialogButtonBox *buttonBox = new QDialogButtonBox(Dialog);
-    buttonBox->setOrientation(Qt::Horizontal);
-    buttonBox->setStandardButtons(QDialogButtonBox::Close);
-
-    verticalLayout->addWidget(buttonBox);
-
-    Dialog->setWindowTitle(tr("About Gaiascape"));
-    label->setText(tr("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
-                      "<html><head><meta name=\"qrichtext\" content=\"1\" /></head><body>\n"
-                      "<h1>Gaiascape</h1>\n"
-                      "<p>Written by Rory Dungan &lt;<a href=\"mailto:rorydungan@gmail.com\">rorydungan@gmail.com</a>&gt; and Dylan Ford &lt;<a href=\"mailto:dylan@fordfam.com\">dylan@fordfam.com</a>&gt;</p>\n"
-                      "<p>Artwork by Daniel Galbraith &lt;<a href=\"mailto:dgalbraih2@gmail.com\">dgalbraith2@gmail.com</a>&gt;and Daniel Docherty &lt;<a href=\"mailto:ddocherty.z1@gmail.com\">ddocherty.z1@gmail.com</a>&gt;</p>\n"/* and Joshua Dauth &lt;<a href=\"mailto:kalthar@hotmail.com\">kalthar@hotmail.com</a>&gt;*/
-                      "<p>Thanks also to Kito Berg-Taylor for the Qt Ogre intregation code. </p>\n"
-                      "<p>Portions Copyright (C) 2010 Nokia Corporation and/or its subsidiary(-ies).  All rights reserved.  Contact: Nokia Corporation (qt-info@nokia.com).  This software contains Qt v.4.8.1.  Qt is licensed under the GNU Lesser General Public License v.2.1, which can be found at http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt. </p>"
-                      "<p>Portions Copyright (C) 2000-2011 Torus Knot Software Ltd. OGRE is licensed under the MIT License. "
-                      "<p>Uses icons from the Tango Desktop Project &lt;<a href=\"http://tango.freedesktop.org/\">tango.freedesktop.org</a>&gt;</p>\n"
-                      "</body></html>"));
-    QObject::connect(buttonBox, SIGNAL(rejected()), Dialog, SLOT(accept()));
-    Dialog->setFixedSize(Dialog->sizeHint());
-    Dialog->setWindowFlags(Dialog->windowFlags() & ~Qt::WindowContextHelpButtonHint);
-    Dialog->show();
-    Dialog->setModal(true);
+    AboutBox* aboutBox = new AboutBox(this);
+    aboutBox->show();
+    aboutBox->setModal(true);
 }
 
 void MainWindow::statusTextureUpdateInProgress()
@@ -446,17 +456,36 @@ void MainWindow::resetDefaultTextures()
 
 }
 
-void MainWindow::updateSkybox()
+void MainWindow::updateEnvironment()
 {
-
+    mOgreWidget->setSkyDome(ui->skydomeLineEdit->text(),
+                            ui->skyCurvatureSpinBox->value(),
+                            ui->skydomeTilingSpinBox->value());
+    mOgreWidget->setFog(ui->fogModeComboBox->currentIndex(),
+                        ui->fogColourLabel->palette().color(QPalette::Button),
+                        ui->fogDensitySpinBox->value(),
+                        ui->fogStartSpinBox->value(),
+                        ui->fogEndSpinBox->value());
 }
 
-void MainWindow::resetDefaultSkybox()
+void MainWindow::resetDefaultEnvironment()
 {
+    // Reset all controls to defaults
+    ui->skydomeLineEdit->setText("media/textures/clouds.jpg");
+    ui->skyCurvatureSpinBox->setValue(10.0);
+    ui->skydomeTilingSpinBox->setValue(8);
+    ui->fogModeComboBox->setCurrentIndex(0);
+    QColor colour = QColor(230, 230, 230);
+    ui->fogColourLabel->setText(colour.name());
+    ui->fogColourLabel->setPalette(QPalette(colour));
+    ui->fogDensitySpinBox->setValue(0.001);
+    ui->fogStartSpinBox->setValue(0);
+    ui->fogEndSpinBox->setValue(0);
 
+    updateEnvironment();
 }
 
-void MainWindow::loadSkyboxImage()
+void MainWindow::loadSkydomeImage()
 {
     // Get file path
     QString filePath = QFileDialog::getOpenFileName(this, tr("Open texture file"), QString(), tr("Images (*.jpg *.jpeg *.jpe *.png *.tga *.bmp *.raw *.gif *.dds);;JPEG image (*.jpg *.jpeg *.jpe);;PNG image (*.png);;Targa image (*.tga);;Bitmap image (*.bmp);;RAW image (*.raw);;GIF image (*.gif);;DirectDraw surface (*.dds)"));
@@ -467,7 +496,7 @@ void MainWindow::loadSkyboxImage()
     // Convert path to relative
     filePath = QDir::current().relativeFilePath(filePath);
 
-    // Find the appropriate lineEdit box and update it with the new file
+    /*/ Depracated - Find the appropriate lineEdit box and update it with the new file
     if(sender() == ui->skyboxBackButton)
         ui->skyboxBackLineEdit->setText(filePath);
     else if(sender() == ui->skyboxDownButton)
@@ -479,5 +508,58 @@ void MainWindow::loadSkyboxImage()
     else if(sender() == ui->skyboxRightButton)
         ui->skyboxRightLineEdit->setText(filePath);
     else if(sender() == ui->skyboxUpButton)
-        ui->skyboxUpLineEdit->setText(filePath);
+        ui->skyboxUpLineEdit->setText(filePath);*/
+
+    ui->skydomeLineEdit->setText(filePath);
+}
+
+void MainWindow::updateFogButtonColour()
+{
+    // Open a new colour selection dialog, starting with the currently selected colour
+    QColor colour = QColorDialog::getColor(ui->fogColourLabel->palette().color(QPalette::Button), this);
+    if(colour.isValid())
+    {
+        ui->fogColourLabel->setText(colour.name());
+        ui->fogColourLabel->setPalette(QPalette(colour));
+    }
+}
+
+void MainWindow::fogModeChanged(int mode)
+{
+    switch(mode)
+    {
+    case 0: // Disabled - disable all fog controls
+        ui->fogColourButton->setEnabled(false);
+        ui->fogColourLabel->setEnabled(false);
+        ui->fogColourLabel_0->setEnabled(false);
+        ui->fogDensityLabel->setEnabled(false);
+        ui->fogDensitySpinBox->setEnabled(false);
+        ui->fogEndLabel->setEnabled(false);
+        ui->fogEndSpinBox->setEnabled(false);
+        ui->fogStartLabel->setEnabled(false);
+        ui->fogStartSpinBox->setEnabled(false);
+        break;
+    case 1: // Linear fog
+        ui->fogColourButton->setEnabled(true);
+        ui->fogColourLabel->setEnabled(true);
+        ui->fogColourLabel_0->setEnabled(true);
+        ui->fogDensityLabel->setEnabled(false);
+        ui->fogDensitySpinBox->setEnabled(false);
+        ui->fogEndLabel->setEnabled(true);
+        ui->fogEndSpinBox->setEnabled(true);
+        ui->fogStartLabel->setEnabled(true);
+        ui->fogStartSpinBox->setEnabled(true);
+        break;
+    default: // Exponential fog
+        ui->fogColourButton->setEnabled(true);
+        ui->fogColourLabel->setEnabled(true);
+        ui->fogColourLabel_0->setEnabled(true);
+        ui->fogDensityLabel->setEnabled(true);
+        ui->fogDensitySpinBox->setEnabled(true);
+        ui->fogEndLabel->setEnabled(false);
+        ui->fogEndSpinBox->setEnabled(false);
+        ui->fogStartLabel->setEnabled(false);
+        ui->fogStartSpinBox->setEnabled(false);
+        break;
+    }
 }

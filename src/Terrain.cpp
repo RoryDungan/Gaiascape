@@ -1,5 +1,7 @@
 #include "Terrain.h"
 #include <math.h> // Needed only temporarily so that dimensions can be calculated without going through the heightmap generator
+#include <QDesktopServices> // Also needed temporarily, so that the heightmap image can be outputted to a directory where ImageViewer can easily find it
+#include <QDir> // Same as QDesktopServices
 
 Terrain::Terrain(Ogre::SceneManager* sceneManager, Ogre::Light* light)
 {
@@ -112,7 +114,7 @@ void Terrain::generateTerrain()
 
     Ogre::Image img;
     img.loadDynamicImage(pStream, iDimensions, iDimensions, Ogre::PF_L8); // PF_L8 = 8-pit pixel format, all luminance
-    img.save("map.bmp");
+    img.save(std::string(QDesktopServices::storageLocation(QDesktopServices::TempLocation).toAscii() + QDir::separator().toAscii() + "gaiascape-heightmap.bmp"));
 
     // How generating the terrain will work
     //  Because we cannot conveniently return an array, instead the array is created here.

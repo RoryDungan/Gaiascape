@@ -31,7 +31,7 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>516</width>
+         <width>514</width>
          <height>514</height>
         </rect>
        </property>
@@ -129,6 +129,12 @@
    </property>
   </action>
   <action name="actionPan">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="../icons.qrc">
      <normaloff>:/media/24x24/cursor-select.png</normaloff>:/media/24x24/cursor-select.png</iconset>
@@ -138,6 +144,9 @@
    </property>
   </action>
   <action name="actionExtrude">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="../icons.qrc">
      <normaloff>:/media/24x24/go-up.png</normaloff>:/media/24x24/go-up.png</iconset>
@@ -147,6 +156,9 @@
    </property>
   </action>
   <action name="actionIntrude">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="../icons.qrc">
      <normaloff>:/media/24x24/go-down.png</normaloff>:/media/24x24/go-down.png</iconset>

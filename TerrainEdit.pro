@@ -34,7 +34,8 @@ HEADERS  += include/algorithms/TerrainBlock.h \
     include/OptionsDialog.h \
     include/Floramanager.h \
     include/FloraMain.h \
-    include/FloraTree.h
+    include/FloraTree.h \
+    include/AboutBox.h
 
 INCLUDEPATH += include/ \
     include/OGRE/ \
