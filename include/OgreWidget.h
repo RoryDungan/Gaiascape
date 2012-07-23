@@ -9,6 +9,7 @@
     #endif // MACOS
 #endif // WIN32
 #include <QMouseEvent>
+#include <QColor>
 #include "Terrain.h"
 
 class OgreWidget : public QGLWidget
@@ -16,16 +17,12 @@ class OgreWidget : public QGLWidget
     Q_OBJECT
 
 public:
-    OgreWidget( QWidget *parent=0 )
+    OgreWidget( QWidget *parent=0, QString logFile = "", QString renderSystem = "OpenGL Rendering Subsystem" )
         : QGLWidget( parent )
         , mOgreWindow(NULL)
     {
         // Fire up Ogre
-#ifdef _DEBUG
-        init( "plugins_d.cfg", "resources.cfg", "ogre.cfg", "ogre.log" );
-#else
-        init( "plugins.cfg", "resources.cfg", "ogre.cfg", "ogre.log" );
-#endif
+        init(logFile.toStdString(), renderSystem.toStdString());
     }
 
     virtual ~OgreWidget()
@@ -35,16 +32,6 @@ public:
         delete mOgreRoot;
         destroy();
     }
-
-    void setupScene();
-
-    // Camera movement with the keyboard
-    void setCameraMovementDirection(bool forward, bool back, bool left, bool right, bool up, bool down, bool sprint);
-    Ogre::Vector3 mCameraMovement;
-
-    // Ogre::Real is actually just a typedef of float so it's ok to assign it as one
-    void setBrushSize(float size) { mBrushSize = size; }
-    Terrain* getTerrain() { return mTerrain; }
 
     // Is used to tell what action clicking on the widget has
     // Corrosponds to what tool the user has selected
@@ -58,12 +45,23 @@ public:
         IM_PLACEOBJ
     } mInteractionMode;
 
+    void setupScene();
     void setInteractionMode(interactionModes i);
     void setViewMode(Ogre::PolygonMode mode) { mCamera->setPolygonMode(mode); }
     void saveScreenshotToFile(QString filename);
     void setCameraInverted(bool inverted) { bCameraControlsInverted = inverted; }
     void setFOVy(float fov);
+    // Ogre::Real is actually just a typedef of float so it's ok to assign it as one
+    void setBrushSize(float size) { mBrushSize = size; }
+    Terrain* getTerrain() { return mTerrain; }
+    // Each string corrosponds to the path the the image
+    //void setSkyBox(QString up, QString dn, QString lf, QString rt, QString fr, QString bk);
+    void setSkyDome(QString filepath, float curvature = 10.0f, float tiling = 8.0f);
+    void setFog(int fogType, QColor colour, float density = 0.001, float start = 50, float end = 500);
+    // Camera movement with the keyboard
+    void setCameraMovementDirection(bool forward, bool back, bool left, bool right, bool up, bool down, bool sprint);
 
+    Ogre::Vector3 mCameraMovement;
     bool bCtrlPressed;
 
 signals:
@@ -78,7 +76,7 @@ protected:
     virtual void mouseReleaseEvent(QMouseEvent *);
     virtual void mouseMoveEvent(QMouseEvent *);
 
-    void init( std::string, std::string, std::string, std::string );
+    void init( std::string, std::string);
 
     void modifyTerrain(Ogre::Terrain* terrain, const Ogre::Vector3& centerPos, Ogre::Real timeElapsed);
 

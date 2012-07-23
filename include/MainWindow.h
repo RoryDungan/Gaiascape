@@ -6,6 +6,8 @@
 #include <QTreeWidgetItem>
 #include <QProgressBar>
 #include <QSettings>
+#include <QComboBox>
+#include <QSlider>
 #include "OgreWidget.h"
 
 namespace Ui {
@@ -26,6 +28,8 @@ private:
     QTimer* mRenderTimer;
     QProgressBar* mStatusProgressBar;
     QSettings* mSettings;
+    QComboBox* mToolComboBox;
+    QString mApplicationDataDir;
 
     // Called when the program is first run; creates a config file with default settings
     void createNewConfigFile();
@@ -69,9 +73,11 @@ public slots:
     void statusTextureUpdateInProgress();
     void statusTextreUpdateFinished();
     void updateSettings();
-    void loadSkyboxImage();
-    void updateSkybox();
-    void resetDefaultSkybox();
+    void loadSkydomeImage();
+    void updateEnvironment();
+    void resetDefaultEnvironment();
+    void updateFogButtonColour();
+    void fogModeChanged(int);
 };
 
 #endif // MAINWINDOW_H

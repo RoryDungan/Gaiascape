@@ -1,5 +1,7 @@
 #include "OgreWidget.h"
 #include <QDebug>
+#include <QFileInfo>
+#include <QDir>
 
 #define THIS OgreWidget
 
@@ -7,35 +9,36 @@
  * @brief init the object
  * @author kito berg-taylor
  */
-void THIS::init( std::string plugins_file,
-         std::string resources_file,
-         std::string ogre_cfg_file,
-         std::string ogre_log )
-{
+void THIS::init( std::string logFile,
+         std::string renderSystem)
+{qDebug() << QString(logFile.c_str());
     // create the main ogre object
-    mOgreRoot = new Ogre::Root( plugins_file, ogre_cfg_file, ogre_log );
+    mOgreRoot = new Ogre::Root( "", "", logFile );
+
+    // Load plugins
+    if(renderSystem == "Direct3D9")
+        mOgreRoot->loadPlugin("RenderSystem_Direct3D9");
+    else// if(renderSystem == "OpenGL") OpenGL is more cross-platform so should be used as a fallback unless Direct3D is explicitly specified
+        mOgreRoot->loadPlugin("RenderSystem_GL");
+    mOgreRoot->loadPlugin("Plugin_CgProgramManager");
 
     // setup a renderer
     Ogre::RenderSystemList::const_iterator renderers = mOgreRoot->getAvailableRenderers().begin();
     while(renderers != mOgreRoot->getAvailableRenderers().end())
     {
         Ogre::String rName = (*renderers)->getName();
-#ifdef _WIN32
-        if (rName == "Direct3D9 Rendering Subsystem")
-#else
-        if (rName == "OpenGL Rendering Subsystem")
-#endif
+        if (rName == renderSystem + " Rendering Subsystem")
             break;
         renderers++;
     }
 
-    Ogre::RenderSystem *renderSystem = *renderers;
-    mOgreRoot->setRenderSystem( renderSystem );
+    Ogre::RenderSystem *ogreRenderSystem = *renderers;
+    mOgreRoot->setRenderSystem(ogreRenderSystem);
     QString dimensions = QString( "%1x%2" )
                     .arg(this->width())
                     .arg(this->height());
 
-    renderSystem->setConfigOption( "Video Mode", dimensions.toStdString() );
+    ogreRenderSystem->setConfigOption( "Video Mode", dimensions.toStdString() );
 
     // initialize without creating window
     mOgreRoot->getRenderSystem()->setConfigOption( "Full Screen", "No" );
@@ -51,26 +54,11 @@ void THIS::init( std::string plugins_file,
     mBrushSize = 0.1;
 
     // Set up resources
-    Ogre::ConfigFile cf;
-    cf.load(resources_file);    
-
-    // Go through all sections & settings in the file
-    Ogre::ConfigFile::SectionIterator seci = cf.getSectionIterator();
-
-    Ogre::String secName, typeName, archName;
-    while (seci.hasMoreElements())
-    {
-        secName = seci.peekNextKey();
-        Ogre::ConfigFile::SettingsMultiMap *settings = seci.getNext();
-        Ogre::ConfigFile::SettingsMultiMap::iterator i;
-        for (i = settings->begin(); i != settings->end(); ++i)
-        {
-            typeName = i->first;
-            archName = i->second;
-            Ogre::ResourceGroupManager::getSingleton().addResourceLocation(
-                archName, typeName, secName);
-        }
-    }
+    Ogre::ResourceGroupManager::getSingleton().addResourceLocation("media", "FileSystem");
+    Ogre::ResourceGroupManager::getSingleton().addResourceLocation("media/models", "FileSystem");
+    Ogre::ResourceGroupManager::getSingleton().addResourceLocation("media/textures", "FileSystem");
+    Ogre::ResourceGroupManager::getSingleton().addResourceLocation("media/textures/nvidia", "FileSystem");
+    Ogre::ResourceGroupManager::getSingleton().addResourceLocation("media/textures/irrskybox", "FileSystem");
     Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
 }
 
@@ -161,10 +149,6 @@ void THIS::initializeGL()
     mCamera->setAutoAspectRatio(true);
     //mCamera->setFOVy(mCamFOV);
 
-    // This should really be called after initializeGL() because it takes a fair amount of time to load the resources
-    // and initializeGL() is called before the main window of the program is created. In future I would like to have
-    // it create the window immediatly, set the cursor to busy/wait and then call setupScene(), preferably in a
-    // background thread - Rory
     setupScene();
 }
 
@@ -177,7 +161,6 @@ void THIS::setFOVy(float fov)
     if(mOgreWindow->isActive()) mCamera->setFOVy(Ogre::Degree(fov));
     else mCamFOV = Ogre::Degree(10.0f);
 }
-
 
 /**
  * @brief Handle mouse input
@@ -281,7 +264,8 @@ void THIS::setupScene()
     mCamera->lookAt(Ogre::Vector3(1963, 50, 1660));
 
     // Set up skybox
-    mSceneMgr->setSkyBox(true, "irrSky"); //For some reason this crashes, I have no idea why. - Rory
+    //mSceneMgr->setSkyBox(true, "irrSky");
+    setSkyDome("clouds.jpg");
 
     // Set up light
     Ogre::Vector3 lightdir(0.55, -0.3, 0.75);
@@ -430,7 +414,9 @@ void THIS::modifyTerrain(Ogre::Terrain* terrain, const Ogre::Vector3 &centerPos,
             weight = 1.0f - (weight * weight);
 
             float addedHeight = weight * 250.0f * timeElapsed;
-            float newHeight = mInteractionMode == IM_EXTRUDE ? terrain->getHeightAtPoint(x, y) + addedHeight : terrain->getHeightAtPoint(x, y) - addedHeight;
+            float newHeight = mInteractionMode == IM_EXTRUDE
+                    ? terrain->getHeightAtPoint(x, y) + addedHeight
+                    : terrain->getHeightAtPoint(x, y) - addedHeight;
             terrain->setHeightAtPoint(x, y, newHeight);
         }
     }
@@ -477,4 +463,49 @@ void THIS::setCameraMovementDirection(bool forward, bool back, bool left, bool r
     mCameraMovement = Ogre::Vector3((left ? movementSpeed : 0.0f) - (right ? movementSpeed : 0.0f),
                                     (up ? movementSpeed : 0.0f) - (down ? movementSpeed : 0.0f),
                                     (forward ? movementSpeed : 0.0f) - (back ? movementSpeed : 0.0f));
+}
+
+/**
+ * @brief Create or change the skybox
+ * @author Rory Dungan
+ */
+void THIS::setSkyDome(QString filepath, float curvature, float tiling)
+{
+    // If necessary, add resource group in directory
+    QDir directory = QFileInfo(filepath).dir();
+    if(!Ogre::ResourceGroupManager::getSingleton().resourceLocationExists(directory.path().toStdString()))
+        Ogre::ResourceGroupManager::getSingleton().addResourceLocation(directory.path().toStdString(), "FileSystem");
+
+    // In order for this to be user-configurable we must manually create the material
+    std::string name = QFileInfo(filepath).fileName().toStdString();
+    Ogre::MaterialPtr skydome = Ogre::MaterialManager::getSingleton().create("sky_" + name, Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+    Ogre::Pass* pass = skydome->getTechnique(0)->getPass(0);
+    pass->setLightingEnabled(false);
+    pass->setDepthWriteEnabled(false);
+    pass->createTextureUnitState(name);
+    mSceneMgr->setSkyDome(true, "sky_" + name, curvature, tiling); // Finished setting up material and loading data, now create the skydome
+}
+
+/**
+ * @brief Change the fog parameters
+ * @author Rory Dungan
+ */
+void THIS::setFog(int fogType, QColor colour, float density, float start, float end)
+{
+    switch(fogType)
+    {
+    case 0: // No fog
+        mSceneMgr->setFog(Ogre::FOG_NONE);
+        break;
+    case 1: // Linear fog
+        mSceneMgr->setFog(Ogre::FOG_LINEAR, Ogre::ColourValue(colour.redF(), colour.greenF(), colour.blueF()), density, start, end);
+        break;
+    case 2: // Exponential fog
+        mSceneMgr->setFog(Ogre::FOG_EXP, Ogre::ColourValue(colour.redF(), colour.greenF(), colour.blueF()), density, start, end);
+        break;
+    case 3: // Exponential^2
+        mSceneMgr->setFog(Ogre::FOG_EXP2, Ogre::ColourValue(colour.redF(), colour.greenF(), colour.blueF()), density, start, end);
+        break;
+    default: break;
+    }
 }

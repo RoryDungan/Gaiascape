@@ -74,9 +74,9 @@
    <addaction name="menuTools"/>
    <addaction name="menuHelp"/>
   </widget>
-  <widget class="QToolBar" name="mainToolBar">
+  <widget class="QToolBar" name="fileToolBar">
    <property name="windowTitle">
-    <string>Home</string>
+    <string>File</string>
    </property>
    <property name="iconSize">
     <size>
@@ -164,6 +164,11 @@
         </item>
         <item>
          <property name="text">
+          <string>Specular</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
           <string>Normal map</string>
          </property>
          <property name="text">
@@ -189,6 +194,11 @@
          </property>
          <property name="text">
           <string>dirt_grayrocky_diffusespecular.dds</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Specular</string>
          </property>
         </item>
         <item>
@@ -253,18 +263,18 @@
     </layout>
    </widget>
   </widget>
-  <widget class="QDockWidget" name="skyDockWidget">
+  <widget class="QDockWidget" name="environmentDockWidget">
    <property name="minimumSize">
     <size>
      <width>225</width>
-     <height>335</height>
+     <height>423</height>
     </size>
    </property>
    <property name="features">
     <set>QDockWidget::NoDockWidgetFeatures</set>
    </property>
    <property name="windowTitle">
-    <string>Sky</string>
+    <string>Environment</string>
    </property>
    <attribute name="dockWidgetArea">
     <number>1</number>
@@ -274,16 +284,19 @@
      <item>
       <widget class="QGroupBox" name="groupBox">
        <property name="title">
-        <string>Skybox</string>
+        <string>Sky</string>
        </property>
        <layout class="QFormLayout" name="formLayout">
+        <property name="fieldGrowthPolicy">
+         <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+        </property>
         <property name="labelAlignment">
          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
         </property>
         <item row="0" column="0">
          <widget class="QLabel" name="label_6">
           <property name="text">
-           <string>Up</string>
+           <string>Texture</string>
           </property>
          </widget>
         </item>
@@ -293,10 +306,14 @@
            <number>0</number>
           </property>
           <item>
-           <widget class="QLineEdit" name="skyboxUpLineEdit"/>
+           <widget class="QLineEdit" name="skydomeLineEdit">
+            <property name="text">
+             <string>media/textures/clouds.jpg</string>
+            </property>
+           </widget>
           </item>
           <item>
-           <widget class="QToolButton" name="skyboxUpButton">
+           <widget class="QToolButton" name="skydomeButton">
             <property name="icon">
              <iconset resource="../icons.qrc">
               <normaloff>:/media/16x16/document-open.png</normaloff>:/media/16x16/document-open.png</iconset>
@@ -304,127 +321,201 @@
            </widget>
           </item>
          </layout>
+        </item>
+        <item row="1" column="1">
+         <widget class="QDoubleSpinBox" name="skyCurvatureSpinBox">
+          <property name="minimum">
+           <double>2.000000000000000</double>
+          </property>
+          <property name="maximum">
+           <double>65.000000000000000</double>
+          </property>
+          <property name="value">
+           <double>10.000000000000000</double>
+          </property>
+         </widget>
         </item>
         <item row="1" column="0">
          <widget class="QLabel" name="label_7">
           <property name="text">
-           <string>Down</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="1">
-         <layout class="QHBoxLayout" name="horizontalLayout_3">
-          <property name="spacing">
-           <number>0</number>
-          </property>
-          <item>
-           <widget class="QLineEdit" name="skyboxDownLineEdit"/>
-          </item>
-          <item>
-           <widget class="QToolButton" name="skyboxDownButton">
-            <property name="icon">
-             <iconset resource="../icons.qrc">
-              <normaloff>:/media/16x16/document-open.png</normaloff>:/media/16x16/document-open.png</iconset>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-        <item row="2" column="0">
-         <widget class="QLabel" name="label_8">
-          <property name="text">
-           <string>Front</string>
+           <string>Curvature</string>
           </property>
          </widget>
         </item>
         <item row="2" column="1">
-         <layout class="QHBoxLayout" name="horizontalLayout_4">
-          <property name="spacing">
-           <number>0</number>
+         <widget class="QSpinBox" name="skydomeTilingSpinBox">
+          <property name="minimum">
+           <number>1</number>
           </property>
+          <property name="value">
+           <number>8</number>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0">
+         <widget class="QLabel" name="label_8">
+          <property name="text">
+           <string>Tilling</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item>
+      <widget class="QGroupBox" name="groupBox_2">
+       <property name="title">
+        <string>Fog</string>
+       </property>
+       <layout class="QFormLayout" name="formLayout_4">
+        <property name="fieldGrowthPolicy">
+         <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+        </property>
+        <property name="labelAlignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+        <item row="0" column="0">
+         <widget class="QLabel" name="fogModeLabel">
+          <property name="text">
+           <string>Fog mode</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QComboBox" name="fogModeComboBox">
           <item>
-           <widget class="QLineEdit" name="skyboxFrontLineEdit"/>
+           <property name="text">
+            <string>Disabled</string>
+           </property>
           </item>
           <item>
-           <widget class="QToolButton" name="skyboxFrontButton">
-            <property name="icon">
-             <iconset resource="../icons.qrc">
-              <normaloff>:/media/16x16/document-open.png</normaloff>:/media/16x16/document-open.png</iconset>
-            </property>
-           </widget>
+           <property name="text">
+            <string>Linear</string>
+           </property>
           </item>
-         </layout>
+          <item>
+           <property name="text">
+            <string>Exponential</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Exponential squared</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="fogStartLabel">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="text">
+           <string>Start</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QSpinBox" name="fogStartSpinBox">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="suffix">
+           <string>%</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0">
+         <widget class="QLabel" name="fogEndLabel">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="text">
+           <string>End</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QSpinBox" name="fogEndSpinBox">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="suffix">
+           <string>%</string>
+          </property>
+          <property name="maximum">
+           <number>100</number>
+          </property>
+          <property name="value">
+           <number>100</number>
+          </property>
+         </widget>
         </item>
         <item row="3" column="0">
-         <widget class="QLabel" name="label_9">
+         <widget class="QLabel" name="fogDensityLabel">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="text">
-           <string>Back</string>
+           <string>Density</string>
           </property>
          </widget>
         </item>
         <item row="3" column="1">
-         <layout class="QHBoxLayout" name="horizontalLayout_5">
-          <property name="spacing">
-           <number>0</number>
+         <widget class="QDoubleSpinBox" name="fogDensitySpinBox">
+          <property name="enabled">
+           <bool>false</bool>
           </property>
-          <item>
-           <widget class="QLineEdit" name="skyboxBackLineEdit"/>
-          </item>
-          <item>
-           <widget class="QToolButton" name="skyboxBackButton">
-            <property name="icon">
-             <iconset resource="../icons.qrc">
-              <normaloff>:/media/16x16/document-open.png</normaloff>:/media/16x16/document-open.png</iconset>
-            </property>
-           </widget>
-          </item>
-         </layout>
+          <property name="decimals">
+           <number>3</number>
+          </property>
+          <property name="minimum">
+           <double>0.001000000000000</double>
+          </property>
+          <property name="maximum">
+           <double>1.000000000000000</double>
+          </property>
+          <property name="singleStep">
+           <double>0.010000000000000</double>
+          </property>
+         </widget>
         </item>
         <item row="4" column="0">
-         <widget class="QLabel" name="label_10">
+         <widget class="QLabel" name="fogColourLabel_0">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="text">
-           <string>Left</string>
+           <string>Colour</string>
           </property>
          </widget>
         </item>
         <item row="4" column="1">
-         <layout class="QHBoxLayout" name="horizontalLayout_6">
-          <property name="spacing">
-           <number>0</number>
-          </property>
+         <layout class="QHBoxLayout" name="horizontalLayout_4">
           <item>
-           <widget class="QLineEdit" name="skyboxLeftLineEdit"/>
-          </item>
-          <item>
-           <widget class="QToolButton" name="skyboxLeftButton">
-            <property name="icon">
-             <iconset resource="../icons.qrc">
-              <normaloff>:/media/16x16/document-open.png</normaloff>:/media/16x16/document-open.png</iconset>
+           <widget class="QLabel" name="fogColourLabel">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="frameShape">
+             <enum>QFrame::StyledPanel</enum>
+            </property>
+            <property name="text">
+             <string/>
             </property>
            </widget>
           </item>
-         </layout>
-        </item>
-        <item row="5" column="0">
-         <widget class="QLabel" name="label_11">
-          <property name="text">
-           <string>Right</string>
-          </property>
-         </widget>
-        </item>
-        <item row="5" column="1">
-         <layout class="QHBoxLayout" name="horizontalLayout_7">
-          <property name="spacing">
-           <number>0</number>
-          </property>
           <item>
-           <widget class="QLineEdit" name="skyboxRightLineEdit"/>
-          </item>
-          <item>
-           <widget class="QToolButton" name="skyboxRightButton">
+           <widget class="QToolButton" name="fogColourButton">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
             <property name="icon">
              <iconset resource="../icons.qrc">
-              <normaloff>:/media/16x16/document-open.png</normaloff>:/media/16x16/document-open.png</iconset>
+              <normaloff>:/media/16x16/colour-picker.png</normaloff>:/media/16x16/colour-picker.png</iconset>
             </property>
            </widget>
           </item>
@@ -440,14 +531,14 @@
        </property>
        <property name="sizeHint" stdset="0">
         <size>
-         <width>20</width>
-         <height>40</height>
+         <width>0</width>
+         <height>0</height>
         </size>
        </property>
       </spacer>
      </item>
      <item>
-      <widget class="QCommandLinkButton" name="updateSkyButton">
+      <widget class="QCommandLinkButton" name="updateEnvironmentButton">
        <property name="text">
         <string>Accept</string>
        </property>
@@ -467,7 +558,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QCommandLinkButton" name="resetSkyButton">
+      <widget class="QCommandLinkButton" name="resetEnvironmentButton">
        <property name="text">
         <string>Reset</string>
        </property>
@@ -576,22 +667,6 @@
            </property>
           </widget>
          </item>
-         <item row="0" column="1">
-          <widget class="QSpinBox" name="spinBox">
-           <property name="minimum">
-            <number>2</number>
-           </property>
-           <property name="maximum">
-            <number>98</number>
-           </property>
-           <property name="singleStep">
-            <number>2</number>
-           </property>
-           <property name="value">
-            <number>8</number>
-           </property>
-          </widget>
-         </item>
          <item row="3" column="0">
           <widget class="QLabel" name="label_5">
            <property name="text">
@@ -610,6 +685,25 @@
            <property name="orientation">
             <enum>Qt::Horizontal</enum>
            </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QComboBox" name="terrainSizeBox">
+           <item>
+            <property name="text">
+             <string>Small (257x257)</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Medium (1024x1024)</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Large (4097x4097)</string>
+            </property>
+           </item>
           </widget>
          </item>
         </layout>
@@ -724,9 +818,9 @@
     </layout>
    </widget>
   </widget>
-  <widget class="QToolBar" name="toolBar_2">
+  <widget class="QToolBar" name="homeToolBar">
    <property name="windowTitle">
-    <string>toolBar_2</string>
+    <string>Home</string>
    </property>
    <property name="toolButtonStyle">
     <enum>Qt::ToolButtonTextBesideIcon</enum>
@@ -740,6 +834,17 @@
    <addaction name="actionShow_heightmap_image"/>
    <addaction name="separator"/>
    <addaction name="actionTake_screenshot"/>
+  </widget>
+  <widget class="QToolBar" name="contextToolBar">
+   <property name="windowTitle">
+    <string>Context</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>true</bool>
+   </attribute>
   </widget>
   <action name="action_New">
    <property name="icon">
@@ -1383,10 +1488,10 @@
    </hints>
   </connection>
   <connection>
-   <sender>updateSkyButton</sender>
+   <sender>updateEnvironmentButton</sender>
    <signal>clicked()</signal>
    <receiver>MainWindow</receiver>
-   <slot>updateSkybox()</slot>
+   <slot>updateEnvironment()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>147</x>
@@ -1399,10 +1504,10 @@
    </hints>
   </connection>
   <connection>
-   <sender>resetSkyButton</sender>
+   <sender>resetEnvironmentButton</sender>
    <signal>clicked()</signal>
    <receiver>MainWindow</receiver>
-   <slot>resetDefaultSkybox()</slot>
+   <slot>resetDefaultEnvironment()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>147</x>
@@ -1415,10 +1520,10 @@
    </hints>
   </connection>
   <connection>
-   <sender>skyboxUpButton</sender>
+   <sender>skydomeButton</sender>
    <signal>clicked()</signal>
    <receiver>MainWindow</receiver>
-   <slot>loadSkyboxImage()</slot>
+   <slot>loadSkydomeImage()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>228</x>
@@ -1431,14 +1536,14 @@
    </hints>
   </connection>
   <connection>
-   <sender>skyboxDownButton</sender>
+   <sender>fogColourButton</sender>
    <signal>clicked()</signal>
    <receiver>MainWindow</receiver>
-   <slot>loadSkyboxImage()</slot>
+   <slot>updateFogButtonColour()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>228</x>
-     <y>150</y>
+     <x>232</x>
+     <y>273</y>
     </hint>
     <hint type="destinationlabel">
      <x>433</x>
@@ -1447,62 +1552,14 @@
    </hints>
   </connection>
   <connection>
-   <sender>skyboxFrontButton</sender>
-   <signal>clicked()</signal>
+   <sender>fogModeComboBox</sender>
+   <signal>currentIndexChanged(int)</signal>
    <receiver>MainWindow</receiver>
-   <slot>loadSkyboxImage()</slot>
+   <slot>fogModeChanged(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>228</x>
-     <y>180</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>433</x>
-     <y>339</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>skyboxBackButton</sender>
-   <signal>clicked()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>loadSkyboxImage()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>228</x>
-     <y>210</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>433</x>
-     <y>339</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>skyboxLeftButton</sender>
-   <signal>clicked()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>loadSkyboxImage()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>228</x>
-     <y>240</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>433</x>
-     <y>339</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>skyboxRightButton</sender>
-   <signal>clicked()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>loadSkyboxImage()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>228</x>
-     <y>270</y>
+     <x>175</x>
+     <y>245</y>
     </hint>
     <hint type="destinationlabel">
      <x>433</x>
@@ -1537,8 +1594,10 @@
   <slot>showAboutBox()</slot>
   <slot>updateTextures()</slot>
   <slot>resetDefaultTextures()</slot>
-  <slot>updateSkybox()</slot>
-  <slot>resetDefaultSkybox()</slot>
-  <slot>loadSkyboxImage()</slot>
+  <slot>updateEnvironment()</slot>
+  <slot>resetDefaultEnvironment()</slot>
+  <slot>loadSkydomeImage()</slot>
+  <slot>updateFogButtonColour()</slot>
+  <slot>fogModeChanged(int)</slot>
  </slots>
 </ui>
