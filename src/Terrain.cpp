@@ -6,6 +6,8 @@
 Terrain::Terrain(Ogre::SceneManager* sceneManager, Ogre::Light* light)
 {
     // Workaround by Rory - this needs to be set outside of the header file
+    // Note by Wraith - I believe that terrain requires this size to be able to integrate with the algorithm.
+    // Instead, probably include the amount of tiles available.
     iTerrainSize = 8;
 
     mSceneManager = sceneManager;
@@ -271,21 +273,6 @@ void Terrain::generateTerrain()
             std::cout << "Weird error occured\n"; // This hasn't been called for a while and may not be necessary any more
         }
     }
-
-    // Generate an image of slopeMap for diagnostic purposes
-    Ogre::uchar stream2[iDimensions*iDimensions];
-    float* pSlopeMap = &slopeMap[0];
-    for(long unsigned int i = 0; i < iFinalX + iDimensions - 1; ++i)
-    {
-        stream2[i] = (Ogre::uchar)(*(pSlopeMap + i)*255); // Probably just put in the above if statement if it works
-    }
-    Ogre::uchar* pStream2 = &stream2[0];
-
-    Ogre::Image img2;
-    img2.loadDynamicImage(pStream2, iDimensions, iDimensions, Ogre::PF_L8); // PF_L8 = 8-pit pixel format, all luminance
-    img2.save("slopeMap.bmp");
-
-    floraManager::getSingletonPtr()->getFlora();
 }
 
 std::string Terrain::intToStr(int number)

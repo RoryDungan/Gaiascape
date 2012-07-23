@@ -3,11 +3,6 @@
 
 floraManager* floraManager::sInstance = 0;
 
-void floraManager::getFlora()
-{
-    std::cout << "Number of flora = " << vFlora.size() << "\n";
-}
-
 floraManager floraManager::getSingleton()
 {
     if(!sInstance)

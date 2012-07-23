@@ -6,9 +6,13 @@ floraTree::floraTree(std::string name, Ogre::SceneManager *sceneMgr, Ogre::Vecto
     mSceneMgr = sceneMgr;
     mNode = mSceneMgr->getRootSceneNode()->createChildSceneNode(sName + "_main");
 
-    mEnt = mSceneMgr->createEntity(sName + "_entity", "ninja.mesh");
+    mEnt = mSceneMgr->createEntity(sName + "_entity", "shrub.mesh");
     mNode->attachObject(mEnt);
-    mNode->setScale(0.9, 0.9, 0.9); // Should be randomized
+
+    // Scale starts at a base number of 85 - 95, and each individual dimension may vary by 5.
+    short unsigned int baseScale = Random::getSingleton().getRand(85, 95);
+    mNode->setScale(baseScale + Random::getSingleton().getRand(-5, 5), baseScale + Random::getSingleton().getRand(-5, 5), baseScale + Random::getSingleton().getRand(-5, 5));
+
     mNode->setPosition(location);
     // Also add a random rotation
     mNode->yaw(Ogre::Degree(Random::getSingleton().getRand(0, 359)));
