@@ -3,6 +3,11 @@
 
 floraManager* floraManager::sInstance = 0;
 
+void floraManager::getFlora()
+{
+    std::cout << "Number of flora = " << vFlora.size() << "\n";
+}
+
 floraManager floraManager::getSingleton()
 {
     if(!sInstance)
@@ -37,7 +42,18 @@ bool floraManager::removeFlora(floraMain *flora)
     {
         if(vFlora[x]->getName() == flora->getName())
         {
-            vFlora.erase(vFlora.begin() + x);
+            Ogre::Entity* entity = vFlora[x]->mEnt;
+            Ogre::SceneNode* node = vFlora[x]->mNode;
+
+            node->detachObject(entity->getName());
+            vFlora[x]->getSceneMgr()->destroyEntity(entity->getName());
+            vFlora[x]->getSceneMgr()->destroySceneNode(node->getName());
+
+            vFlora.erase(vFlora.begin() + x); // Erase vector data
+
+            delete entity;
+            delete node;
+
             return true; // Success!
         }
     }
@@ -46,11 +62,21 @@ bool floraManager::removeFlora(floraMain *flora)
 
 void floraManager::removeAllFlora()
 {
+    Ogre::Entity* entity;
+    Ogre::SceneNode* node;
+
     for(short unsigned i = 0; i < vFlora.size(); i++)
     {
-        delete vFlora[i];
+        entity = vFlora[i]->mEnt;
+        node = vFlora[i]->mNode;
+
+        node->detachObject(entity->getName());
+        vFlora[i]->getSceneMgr()->destroyEntity(entity->getName());
+        vFlora[i]->getSceneMgr()->destroySceneNode(node->getName());
     }
-    vFlora.clear();
+    vFlora.clear(); // Clear vector data
+    //delete entity;
+    //delete node;
 }
 
 float floraManager::getFloraClosestToPoint(Ogre::Vector3 point) // Two dimensional because why not?

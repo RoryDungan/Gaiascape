@@ -14,6 +14,7 @@ class floraManager
         bool addFlora(floraMain& newFlora);
         bool removeFlora(floraMain* flora);
         void removeAllFlora(); // To be done every time we generate new terrain
+        void getFlora(); // Debug function which returns the number of flora recorded
 
         float getFloraClosestToPoint(Ogre::Vector3 point);
     private:

@@ -8,10 +8,9 @@
 
 #include <sstream> // For intToStr. Move if the function is required somewhere else.
 
-#include <algorithms/HeightMapGen.h>
-#include "algorithms/random.h"
-#include "floramanager.h"
-#include "floraTree.h" // Probably just have this included in floraMain and include that instead
+#include "algorithms/HeightMapGen.h"
+#include "FloraManager.h"
+#include "FloraTree.h" // Probably just have this included in floraMain and include that instead
 
 class Terrain
 {

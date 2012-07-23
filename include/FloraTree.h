@@ -7,6 +7,7 @@ class floraTree : public floraMain
 {
 public:
     floraTree(std::string name, Ogre::SceneManager* sceneMgr, Ogre::Vector3 location);
+    ~floraTree() { /*stub*/ }
 };
 
 #endif // FLORATREE_H
