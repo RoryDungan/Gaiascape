@@ -257,7 +257,13 @@ short unsigned int HeightMapGen::retrieveDimensions()
     return iDimensions;
 }
 
-void HeightMapGen::retrieveHeightmap(float talos, unsigned int size, float* heightmapArray)
+// retrieveHeightmap
+//  talos = the angle at which a slope must be for erosion to take place
+//  size = The number of subdivisions the original square will have.
+//  heightmapArray = The array we will put the heighmap into.
+//  staggerValue = The degree to which the stagger value will be increased/decreased. 1 = 100% (normal)
+
+void HeightMapGen::retrieveHeightmap(float talos, unsigned int size, float* heightmapArray, float staggerValue)
 {
     iNumberOfBlocks = pow(pow(4.0, size * 0.5), 2) + 1;
     fTalos = talos; // A good default is 4/iNumberOfBlocks, however this will change depending on how eroded the terrain should be.
@@ -270,7 +276,7 @@ void HeightMapGen::retrieveHeightmap(float talos, unsigned int size, float* heig
     // Or in other terms, the number of subdivisions.
     // iQuadrants = 1 will have 9 vertices, iQuadrants = 2 will have 25 vertices [I THINK]
     iQuadrants = size;
-    fStaggerValue = iNumberOfBlocks*255;
+    fStaggerValue = iNumberOfBlocks*255*staggerValue;
 
     pHMBlocks = heightmapArray;
 

@@ -103,7 +103,9 @@ void Terrain::generateTerrain()
     for(long unsigned int i = 0; i < iDimensions*iDimensions; i++)
         heightMap[i] = 0;
 
-    HMHMgen.retrieveHeightmap(1, iTerrainSize, &heightMap[0]); // Talos is set to something random for a defualt until erosion is added
+    // Talos is set to something random for a defualt until erosion is added
+    short unsigned int staggerValue = 1;
+    HMHMgen.retrieveHeightmap(1, iTerrainSize, &heightMap[0], staggerValue);
 
     Ogre::uchar stream[iDimensions*iDimensions];
     long unsigned int iFinalX = (iDimensions - 1)*iDimensions;
@@ -197,7 +199,7 @@ void Terrain::generateTerrain()
     //      Slope
     float slopeMap[iDimensions*iDimensions];
     HMHMgen.retrieveSlopemap(&slopeMap[0], &heightMap[0], iDimensions);
-    short unsigned int iProbability = 0; // Probability a tree will spawn. If random returns equal to or below this number, it spawns.
+    short signed int iProbability = 0; // Probability a tree will spawn. If random returns equal to or below this number, it spawns.
 
     Ogre::Vector3 enterPos; // The point the flora will be entering.
     short unsigned int iRandomNumber; // A randomly generated number from 0 to 10. Should be changed to 0 to 100 for more depth.
@@ -218,9 +220,7 @@ void Terrain::generateTerrain()
             // Set up variables
             iProbability = 0;
             iRandomBlock = Random::getSingleton().getRand(0, iFinalX + iDimensions - 1);
-            // std::cout << "iRandomBlock = " << iRandomBlock << "\n";
             mTerrainGroup->getTerrain(0, 0)->getPoint(iRandomBlock%iDimensions, (iRandomBlock*2)/iDimensions, &enterPos); // Puts the vector3 position of what's specified into enterPos
-            std::cout << "Generating at x = " << iRandomBlock%iDimensions << " and y = " << (iRandomBlock*2)/iDimensions << "\n";
 
             // --------------------------
             // Height probability changes
@@ -242,12 +242,13 @@ void Terrain::generateTerrain()
             // Proximity to trees - Disabled because the for loop isn't functioning correctly
             // < 3 = 0% prob
             // 3.1-10 = +30% prob
-            if(iProbability != -1 && floraManager::getSingletonPtr()->getFloraClosestToPoint(enterPos) <= 3) // 3 is arbitrary and needs to be adjusted to the scale of the model!
+            if(iProbability != -1 && floraManager::getSingletonPtr()->getFloraClosestToPoint(enterPos) <= 90) // 3 is arbitrary and needs to be adjusted to the scale of the model!
             {
-                std::cout << "Too close!\n";
+                // Needs to be bigger
                 iProbability = -1;
+                std::cout << "Too close!\n";
             }
-            if(iProbability != -1 && floraManager::getSingletonPtr()->getFloraClosestToPoint(enterPos) <= 10) // Plants tend to gather together due to factors we don't calculate, so simullate this
+            if(iProbability != -1 && floraManager::getSingletonPtr()->getFloraClosestToPoint(enterPos) <= 450) // Plants tend to gather together due to factors we don't calculate, so simullate this
             {
                 std::cout << "Pretty close\n";
                 iProbability += 3;
