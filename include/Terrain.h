@@ -7,6 +7,7 @@
 #include <OGRE/OgreImage.h>
 
 #include <sstream> // For intToStr. Move if the function is required somewhere else.
+#include <vector> // For the HMblocks vector
 
 #include "algorithms/HeightMapGen.h"
 #include "FloraManager.h"
@@ -15,13 +16,13 @@
 class Terrain
 {
 public:
-    Terrain(Ogre::SceneManager* sceneManager, Ogre::Light *light);
+    Terrain(Ogre::SceneManager* sceneManager, Ogre::Light *light, short unsigned int size, short unsigned int talos, short unsigned int staggerValue);
     ~Terrain();
     Ogre::TerrainGroup* getTerrainGroup() { return mTerrainGroup; }
 
     void createFlatTerrain();
     void loadHeightmap();
-    void generateTerrain();
+    void generateTerrain(short signed int x, short signed int y);
 
     enum textureCatagory { TEX_GRASS, TEX_DIRT, TEX_ROCK, TEX_GENERIC };
     enum textureType { TT_NORMALMAP, TT_DIFFUSE };
@@ -39,13 +40,20 @@ private:
     bool mTerrainsImported;
 
     std::string intToStr(int number);
+    HeightMapGen* getByLoc(signed short x, signed short y);
     void defineTerrainFromFile(long x, long y);
     void initBlendMaps(Ogre::Terrain* terrain);
     void configureTerrainDefaults(Ogre::Light* light);
     void configureTextures(Ogre::Terrain::LayerInstanceList& layerList);
 
-    // This should be defined before the terrain is generated. 4 is set as default for a small world.
-    short unsigned int iTerrainSize;// = 4;
+    // List of heightmaps we have
+    std::vector<HeightMapGen*> HMblocks;
+
+    // These should be defined before the terrain is generated.
+    short unsigned int iTerrainSize;
+    short unsigned int iTalos;
+    short unsigned int iBlocks;
+    short unsigned int iStaggerValue;
 };
 
 #endif // TERRAIN_H

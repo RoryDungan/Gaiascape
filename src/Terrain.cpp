@@ -3,12 +3,13 @@
 #include <QDesktopServices> // Also needed temporarily, so that the heightmap image can be outputted to a directory where ImageViewer can easily find it
 #include <QDir> // Same as QDesktopServices
 
-Terrain::Terrain(Ogre::SceneManager* sceneManager, Ogre::Light* light)
+Terrain::Terrain(Ogre::SceneManager* sceneManager, Ogre::Light *light, short unsigned int size, short unsigned int talos, short unsigned int staggerValue)
 {
-    // Workaround by Rory - this needs to be set outside of the header file
-    // Note by Wraith - I believe that terrain requires this size to be able to integrate with the algorithm.
-    // Instead, probably include the amount of tiles available.
-    iTerrainSize = 8;
+    // Terrain Size must be constant if tiles are to make any sense interacting with each other.
+    iTerrainSize = size;
+    // These do not need to be constant, but for large, consistent terrains, it doesn't make sense otherwise.
+    iTalos = talos;               // Minimum angle where thermal erosion takes place
+    iStaggerValue = staggerValue; // The unevenness of the terrain
 
     mSceneManager = sceneManager;
     mSun = light;
@@ -88,44 +89,40 @@ void Terrain::loadHeightmap()
     mTerrainGroup->freeTemporaryResources();
 }
 
-void Terrain::generateTerrain()
+
+// x = The x position of the terrain we are generating
+// y = The y position of the terrain we are generating
+
+void Terrain::generateTerrain(signed short x, signed short y)
 {
+    // First, check to make sure the terrain doesn't already exist.
+    if(getByLoc(x, y) != NULL)
+    {
+        std::cout << "Tried to generate terrain at x = " << x << " and y = " << y << " but terrain already exists there!\n";
+        return;
+    }
     mTerrainGlobals = new Ogre::TerrainGlobalOptions();
 
     // Firstly, generate the terrain data we're going to be working with
     // The reason why this looks weird is that all HMgen classes must start with what they are calculating,
     // in this case, a HM.
-    HeightMapGen HMHMgen(0.0f, iTerrainSize);
-    // Set the array to be filled with zeroes, and be flat.
-    // Set up the dimensions of the array
-    short unsigned int iDimensions = pow(4.0, iTerrainSize * 0.5) + 1;
-    float heightMap[iDimensions*iDimensions];
-    for(long unsigned int i = 0; i < iDimensions*iDimensions; i++)
-        heightMap[i] = 0;
+    HeightMapGen* HMHMgen = new HeightMapGen(iTerrainSize, x, y, iTalos, iStaggerValue);
 
-    // Talos is set to something random for a defualt until erosion is added
-    short unsigned int staggerValue = 1;
-    HMHMgen.retrieveHeightmap(1, iTerrainSize, &heightMap[0], staggerValue);
-
-    Ogre::uchar stream[iDimensions*iDimensions];
-    long unsigned int iFinalX = (iDimensions - 1)*iDimensions;
-    float* pHeightMap = &heightMap[0];
-    for(long unsigned int i = 0; i < iFinalX + iDimensions - 1; ++i)
+    // Convert that to an image
+    Ogre::uchar stream[HMHMgen->iDimensions*HMHMgen->iDimensions];
+    float* pHeightMap = HMHMgen->getHeightmap();
+    for(long unsigned int i = 0; i < HMHMgen->iFinalX + HMHMgen->iDimensions - 1; ++i)
     {
         stream[i] = (Ogre::uchar)(*(pHeightMap + i)*255); // Probably just put in the above if statement if it works
     }
     Ogre::uchar* pStream = &stream[0];
 
     Ogre::Image img;
-    img.loadDynamicImage(pStream, iDimensions, iDimensions, Ogre::PF_L8); // PF_L8 = 8-pit pixel format, all luminance
+    img.loadDynamicImage(pStream, HMHMgen->iDimensions, HMHMgen->iDimensions, Ogre::PF_L8); // PF_L8 = 8-pit pixel format, all luminance
     img.save(std::string(QDesktopServices::storageLocation(QDesktopServices::TempLocation).toAscii() + QDir::separator().toAscii() + "gaiascape-heightmap.bmp"));
 
-    // How generating the terrain will work
-    //  Because we cannot conveniently return an array, instead the array is created here.
-    //  We then pass a pointer of that array to the function which generates the terrain
-
     // construct terrain group
-    mTerrainGroup = new Ogre::TerrainGroup(mSceneManager, Ogre::Terrain::ALIGN_X_Z, iDimensions, 12000.0f);
+    mTerrainGroup = new Ogre::TerrainGroup(mSceneManager, Ogre::Terrain::ALIGN_X_Z, HMHMgen->iDimensions, 12000.0f);
     //mTerrainGroup->setFilenameConvention(Ogre::String("Terrain"), Ogre::String("dat"));
     mTerrainGroup->setOrigin(Ogre::Vector3::ZERO);
 
@@ -143,7 +140,7 @@ void Terrain::generateTerrain()
 
     // Configure default import settings for if we use imported image
     Ogre::Terrain::ImportData& defaultimp = mTerrainGroup->getDefaultImportSettings();
-    defaultimp.terrainSize = iDimensions;
+    defaultimp.terrainSize = HMHMgen->iDimensions;
     defaultimp.worldSize = 12000.0f;
     defaultimp.inputScale = 1800;
     defaultimp.minBatchSize = 129;
@@ -163,14 +160,10 @@ void Terrain::generateTerrain()
     defaultimp.layerList[2].textureNames.push_back("growth_weirdfungus-03_normalheight.dds");
 
     // define our terrains and instruct the TerrainGroup to load them all
-    for(long x = 0; x <= 0; ++x)
-        for(long y = 0; y <= 0; ++y)
-        {
-            mTerrainGroup->defineTerrain(x, y, &img);
-            mTerrainsImported = true;
-        }
+    mTerrainGroup->defineTerrain(x, y, &img);
+    mTerrainsImported = true;
 
-    // sync load since we want everything in place when we start
+    // sync load since we want everything in place when we start - Do after all terrains have finished?
     mTerrainGroup->loadAllTerrains(true);
 
     // Now, if we just imported our terrains, we would like our blendmaps to be calculated:
@@ -197,8 +190,8 @@ void Terrain::generateTerrain()
     //      Altitude
     //      Proximity to other trees
     //      Slope
-    float slopeMap[iDimensions*iDimensions];
-    HMHMgen.retrieveSlopemap(&slopeMap[0], &heightMap[0], iDimensions);
+    float slopeMap[HMHMgen->iDimensions*HMHMgen->iDimensions];
+    HMHMgen->getSlopemap(&slopeMap[0]);
     short signed int iProbability = 0; // Probability a tree will spawn. If random returns equal to or below this number, it spawns.
 
     Ogre::Vector3 enterPos; // The point the flora will be entering.
@@ -207,7 +200,7 @@ void Terrain::generateTerrain()
     long unsigned int iRandomBlock; // A randomly selected vertex from the terrain used to spawn a tree
     floraTree* addedTree;
 
-    mTerrainGroup->getTerrain(0, 0)->getPoint(1%iDimensions, 1/iDimensions, &enterPos);
+    mTerrainGroup->getTerrain(0, 0)->getPoint(1%HMHMgen->iDimensions, 1/HMHMgen->iDimensions, &enterPos);
 
     for(long unsigned int i = 0; i < treesToGenerate; ++i)
     {
@@ -219,8 +212,8 @@ void Terrain::generateTerrain()
 
             // Set up variables
             iProbability = 0;
-            iRandomBlock = Random::getSingleton().getRand(0, iFinalX + iDimensions - 1);
-            mTerrainGroup->getTerrain(0, 0)->getPoint(iRandomBlock%iDimensions, (iRandomBlock*2)/iDimensions, &enterPos); // Puts the vector3 position of what's specified into enterPos
+            iRandomBlock = Random::getSingleton().getRand(0, HMHMgen->iFinalX + HMHMgen->iDimensions - 1);
+            mTerrainGroup->getTerrain(0, 0)->getPoint(iRandomBlock%HMHMgen->iDimensions, (iRandomBlock*2)/HMHMgen->iDimensions, &enterPos); // Puts the vector3 position of what's specified into enterPos
 
             // --------------------------
             // Height probability changes
@@ -230,18 +223,18 @@ void Terrain::generateTerrain()
             // 11-30% = 40% prob
             // 31-50% = 30% prob
             // 51-90% = 10% prob
-            if(heightMap[iRandomBlock] <= 0.9) // Put an else iProbability = -1 if you want nothing to spawn above 90%
+            if(*(pHeightMap + iRandomBlock) <= 0.9) // Put an else iProbability = -1 if you want nothing to spawn above 90%
                 iProbability += 1;
-            if(heightMap[iRandomBlock] <= 0.5f)
+            if(*(pHeightMap + iRandomBlock) <= 0.5f)
                 iProbability += 2;
-            if(heightMap[iRandomBlock] <= 0.3f)
+            if(*(pHeightMap + iRandomBlock) <= 0.3f)
                 iProbability += 1;
-            if(heightMap[iRandomBlock] <= 0.1f)
+            if(*(pHeightMap + iRandomBlock) <= 0.1f)
                 iProbability += 1; // DISABLE if water spawns at a certain level, since we don't want vegetation on sand
 
-            // Proximity to trees - Disabled because the for loop isn't functioning correctly
-            // < 3 = 0% prob
-            // 3.1-10 = +30% prob
+            // Proximity to trees
+            // < 90 = 0% prob - We don't want trees spawning too close to each other.
+            // 91-450 = +30% prob
             if(iProbability != -1 && floraManager::getSingletonPtr()->getFloraClosestToPoint(enterPos) <= 90) // 3 is arbitrary and needs to be adjusted to the scale of the model!
             {
                 // Needs to be bigger
@@ -274,6 +267,10 @@ void Terrain::generateTerrain()
             std::cout << "Weird error occured\n"; // This hasn't been called for a while and may not be necessary any more
         }
     }
+
+    // Store the heightmap generator for later use. As of this point, this can actually be done fairly early on, but
+    // it might be changed later on in this function.
+
 }
 
 std::string Terrain::intToStr(int number)
@@ -281,6 +278,16 @@ std::string Terrain::intToStr(int number)
     std::stringstream ss;
     ss << number; // Put the integer into the magical stringstream box
     return ss.str(); // Return the string
+}
+
+HeightMapGen* Terrain::getByLoc(signed short x, signed short y)
+{
+    for(unsigned short i = 0; i < HMblocks.size(); i++)
+    {
+        if(HMblocks[i]->getX() == x && HMblocks[i]->getY() == y)
+            return HMblocks[i];
+    }
+    return NULL;
 }
 
 void Terrain::clearTerrain()

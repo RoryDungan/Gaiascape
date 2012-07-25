@@ -312,7 +312,9 @@ void MainWindow::generateTerrain()
     QElapsedTimer timer;
     mOgreWidget->getTerrain()->clearTerrain();
     timer.start();
-    mOgreWidget->getTerrain()->generateTerrain();
+    // This can be spawned at any point. If this function does what I believe it does, later this will be modifyed to create
+    // multiple terrain blocks.
+    mOgreWidget->getTerrain()->generateTerrain(0, 0);
     qDebug() << "Terrain genarated in" << timer.elapsed() << "milliseconds";
     QApplication::restoreOverrideCursor();
 }

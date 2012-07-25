@@ -8,13 +8,26 @@
 class HeightMapGen
 {
     public:
-        HeightMapGen(float talos, unsigned int size);
+        HeightMapGen(unsigned int size, signed short x, signed short y, float talos, float staggerValue);
 
         short unsigned int retrieveDimensions();
-        void retrieveHeightmap(float talos, unsigned int size, float *heightmapArray, float staggerValue);  // Size for terrain should always be 8
-        void retrieveSlopemap(float *slopemapArray, float *heightmapArray, short unsigned int dimensions);
+
+        void getSlopemap(float *slopemapArray);
+        float* getHeightmap(){ return pHMBlocks; }
+        signed short getX(){ return iX; }
+        signed short getY(){ return iY; }
+
+        short unsigned int iNumberOfBlocks;
+        long unsigned int iFinalX;
+        long unsigned int iFinalPoint;
+        short unsigned int iDimensions;
+        short unsigned int iQuadrants;
 
     private:
+        // An overload which allows a row to be already defined. Useful when we are generating a terrain next to one which already exists.
+        void generateHeightmap(float talos, float staggerValue, float *northArray, float *eastArray, float *southArray, float *westArray);
+        void generateHeightmap(float talos, float staggerValue);  // Size for terrain should always be 8
+
         void genQuadrant(int xNW, int yNW, int xSE, int ySE, int iteration, int quadrant);
         void erodeBlock(float c, long unsigned int block);
         void transportMaterial(float material, long unsigned int block);
@@ -23,14 +36,11 @@ class HeightMapGen
 
         float* pHMBlocks;
 
-        short unsigned int iNumberOfBlocks;
-        long unsigned int iFinalX;
-        long unsigned int iFinalPoint;
-        short unsigned int iDimensions;
-        short unsigned int iQuadrants;
-
         float fStaggerValue;
-        float fTalos; // Maximum angle a slope may have
+        float fTalos;                           // Maximum angle a slope may have
+
+        signed short iX;
+        signed short iY;
 
 };
 

@@ -280,7 +280,11 @@ void THIS::setupScene()
     mSceneMgr->setAmbientLight(Ogre::ColourValue(0.2, 0.2, 0.2));
 
     // Set up terrain
-    mTerrain = new Terrain(mSceneMgr, light);
+    // @Wraith - I don't actually remember what talos was set to before, and can't find out until I commit.
+    // REGARDING RORY - You should be able to use this function to integrate the sliders with modifying the terrain.
+    // More functionality will be added, but probably to a different function, from what I can think of at the moment.
+    // In order, the variables are terrainSize, talos, and staggerValue (the unevenness of the terrain)
+    mTerrain = new Terrain(mSceneMgr, light, 8, 8, 1);
 
     mEditMarker = mSceneMgr->createEntity("EditMarker", "sphere.mesh");
     mEditNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();

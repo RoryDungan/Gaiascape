@@ -5,9 +5,33 @@
 #include <QImage>
 #include <QByteArray>
 
-HeightMapGen::HeightMapGen(float talos, unsigned int size)
+HeightMapGen::HeightMapGen(unsigned int size, signed short x, signed short y, float talos, float staggerValue)
 {
+    iX = x;
+    iY = y;
 
+    iNumberOfBlocks = pow(pow(4.0, size * 0.5), 2) + 1;
+    // Rows and columns start at 0, which is unintuitive now but makes the code a hell of a lot easier to read later.
+    // In this circumstance iRows and iColumns will always be the same. When this code is converted to its own
+    // heightmap generator class, there may be some situation where the dimensions are different.
+    iDimensions = pow(4.0, size * 0.5) + 1;
+
+    // iQuadrants is the number of quadrants that are going to be generated
+    // Or in other terms, the number of subdivisions.
+    // iQuadrants = 1 will have 9 vertices, iQuadrants = 2 will have 25 vertices [I THINK]
+    iQuadrants = size;
+
+    // FinalX is the far right x point, in terms of a pointer.
+    iFinalX = (iDimensions - 1)*iDimensions;
+    iFinalPoint = iFinalX + iDimensions - 1;
+
+    // Create a clear path for pHMBlocks
+    float heightMap[iDimensions*iDimensions];
+    for(long unsigned int i = 0; i < iDimensions*iDimensions; i++)
+        heightMap[i] = 0;
+    pHMBlocks = &heightMap[0];
+
+    generateHeightmap(talos, staggerValue);
 }
 
 void HeightMapGen::genQuadrant(int xNW, int yNW, int xSE, int ySE, int iteration, int quadrant)
@@ -252,37 +276,57 @@ void HeightMapGen::transportMaterial(float material, unsigned long int block)
     }
 }
 
-short unsigned int HeightMapGen::retrieveDimensions()
+// Define a row of the terrain which is supplied in one of the arrays. Then run normal generation. Don't do this for NULL arrays.
+// This may cause weird terrain if a weird amount of floats is supplied. It should be obvious if that happens.
+
+void HeightMapGen::generateHeightmap(float talos, float staggerValue, float *northArray, float *eastArray, float *southArray, float *westArray)
 {
-    return iDimensions;
+    short unsigned int i;
+    if(northArray != NULL)
+    {
+        for (i = 0; i < iDimensions; i++)
+        {
+            *(pHMBlocks + i) = *(northArray + i);
+        }
+    }
+
+    if(eastArray != NULL)
+    {
+        for (i = 0; i < iDimensions; i++)
+        {
+            *(pHMBlocks + iDimensions*(i + 1) - 1) = *(eastArray + i);
+        }
+    }
+
+    if(southArray != NULL)
+    {
+        for (i = 0; i < iDimensions; i++)
+        {
+            *(pHMBlocks + iDimensions*(iDimensions - 1) + i) = *(southArray + i);
+        }
+    }
+
+    if(westArray != NULL)
+    {
+        for (i = 0; i < iDimensions; i++)
+        {
+            *(pHMBlocks + iDimensions*i) = *(westArray + i);
+        }
+    }
+
+    generateHeightmap(talos, staggerValue);
 }
 
 // retrieveHeightmap
 //  talos = the angle at which a slope must be for erosion to take place
-//  size = The number of subdivisions the original square will have.
 //  heightmapArray = The array we will put the heighmap into.
 //  staggerValue = The degree to which the stagger value will be increased/decreased. 1 = 100% (normal)
 
-void HeightMapGen::retrieveHeightmap(float talos, unsigned int size, float* heightmapArray, float staggerValue)
+void HeightMapGen::generateHeightmap(float talos, float staggerValue)
 {
-    iNumberOfBlocks = pow(pow(4.0, size * 0.5), 2) + 1;
     fTalos = talos; // A good default is 4/iNumberOfBlocks, however this will change depending on how eroded the terrain should be.
-    // Rows and columns start at 0, which is unintuitive now but makes the code a hell of a lot easier to read later.
-    // In this circumstance iRows and iColumns will always be the same. When this code is converted to its own
-    // heightmap generator class, there may be some situation where the dimensions are different.
-    iDimensions = pow(4.0, size * 0.5) + 1;
 
-    // iQuadrants is the number of quadrants that are going to be generated
-    // Or in other terms, the number of subdivisions.
-    // iQuadrants = 1 will have 9 vertices, iQuadrants = 2 will have 25 vertices [I THINK]
-    iQuadrants = size;
     fStaggerValue = iNumberOfBlocks*255*staggerValue;
-
-    pHMBlocks = heightmapArray;
-
-    // FinalX is the far right x point, in terms of a pointer.
-    iFinalX = (iDimensions - 1)*iDimensions;
-    iFinalPoint = iFinalX + iDimensions - 1;
 
     // NW corner
     *pHMBlocks = Random::getSingleton().getRand(5, 10);
@@ -362,11 +406,8 @@ void HeightMapGen::retrieveHeightmap(float talos, unsigned int size, float* heig
     writeMap();
 }
 
-void HeightMapGen::retrieveSlopemap(float *slopemapArray, float *heightmapArray, unsigned short dimensions)
+void HeightMapGen::getSlopemap(float *slopemapArray)
 {
-    iDimensions = dimensions;
-    pHMBlocks = heightmapArray;
-
     // FinalX is the far right x point, in terms of a pointer.
     iFinalX = (iDimensions - 1)*iDimensions;
     iFinalPoint = iFinalX + iDimensions - 1;
