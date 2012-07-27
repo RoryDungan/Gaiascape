@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'MainWindow.ui'
 **
-** Created: Fri 27. Jul 10:35:08 2012
+** Created: Fri 27. Jul 15:45:37 2012
 **      by: Qt User Interface Compiler version 4.8.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -83,6 +83,16 @@ public:
     QDockWidget *environmentDockWidget;
     QWidget *dockWidgetContents_3;
     QVBoxLayout *verticalLayout_3;
+    QGroupBox *groupBox_3;
+    QFormLayout *formLayout_5;
+    QLabel *label_10;
+    QLabel *label_11;
+    QDoubleSpinBox *sunAltitudeSpinBox;
+    QDoubleSpinBox *sunAngleSpinBox;
+    QLabel *label_12;
+    QHBoxLayout *horizontalLayout_5;
+    QLabel *sunColourLabel;
+    QToolButton *sunColourButton;
     QGroupBox *groupBox;
     QFormLayout *formLayout;
     QLabel *label_6;
@@ -325,7 +335,7 @@ public:
         MainWindow->addDockWidget(static_cast<Qt::DockWidgetArea>(2), texturesDockWidget);
         environmentDockWidget = new QDockWidget(MainWindow);
         environmentDockWidget->setObjectName(QString::fromUtf8("environmentDockWidget"));
-        environmentDockWidget->setMinimumSize(QSize(225, 423));
+        environmentDockWidget->setMinimumSize(QSize(225, 519));
         environmentDockWidget->setFeatures(QDockWidget::DockWidgetFloatable|QDockWidget::DockWidgetMovable);
         dockWidgetContents_3 = new QWidget();
         dockWidgetContents_3->setObjectName(QString::fromUtf8("dockWidgetContents_3"));
@@ -333,6 +343,63 @@ public:
         verticalLayout_3->setSpacing(6);
         verticalLayout_3->setContentsMargins(11, 11, 11, 11);
         verticalLayout_3->setObjectName(QString::fromUtf8("verticalLayout_3"));
+        groupBox_3 = new QGroupBox(dockWidgetContents_3);
+        groupBox_3->setObjectName(QString::fromUtf8("groupBox_3"));
+        formLayout_5 = new QFormLayout(groupBox_3);
+        formLayout_5->setSpacing(6);
+        formLayout_5->setContentsMargins(11, 11, 11, 11);
+        formLayout_5->setObjectName(QString::fromUtf8("formLayout_5"));
+        formLayout_5->setLabelAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
+        label_10 = new QLabel(groupBox_3);
+        label_10->setObjectName(QString::fromUtf8("label_10"));
+
+        formLayout_5->setWidget(0, QFormLayout::LabelRole, label_10);
+
+        label_11 = new QLabel(groupBox_3);
+        label_11->setObjectName(QString::fromUtf8("label_11"));
+
+        formLayout_5->setWidget(1, QFormLayout::LabelRole, label_11);
+
+        sunAltitudeSpinBox = new QDoubleSpinBox(groupBox_3);
+        sunAltitudeSpinBox->setObjectName(QString::fromUtf8("sunAltitudeSpinBox"));
+        sunAltitudeSpinBox->setMaximum(360);
+
+        formLayout_5->setWidget(0, QFormLayout::FieldRole, sunAltitudeSpinBox);
+
+        sunAngleSpinBox = new QDoubleSpinBox(groupBox_3);
+        sunAngleSpinBox->setObjectName(QString::fromUtf8("sunAngleSpinBox"));
+        sunAngleSpinBox->setMaximum(360);
+
+        formLayout_5->setWidget(1, QFormLayout::FieldRole, sunAngleSpinBox);
+
+        label_12 = new QLabel(groupBox_3);
+        label_12->setObjectName(QString::fromUtf8("label_12"));
+
+        formLayout_5->setWidget(2, QFormLayout::LabelRole, label_12);
+
+        horizontalLayout_5 = new QHBoxLayout();
+        horizontalLayout_5->setSpacing(6);
+        horizontalLayout_5->setObjectName(QString::fromUtf8("horizontalLayout_5"));
+        sunColourLabel = new QLabel(groupBox_3);
+        sunColourLabel->setObjectName(QString::fromUtf8("sunColourLabel"));
+        sunColourLabel->setFrameShape(QFrame::StyledPanel);
+
+        horizontalLayout_5->addWidget(sunColourLabel);
+
+        sunColourButton = new QToolButton(groupBox_3);
+        sunColourButton->setObjectName(QString::fromUtf8("sunColourButton"));
+        QIcon icon18;
+        icon18.addFile(QString::fromUtf8(":/media/16x16/colour-picker.png"), QSize(), QIcon::Normal, QIcon::Off);
+        sunColourButton->setIcon(icon18);
+
+        horizontalLayout_5->addWidget(sunColourButton);
+
+
+        formLayout_5->setLayout(2, QFormLayout::FieldRole, horizontalLayout_5);
+
+
+        verticalLayout_3->addWidget(groupBox_3);
+
         groupBox = new QGroupBox(dockWidgetContents_3);
         groupBox->setObjectName(QString::fromUtf8("groupBox"));
         formLayout = new QFormLayout(groupBox);
@@ -356,9 +423,9 @@ public:
 
         skydomeButton = new QToolButton(groupBox);
         skydomeButton->setObjectName(QString::fromUtf8("skydomeButton"));
-        QIcon icon18;
-        icon18.addFile(QString::fromUtf8(":/media/16x16/document-open.png"), QSize(), QIcon::Normal, QIcon::Off);
-        skydomeButton->setIcon(icon18);
+        QIcon icon19;
+        icon19.addFile(QString::fromUtf8(":/media/16x16/document-open.png"), QSize(), QIcon::Normal, QIcon::Off);
+        skydomeButton->setIcon(icon19);
 
         horizontalLayout_2->addWidget(skydomeButton);
 
@@ -472,9 +539,7 @@ public:
         fogColourButton = new QToolButton(groupBox_2);
         fogColourButton->setObjectName(QString::fromUtf8("fogColourButton"));
         fogColourButton->setEnabled(false);
-        QIcon icon19;
-        icon19.addFile(QString::fromUtf8(":/media/16x16/colour-picker.png"), QSize(), QIcon::Normal, QIcon::Off);
-        fogColourButton->setIcon(icon19);
+        fogColourButton->setIcon(icon18);
 
         horizontalLayout_4->addWidget(fogColourButton);
 
@@ -503,7 +568,7 @@ public:
         verticalLayout_3->addWidget(resetEnvironmentButton);
 
         environmentDockWidget->setWidget(dockWidgetContents_3);
-        MainWindow->addDockWidget(static_cast<Qt::DockWidgetArea>(2), environmentDockWidget);
+        MainWindow->addDockWidget(static_cast<Qt::DockWidgetArea>(1), environmentDockWidget);
         foliageDockWidget = new QDockWidget(MainWindow);
         foliageDockWidget->setObjectName(QString::fromUtf8("foliageDockWidget"));
         foliageDockWidget->setFeatures(QDockWidget::DockWidgetFloatable|QDockWidget::DockWidgetMovable);
@@ -824,6 +889,12 @@ public:
         resetTexturesButton->setText(QApplication::translate("MainWindow", "Reset", 0, QApplication::UnicodeUTF8));
         resetTexturesButton->setDescription(QApplication::translate("MainWindow", "Revert to the default configuration", 0, QApplication::UnicodeUTF8));
         environmentDockWidget->setWindowTitle(QApplication::translate("MainWindow", "Environment", 0, QApplication::UnicodeUTF8));
+        groupBox_3->setTitle(QApplication::translate("MainWindow", "Sun", 0, QApplication::UnicodeUTF8));
+        label_10->setText(QApplication::translate("MainWindow", "Altitude", 0, QApplication::UnicodeUTF8));
+        label_11->setText(QApplication::translate("MainWindow", "Angle", 0, QApplication::UnicodeUTF8));
+        label_12->setText(QApplication::translate("MainWindow", "Colour", 0, QApplication::UnicodeUTF8));
+        sunColourLabel->setText(QString());
+        sunColourButton->setText(QString());
         groupBox->setTitle(QApplication::translate("MainWindow", "Sky", 0, QApplication::UnicodeUTF8));
         label_6->setText(QApplication::translate("MainWindow", "Texture", 0, QApplication::UnicodeUTF8));
         skydomeLineEdit->setText(QApplication::translate("MainWindow", "media/textures/clouds.jpg", 0, QApplication::UnicodeUTF8));

@@ -32,7 +32,7 @@ HEADERS  += include/algorithms/TerrainBlock.h \
     include/algorithms/HMBlock.h \
     include/ImageViewer.h \
     include/OptionsDialog.h \
-    include/Floramanager.h \
+    include/FloraManager.h \
     include/FloraMain.h \
     include/FloraTree.h \
     include/AboutBox.h

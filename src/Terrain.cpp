@@ -191,7 +191,7 @@ void Terrain::generateTerrain(signed short x, signed short y)
     //      Proximity to other trees
     //      Slope
     float slopeMap[HMHMgen->iDimensions*HMHMgen->iDimensions];
-    HMHMgen->getSlopemap(&slopeMap[0]);
+    HMHMgen->outputSlopemap(&slopeMap[0]);
     short signed int iProbability = 0; // Probability a tree will spawn. If random returns equal to or below this number, it spawns.
 
     Ogre::Vector3 enterPos; // The point the flora will be entering.

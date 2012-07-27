@@ -406,7 +406,7 @@ void HeightMapGen::generateHeightmap(float talos, float staggerValue)
     writeMap();
 }
 
-void HeightMapGen::getSlopemap(float *slopemapArray)
+void HeightMapGen::outputSlopemap(float *slopemapArray)
 {
     // FinalX is the far right x point, in terms of a pointer.
     iFinalX = (iDimensions - 1)*iDimensions;

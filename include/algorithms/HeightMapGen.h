@@ -12,10 +12,10 @@ class HeightMapGen
 
         short unsigned int retrieveDimensions();
 
-        void getSlopemap(float *slopemapArray);
-        float* getHeightmap(){ return pHMBlocks; }
-        signed short getX(){ return iX; }
-        signed short getY(){ return iY; }
+        void outputSlopemap(float *slopemapArray);
+        float* getHeightmap() { return pHMBlocks; }
+        signed short getX() { return iX; }
+        signed short getY() { return iY; }
 
         short unsigned int iNumberOfBlocks;
         long unsigned int iFinalX;
