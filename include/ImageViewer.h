@@ -15,14 +15,15 @@ class ImageViewer : public QMainWindow
     Q_OBJECT
     
 public:
-    explicit ImageViewer(QWidget *parent = 0, QString imageFile="");
+    explicit ImageViewer(QWidget *parent = 0);
     ~ImageViewer();
+
+    void loadImage(QPixmap image);
 
 protected:
     virtual void mousePressEvent(QMouseEvent *);
     virtual void mouseReleaseEvent(QMouseEvent *);
     virtual void mouseMoveEvent(QMouseEvent *);
-    virtual void closeEvent(QCloseEvent *);
     
 private:
     Ui::ImageViewer *ui;
@@ -35,6 +36,8 @@ private:
 
     void scaleImage(double factor);
     void adjustScrollBar(QScrollBar *scrollBar, double factor);
+signals:
+    void imageClicked(QPoint);
 
 public slots:
     void saveAs();

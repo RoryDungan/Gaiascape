@@ -4,13 +4,13 @@
 #include <OgreRoot.h>
 #include <OgreEntity.h>
 
-#include "algorithms/random.h" // Also used by Terrain.h
+#include "algorithms/Random.h" // Also used by Terrain.h
 
-class floraMain
+class FloraMain
 {
     public:
-        floraMain();
-        ~floraMain()
+        FloraMain();
+        ~FloraMain()
         {
             // Deconstructor
             /*mNode->detachObject(mEnt);

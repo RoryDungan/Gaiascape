@@ -1,13 +1,13 @@
 #ifndef FLORATREE_H
 #define FLORATREE_H
 
-#include "floramain.h"
+#include "FloraMain.h"
 
-class floraTree : public floraMain
+class FloraTree : public FloraMain
 {
 public:
-    floraTree(std::string name, Ogre::SceneManager* sceneMgr, Ogre::Vector3 location);
-    ~floraTree() { /*stub*/ }
+    FloraTree(std::string name, Ogre::SceneManager* sceneMgr, Ogre::Vector3 location);
+    ~FloraTree() { /*stub*/ }
 };
 
 #endif // FLORATREE_H

@@ -8,7 +8,10 @@
 #include <QSettings>
 #include <QComboBox>
 #include <QSlider>
+#include <QToolButton>
+#include <QLabel>
 #include "OgreWidget.h"
+#include "ImageViewer.h"
 
 namespace Ui {
 class MainWindow;
@@ -25,10 +28,18 @@ public:
 private:
     Ui::MainWindow *ui;
     OgreWidget* mOgreWidget;
+    ImageViewer* mHeightmapViewer;
     QTimer* mRenderTimer;
     QProgressBar* mStatusProgressBar;
     QSettings* mSettings;
-    QComboBox* mToolComboBox;
+
+    // WIdgets for context toolbar
+    QToolButton* mSelectedToolButton;
+    QLabel* mBrushSizeLabel; // Needs to be here so it can be disabled and re-enabled later on
+    QSlider* mBrushSizeSlider;
+    QLabel* mBrushWeightLabel;
+    QSlider* mBrushWeightSlider;
+
     QString mApplicationDataDir;
 
     // Called when the program is first run; creates a config file with default settings

@@ -3,22 +3,22 @@
 
 #include <vector>
 
-#include "floramain.h" // Includes OgreRoot
+#include "FloraMain.h" // Includes OgreRoot
 
-class floraManager
+class FloraManager
 {
     public:
-        static floraManager getSingleton();
-        static floraManager* getSingletonPtr();
+        static FloraManager getSingleton();
+        static FloraManager* getSingletonPtr();
 
-        bool addFlora(floraMain& newFlora);
-        bool removeFlora(floraMain* flora);
+        bool addFlora(FloraMain& newFlora);
+        bool removeFlora(FloraMain* flora);
         void removeAllFlora(); // To be done every time we generate new terrain
 
         float getFloraClosestToPoint(Ogre::Vector3 point);
     private:
-        std::vector<floraMain*> vFlora;
-        static floraManager* sInstance;
+        std::vector<FloraMain*> vFlora;
+        static FloraManager* sInstance;
 };
 
 #endif // FLORAMANAGER_H

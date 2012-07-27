@@ -1,6 +1,5 @@
 #include "MainWindow.h"
 #include "ui_MainWindow.h"
-#include "ImageViewer.h"
 #include "algorithms/random.h"
 #include "OptionsDialog.h"
 #include "AboutBox.h"
@@ -8,21 +7,18 @@
 #include <QElapsedTimer>
 #include <QFileDialog>
 #include <QInputDialog>
-#include <QDebug>
 #include <QDialogButtonBox>
 #include <QComboBox>
 #include <QCheckBox>
 #include <QDir>
 #include <QDesktopServices>
 #include <QColorDialog>
+#include <QDebug>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
-    // Show loading dialog
-
-
     // init variables
     bWPressed = false;
     bAPressed = false;
@@ -47,9 +43,6 @@ MainWindow::MainWindow(QWidget *parent) :
         dir.mkpath(mApplicationDataDir);
     }
 
-
-    qDebug() << mApplicationDataDir;
-
     // Load user preferences
     mSettings = new QSettings(mApplicationDataDir + "settings.ini", QSettings::IniFormat, this);
 
@@ -63,7 +56,6 @@ MainWindow::MainWindow(QWidget *parent) :
     mOgreWidget = new OgreWidget(this, mApplicationDataDir + "ogre.log", mSettings->value("Renderer/RenderingSubsystem").toString());
 
     setCentralWidget(mOgreWidget);
-    mOgreWidget->setInteractionMode(OgreWidget::IM_SELECT);
     mOgreWidget->setCameraInverted(mSettings->value("Renderer/CameraInverted", false).toBool());
     //mOgreWidget->setFOVy(mSettings->value("Renderer/FOV", 45).toInt());
 
@@ -92,9 +84,44 @@ MainWindow::MainWindow(QWidget *parent) :
     viewModeGroup->addAction(ui->action_Solid);
     viewModeGroup->addAction(ui->action_Wireframe);
 
-    // Set up toolbar
-    mToolComboBox = new QComboBox(this);
-    ui->contextToolBar->addWidget(mToolComboBox);
+    // Add actions to the main toolbar with correct style
+    QToolButton* screenshotButton = new QToolButton(this);
+    screenshotButton->setDefaultAction(ui->actionTake_screenshot);
+    screenshotButton->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    ui->fileToolBar->addSeparator();
+    ui->fileToolBar->addWidget(screenshotButton);
+    QToolButton* heightmapButton = new QToolButton(this);
+    heightmapButton->setDefaultAction(ui->actionShow_heightmap_image);
+    heightmapButton->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    ui->fileToolBar->addWidget(heightmapButton);
+
+    // Set up context toolbar
+    // Create button for selected tool, with a menu for choosing tools
+    mSelectedToolButton = new QToolButton(this);
+    mSelectedToolButton->setToolTip(tr("Selected tool"));
+    mSelectedToolButton->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    mSelectedToolButton->setPopupMode(QToolButton::InstantPopup);
+    QMenu* menu = new QMenu(this);
+    QList<QAction*> actionList = toolGroup->actions();
+    foreach(QAction* act, actionList)
+        menu->addAction(act);
+    mSelectedToolButton->setMenu(menu);
+    ui->contextToolBar->addWidget(mSelectedToolButton);
+    ui->contextToolBar->addSeparator();
+    // Brush properties
+    mBrushSizeLabel = new QLabel(tr("Brush size:"), this);
+    ui->contextToolBar->addWidget(mBrushSizeLabel);
+    mBrushSizeSlider = new QSlider(Qt::Horizontal, this);
+    mBrushSizeSlider->setFixedWidth(60);
+    ui->contextToolBar->addWidget(mBrushSizeSlider);
+    ui->contextToolBar->addSeparator();
+    mBrushWeightLabel = new QLabel(tr("Brush weight:"), this);
+    ui->contextToolBar->addWidget(mBrushWeightLabel);
+    mBrushWeightSlider = new QSlider(Qt::Horizontal, this);
+    mBrushWeightSlider->setFixedWidth(60);
+    ui->contextToolBar->addWidget(mBrushWeightSlider);
+
+    selectTool(); // This should be the default tool when starting up. Calling this function tells mOgreWidget we want select mode and sets up the context toolbar correctly
 
     // Set up multiple resolutions for icons
     // The designer .ui file does not support having multiple resolution icons for a single
@@ -129,6 +156,9 @@ MainWindow::MainWindow(QWidget *parent) :
     imageIcon.addFile(":/media/24x24/image.png");
     ui->actionShow_heightmap_image->setIcon(imageIcon);
 
+    // Set up heightmap viewer
+    mHeightmapViewer = new ImageViewer(this);
+
     // Set up progress bar
     mStatusProgressBar = new QProgressBar(this);
     mStatusProgressBar->setVisible(false); // Should only appear when needed
@@ -154,12 +184,16 @@ MainWindow::~MainWindow()
     // Save settings
     mSettings->setValue("MainWindow/Maximized", this->isMaximized());
 
+    // Clean up temporty files
+    QFile::remove(QDesktopServices::storageLocation(QDesktopServices::TempLocation) + QDir::separator() + "gaiascape-heightmap.bmp");
+
+    delete mHeightmapViewer;
+
     // Q_OBJECTs are deleted automaticly
 
     delete mRenderTimer;
     delete mOgreWidget;
     delete mStatusProgressBar;
-    delete mToolComboBox;
     delete ui;
 }
 
@@ -267,26 +301,67 @@ void MainWindow::editRedo()
 void MainWindow::selectTool()
 {
     mOgreWidget->setInteractionMode(OgreWidget::IM_SELECT);
+
+    // Update context toobar
+    mSelectedToolButton->setIcon(ui->actionSelect->icon());
+    mSelectedToolButton->setText(ui->actionSelect->text());
+    mBrushSizeLabel->setEnabled(false);
+    mBrushSizeSlider->setEnabled(false);
+    mBrushWeightLabel->setEnabled(false);
+    mBrushWeightSlider->setEnabled(false);
 }
 
 void MainWindow::addEntTool()
 {
     mOgreWidget->setInteractionMode(OgreWidget::IM_PLACEOBJ);
+
+    // Update context toobar button
+    mSelectedToolButton->setIcon(ui->actionPlace_entities->icon());
+    mSelectedToolButton->setText(ui->actionPlace_entities->text());
+    mBrushSizeLabel->setEnabled(false);
+    mBrushSizeSlider->setEnabled(false);
+    mBrushWeightLabel->setEnabled(false);
+    mBrushWeightSlider->setEnabled(false);
 }
 
 void MainWindow::paintTool()
 {
     mOgreWidget->setInteractionMode(OgreWidget::IM_PAINT);
+
+    // Update context toobar button
+    mSelectedToolButton->setIcon(ui->actionPaint->icon());
+    mSelectedToolButton->setText(ui->actionPaint->text());
+    mBrushSizeLabel->setEnabled(true);
+    mBrushSizeSlider->setEnabled(true);
+    mBrushWeightLabel->setEnabled(true);
+    mBrushWeightSlider->setEnabled(true);
 }
 
 void MainWindow::extrudeTool()
 {
     mOgreWidget->setInteractionMode(OgreWidget::IM_EXTRUDE);
+
+    // Update context toobar button
+    mSelectedToolButton->setIcon(ui->actionExtrude->icon());
+    mSelectedToolButton->setText(ui->actionExtrude->text());
+    mBrushSizeLabel->setEnabled(true);
+    mBrushSizeSlider->setEnabled(true);
+    mBrushSizeSlider->setSliderPosition((int)mOgreWidget->getBrushSize());
+    mBrushWeightLabel->setEnabled(true);
+    mBrushWeightSlider->setEnabled(true);
 }
 
 void MainWindow::intrudeTool()
 {
     mOgreWidget->setInteractionMode(OgreWidget::IM_INTRUDE);
+
+    // Update context toobar button
+    mSelectedToolButton->setIcon(ui->actionIntrude->icon());
+    mSelectedToolButton->setText(ui->actionIntrude->text());
+    mBrushSizeLabel->setEnabled(true);
+    mBrushSizeSlider->setEnabled(true);
+    mBrushWeightLabel->setEnabled(true);
+    mBrushWeightSlider->setEnabled(true);
 }
 
 void MainWindow::viewSolid()
@@ -388,8 +463,9 @@ void MainWindow::texturePropertyChanged(QTreeWidgetItem* item, int itemNum)
 // Create a new dialog and show the heightmap image in it
 void MainWindow::showHeightmapImage()
 {
-    ImageViewer* iview = new ImageViewer(this, QDesktopServices::storageLocation(QDesktopServices::TempLocation) + QDir::separator() + "gaiascape-heightmap.bmp"); // Todo: make it copy the image directly from mmory rather than reading from a file
-    iview->show();
+    QImage image(QDesktopServices::storageLocation(QDesktopServices::TempLocation) + QDir::separator() + "gaiascape-heightmap.bmp");
+    if(!image.isNull()) mHeightmapViewer->loadImage(QPixmap::fromImage(image)); // Todo: make it copy the image directly from mmory rather than reading from a file
+    mHeightmapViewer->showNormal();
 }
 
 // Create a new random seed value

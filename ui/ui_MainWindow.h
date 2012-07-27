@@ -1,8 +1,8 @@
 /********************************************************************************
 ** Form generated from reading UI file 'MainWindow.ui'
 **
-** Created: Mon 23. Jul 15:39:32 2012
-**      by: Qt User Interface Compiler version 4.8.0
+** Created: Fri 27. Jul 10:35:08 2012
+**      by: Qt User Interface Compiler version 4.8.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -118,31 +118,33 @@ public:
     QTabWidget *tabWidget;
     QWidget *tab;
     QFormLayout *formLayout_3;
-    QLabel *label_2;
-    QSlider *terrainScaleSlider;
     QLabel *label_3;
-    QSlider *ramdomFactorSlider;
-    QLabel *label_4;
     QLabel *label_5;
-    QSlider *horizontalSlider;
+    QLabel *label_2;
+    QLabel *label_9;
+    QLabel *label_4;
     QComboBox *terrainSizeBox;
+    QComboBox *comboBox;
+    QDoubleSpinBox *terrainScaleSpinBox;
+    QSlider *horizontalSlider;
+    QSlider *ramdomFactorSlider;
     QWidget *tab_2;
     QFormLayout *formLayout_2;
     QLabel *label;
     QHBoxLayout *horizontalLayout;
     QSpinBox *randomSeedBox;
     QToolButton *randomiseToolButton;
+    QSpacerItem *verticalSpacer_2;
     QCommandLinkButton *generateTerrain;
     QCommandLinkButton *loadTerrain;
     QCommandLinkButton *clearTerrain;
-    QToolBar *homeToolBar;
     QToolBar *contextToolBar;
 
     void setupUi(QMainWindow *MainWindow)
     {
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName(QString::fromUtf8("MainWindow"));
-        MainWindow->resize(868, 680);
+        MainWindow->resize(868, 743);
         action_New = new QAction(MainWindow);
         action_New->setObjectName(QString::fromUtf8("action_New"));
         QIcon icon;
@@ -196,13 +198,13 @@ public:
         actionExtrude->setObjectName(QString::fromUtf8("actionExtrude"));
         actionExtrude->setCheckable(true);
         QIcon icon7;
-        icon7.addFile(QString::fromUtf8(":/media/24x24/go-up.png"), QSize(), QIcon::Normal, QIcon::Off);
+        icon7.addFile(QString::fromUtf8(":/media/24x24/extrude.png"), QSize(), QIcon::Normal, QIcon::Off);
         actionExtrude->setIcon(icon7);
         actionIntrude = new QAction(MainWindow);
         actionIntrude->setObjectName(QString::fromUtf8("actionIntrude"));
         actionIntrude->setCheckable(true);
         QIcon icon8;
-        icon8.addFile(QString::fromUtf8(":/media/24x24/go-down.png"), QSize(), QIcon::Normal, QIcon::Off);
+        icon8.addFile(QString::fromUtf8(":/media/24x24/intrude.png"), QSize(), QIcon::Normal, QIcon::Off);
         actionIntrude->setIcon(icon8);
         actionPaint = new QAction(MainWindow);
         actionPaint->setObjectName(QString::fromUtf8("actionPaint"));
@@ -276,7 +278,7 @@ public:
         MainWindow->addToolBar(Qt::LeftToolBarArea, toolBar);
         texturesDockWidget = new QDockWidget(MainWindow);
         texturesDockWidget->setObjectName(QString::fromUtf8("texturesDockWidget"));
-        texturesDockWidget->setFeatures(QDockWidget::NoDockWidgetFeatures);
+        texturesDockWidget->setFeatures(QDockWidget::DockWidgetFloatable|QDockWidget::DockWidgetMovable);
         dockWidgetContents_2 = new QWidget();
         dockWidgetContents_2->setObjectName(QString::fromUtf8("dockWidgetContents_2"));
         verticalLayout = new QVBoxLayout(dockWidgetContents_2);
@@ -324,7 +326,7 @@ public:
         environmentDockWidget = new QDockWidget(MainWindow);
         environmentDockWidget->setObjectName(QString::fromUtf8("environmentDockWidget"));
         environmentDockWidget->setMinimumSize(QSize(225, 423));
-        environmentDockWidget->setFeatures(QDockWidget::NoDockWidgetFeatures);
+        environmentDockWidget->setFeatures(QDockWidget::DockWidgetFloatable|QDockWidget::DockWidgetMovable);
         dockWidgetContents_3 = new QWidget();
         dockWidgetContents_3->setObjectName(QString::fromUtf8("dockWidgetContents_3"));
         verticalLayout_3 = new QVBoxLayout(dockWidgetContents_3);
@@ -501,18 +503,18 @@ public:
         verticalLayout_3->addWidget(resetEnvironmentButton);
 
         environmentDockWidget->setWidget(dockWidgetContents_3);
-        MainWindow->addDockWidget(static_cast<Qt::DockWidgetArea>(1), environmentDockWidget);
+        MainWindow->addDockWidget(static_cast<Qt::DockWidgetArea>(2), environmentDockWidget);
         foliageDockWidget = new QDockWidget(MainWindow);
         foliageDockWidget->setObjectName(QString::fromUtf8("foliageDockWidget"));
-        foliageDockWidget->setFeatures(QDockWidget::NoDockWidgetFeatures);
+        foliageDockWidget->setFeatures(QDockWidget::DockWidgetFloatable|QDockWidget::DockWidgetMovable);
         dockWidgetContents_4 = new QWidget();
         dockWidgetContents_4->setObjectName(QString::fromUtf8("dockWidgetContents_4"));
         foliageDockWidget->setWidget(dockWidgetContents_4);
         MainWindow->addDockWidget(static_cast<Qt::DockWidgetArea>(2), foliageDockWidget);
         terrainDockWidget = new QDockWidget(MainWindow);
         terrainDockWidget->setObjectName(QString::fromUtf8("terrainDockWidget"));
-        terrainDockWidget->setMinimumSize(QSize(263, 305));
-        terrainDockWidget->setFeatures(QDockWidget::NoDockWidgetFeatures);
+        terrainDockWidget->setMinimumSize(QSize(270, 425));
+        terrainDockWidget->setFeatures(QDockWidget::DockWidgetFloatable|QDockWidget::DockWidgetMovable);
         dockWidgetContents = new QWidget();
         dockWidgetContents->setObjectName(QString::fromUtf8("dockWidgetContents"));
         verticalLayout_2 = new QVBoxLayout(dockWidgetContents);
@@ -521,47 +523,60 @@ public:
         verticalLayout_2->setObjectName(QString::fromUtf8("verticalLayout_2"));
         tabWidget = new QTabWidget(dockWidgetContents);
         tabWidget->setObjectName(QString::fromUtf8("tabWidget"));
+        QSizePolicy sizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        sizePolicy.setHorizontalStretch(0);
+        sizePolicy.setVerticalStretch(0);
+        sizePolicy.setHeightForWidth(tabWidget->sizePolicy().hasHeightForWidth());
+        tabWidget->setSizePolicy(sizePolicy);
         tab = new QWidget();
         tab->setObjectName(QString::fromUtf8("tab"));
         formLayout_3 = new QFormLayout(tab);
         formLayout_3->setSpacing(6);
         formLayout_3->setContentsMargins(11, 11, 11, 11);
         formLayout_3->setObjectName(QString::fromUtf8("formLayout_3"));
-        label_2 = new QLabel(tab);
-        label_2->setObjectName(QString::fromUtf8("label_2"));
-
-        formLayout_3->setWidget(1, QFormLayout::LabelRole, label_2);
-
-        terrainScaleSlider = new QSlider(tab);
-        terrainScaleSlider->setObjectName(QString::fromUtf8("terrainScaleSlider"));
-        terrainScaleSlider->setMaximum(100);
-        terrainScaleSlider->setValue(50);
-        terrainScaleSlider->setOrientation(Qt::Horizontal);
-
-        formLayout_3->setWidget(1, QFormLayout::FieldRole, terrainScaleSlider);
-
+        formLayout_3->setFieldGrowthPolicy(QFormLayout::AllNonFixedFieldsGrow);
+        formLayout_3->setLabelAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
         label_3 = new QLabel(tab);
         label_3->setObjectName(QString::fromUtf8("label_3"));
 
-        formLayout_3->setWidget(2, QFormLayout::LabelRole, label_3);
-
-        ramdomFactorSlider = new QSlider(tab);
-        ramdomFactorSlider->setObjectName(QString::fromUtf8("ramdomFactorSlider"));
-        ramdomFactorSlider->setMaximum(100);
-        ramdomFactorSlider->setValue(50);
-        ramdomFactorSlider->setOrientation(Qt::Horizontal);
-
-        formLayout_3->setWidget(2, QFormLayout::FieldRole, ramdomFactorSlider);
-
-        label_4 = new QLabel(tab);
-        label_4->setObjectName(QString::fromUtf8("label_4"));
-
-        formLayout_3->setWidget(0, QFormLayout::LabelRole, label_4);
+        formLayout_3->setWidget(0, QFormLayout::LabelRole, label_3);
 
         label_5 = new QLabel(tab);
         label_5->setObjectName(QString::fromUtf8("label_5"));
 
-        formLayout_3->setWidget(3, QFormLayout::LabelRole, label_5);
+        formLayout_3->setWidget(1, QFormLayout::LabelRole, label_5);
+
+        label_2 = new QLabel(tab);
+        label_2->setObjectName(QString::fromUtf8("label_2"));
+
+        formLayout_3->setWidget(2, QFormLayout::LabelRole, label_2);
+
+        label_9 = new QLabel(tab);
+        label_9->setObjectName(QString::fromUtf8("label_9"));
+
+        formLayout_3->setWidget(3, QFormLayout::LabelRole, label_9);
+
+        label_4 = new QLabel(tab);
+        label_4->setObjectName(QString::fromUtf8("label_4"));
+
+        formLayout_3->setWidget(4, QFormLayout::LabelRole, label_4);
+
+        terrainSizeBox = new QComboBox(tab);
+        terrainSizeBox->setObjectName(QString::fromUtf8("terrainSizeBox"));
+
+        formLayout_3->setWidget(4, QFormLayout::FieldRole, terrainSizeBox);
+
+        comboBox = new QComboBox(tab);
+        comboBox->setObjectName(QString::fromUtf8("comboBox"));
+
+        formLayout_3->setWidget(3, QFormLayout::FieldRole, comboBox);
+
+        terrainScaleSpinBox = new QDoubleSpinBox(tab);
+        terrainScaleSpinBox->setObjectName(QString::fromUtf8("terrainScaleSpinBox"));
+        terrainScaleSpinBox->setMaximum(100000);
+        terrainScaleSpinBox->setValue(5000);
+
+        formLayout_3->setWidget(2, QFormLayout::FieldRole, terrainScaleSpinBox);
 
         horizontalSlider = new QSlider(tab);
         horizontalSlider->setObjectName(QString::fromUtf8("horizontalSlider"));
@@ -569,12 +584,15 @@ public:
         horizontalSlider->setSliderPosition(50);
         horizontalSlider->setOrientation(Qt::Horizontal);
 
-        formLayout_3->setWidget(3, QFormLayout::FieldRole, horizontalSlider);
+        formLayout_3->setWidget(1, QFormLayout::FieldRole, horizontalSlider);
 
-        terrainSizeBox = new QComboBox(tab);
-        terrainSizeBox->setObjectName(QString::fromUtf8("terrainSizeBox"));
+        ramdomFactorSlider = new QSlider(tab);
+        ramdomFactorSlider->setObjectName(QString::fromUtf8("ramdomFactorSlider"));
+        ramdomFactorSlider->setMaximum(100);
+        ramdomFactorSlider->setValue(50);
+        ramdomFactorSlider->setOrientation(Qt::Horizontal);
 
-        formLayout_3->setWidget(0, QFormLayout::FieldRole, terrainSizeBox);
+        formLayout_3->setWidget(0, QFormLayout::FieldRole, ramdomFactorSlider);
 
         tabWidget->addTab(tab, QString());
         tab_2 = new QWidget();
@@ -614,39 +632,37 @@ public:
 
         verticalLayout_2->addWidget(tabWidget);
 
+        verticalSpacer_2 = new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::MinimumExpanding);
+
+        verticalLayout_2->addItem(verticalSpacer_2);
+
         generateTerrain = new QCommandLinkButton(dockWidgetContents);
         generateTerrain->setObjectName(QString::fromUtf8("generateTerrain"));
-        QIcon icon21;
-        icon21.addFile(QString::fromUtf8(":/media/22x22/document-new.png"), QSize(), QIcon::Normal, QIcon::Off);
-        generateTerrain->setIcon(icon21);
+        generateTerrain->setIcon(icon16);
         generateTerrain->setIconSize(QSize(22, 22));
 
         verticalLayout_2->addWidget(generateTerrain);
 
         loadTerrain = new QCommandLinkButton(dockWidgetContents);
         loadTerrain->setObjectName(QString::fromUtf8("loadTerrain"));
-        QIcon icon22;
-        icon22.addFile(QString::fromUtf8(":/media/22x22/document-open.png"), QSize(), QIcon::Normal, QIcon::Off);
-        loadTerrain->setIcon(icon22);
+        QIcon icon21;
+        icon21.addFile(QString::fromUtf8(":/media/22x22/document-open.png"), QSize(), QIcon::Normal, QIcon::Off);
+        loadTerrain->setIcon(icon21);
         loadTerrain->setIconSize(QSize(22, 22));
 
         verticalLayout_2->addWidget(loadTerrain);
 
         clearTerrain = new QCommandLinkButton(dockWidgetContents);
         clearTerrain->setObjectName(QString::fromUtf8("clearTerrain"));
-        QIcon icon23;
-        icon23.addFile(QString::fromUtf8(":/media/22x22/process-stop.png"), QSize(), QIcon::Normal, QIcon::Off);
-        clearTerrain->setIcon(icon23);
+        QIcon icon22;
+        icon22.addFile(QString::fromUtf8(":/media/22x22/process-stop.png"), QSize(), QIcon::Normal, QIcon::Off);
+        clearTerrain->setIcon(icon22);
         clearTerrain->setIconSize(QSize(22, 22));
 
         verticalLayout_2->addWidget(clearTerrain);
 
         terrainDockWidget->setWidget(dockWidgetContents);
         MainWindow->addDockWidget(static_cast<Qt::DockWidgetArea>(2), terrainDockWidget);
-        homeToolBar = new QToolBar(MainWindow);
-        homeToolBar->setObjectName(QString::fromUtf8("homeToolBar"));
-        homeToolBar->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-        MainWindow->addToolBar(Qt::TopToolBarArea, homeToolBar);
         contextToolBar = new QToolBar(MainWindow);
         contextToolBar->setObjectName(QString::fromUtf8("contextToolBar"));
         MainWindow->addToolBar(Qt::TopToolBarArea, contextToolBar);
@@ -688,9 +704,6 @@ public:
         toolBar->addAction(actionPaint);
         toolBar->addAction(actionExtrude);
         toolBar->addAction(actionIntrude);
-        homeToolBar->addAction(actionShow_heightmap_image);
-        homeToolBar->addSeparator();
-        homeToolBar->addAction(actionTake_screenshot);
 
         retranslateUi(MainWindow);
         QObject::connect(actionSelect, SIGNAL(triggered()), MainWindow, SLOT(selectTool()));
@@ -725,6 +738,7 @@ public:
         QObject::connect(fogModeComboBox, SIGNAL(currentIndexChanged(int)), MainWindow, SLOT(fogModeChanged(int)));
 
         tabWidget->setCurrentIndex(0);
+        terrainSizeBox->setCurrentIndex(1);
 
 
         QMetaObject::connectSlotsByName(MainWindow);
@@ -838,17 +852,32 @@ public:
         resetEnvironmentButton->setDescription(QApplication::translate("MainWindow", "Revert to the default configuration", 0, QApplication::UnicodeUTF8));
         foliageDockWidget->setWindowTitle(QApplication::translate("MainWindow", "Foliage", 0, QApplication::UnicodeUTF8));
         terrainDockWidget->setWindowTitle(QApplication::translate("MainWindow", "Terrain", 0, QApplication::UnicodeUTF8));
-        label_2->setText(QApplication::translate("MainWindow", "Terrain scale", 0, QApplication::UnicodeUTF8));
         label_3->setText(QApplication::translate("MainWindow", "Random factor", 0, QApplication::UnicodeUTF8));
-        label_4->setText(QApplication::translate("MainWindow", "Terrain size", 0, QApplication::UnicodeUTF8));
         label_5->setText(QApplication::translate("MainWindow", "Erosion", 0, QApplication::UnicodeUTF8));
+        label_2->setText(QApplication::translate("MainWindow", "Terrain scale", 0, QApplication::UnicodeUTF8));
+        label_9->setText(QApplication::translate("MainWindow", "Segments", 0, QApplication::UnicodeUTF8));
+        label_4->setText(QApplication::translate("MainWindow", "Segment size", 0, QApplication::UnicodeUTF8));
         terrainSizeBox->clear();
         terrainSizeBox->insertItems(0, QStringList()
-         << QApplication::translate("MainWindow", "Small (257x257)", 0, QApplication::UnicodeUTF8)
-         << QApplication::translate("MainWindow", "Medium (1024x1024)", 0, QApplication::UnicodeUTF8)
-         << QApplication::translate("MainWindow", "Large (4097x4097)", 0, QApplication::UnicodeUTF8)
+         << QApplication::translate("MainWindow", "Small (65x65)", 0, QApplication::UnicodeUTF8)
+         << QApplication::translate("MainWindow", "Medium (257x257)", 0, QApplication::UnicodeUTF8)
+         << QApplication::translate("MainWindow", "Large (1025x1025)", 0, QApplication::UnicodeUTF8)
+         << QApplication::translate("MainWindow", "Massive (4097x4097)", 0, QApplication::UnicodeUTF8)
         );
-        tabWidget->setTabText(tabWidget->indexOf(tab), QApplication::translate("MainWindow", "Basic terrain options", 0, QApplication::UnicodeUTF8));
+        comboBox->clear();
+        comboBox->insertItems(0, QStringList()
+         << QApplication::translate("MainWindow", "1", 0, QApplication::UnicodeUTF8)
+         << QApplication::translate("MainWindow", "4 (2x2)", 0, QApplication::UnicodeUTF8)
+         << QApplication::translate("MainWindow", "9 (3x3)", 0, QApplication::UnicodeUTF8)
+         << QApplication::translate("MainWindow", "16 (4x4)", 0, QApplication::UnicodeUTF8)
+         << QApplication::translate("MainWindow", "25 (5x5)", 0, QApplication::UnicodeUTF8)
+         << QApplication::translate("MainWindow", "36 (6x6)", 0, QApplication::UnicodeUTF8)
+         << QApplication::translate("MainWindow", "49 (7x7)", 0, QApplication::UnicodeUTF8)
+         << QApplication::translate("MainWindow", "64 (8x8)", 0, QApplication::UnicodeUTF8)
+         << QApplication::translate("MainWindow", "81 (9x9)", 0, QApplication::UnicodeUTF8)
+         << QApplication::translate("MainWindow", "100 (10x10)", 0, QApplication::UnicodeUTF8)
+        );
+        tabWidget->setTabText(tabWidget->indexOf(tab), QApplication::translate("MainWindow", "Basic options", 0, QApplication::UnicodeUTF8));
         label->setText(QApplication::translate("MainWindow", "Random seed", 0, QApplication::UnicodeUTF8));
 #ifndef QT_NO_TOOLTIP
         randomiseToolButton->setToolTip(QApplication::translate("MainWindow", "Randomise", 0, QApplication::UnicodeUTF8));
@@ -861,7 +890,6 @@ public:
         loadTerrain->setDescription(QApplication::translate("MainWindow", "Create a terrain from an existing file", 0, QApplication::UnicodeUTF8));
         clearTerrain->setText(QApplication::translate("MainWindow", "Clear terrain", 0, QApplication::UnicodeUTF8));
         clearTerrain->setDescription(QApplication::translate("MainWindow", "Flatten the entire terrain", 0, QApplication::UnicodeUTF8));
-        homeToolBar->setWindowTitle(QApplication::translate("MainWindow", "Home", 0, QApplication::UnicodeUTF8));
         contextToolBar->setWindowTitle(QApplication::translate("MainWindow", "Context", 0, QApplication::UnicodeUTF8));
     } // retranslateUi
 

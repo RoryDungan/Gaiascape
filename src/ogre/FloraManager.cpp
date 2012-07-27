@@ -1,23 +1,23 @@
-#include "floramanager.h"
-#include "math.h"
+#include "FloraManager.h"
+#include <cmath>
 
-floraManager* floraManager::sInstance = 0;
+FloraManager* FloraManager::sInstance = 0;
 
-floraManager floraManager::getSingleton()
+FloraManager FloraManager::getSingleton()
 {
     if(!sInstance)
-        sInstance = new floraManager;
+        sInstance = new FloraManager;
     return *sInstance;
 }
 
-floraManager* floraManager::getSingletonPtr()
+FloraManager* FloraManager::getSingletonPtr()
 {
     if(!sInstance)
-        sInstance = new floraManager;
+        sInstance = new FloraManager;
     return sInstance;
 }
 
-bool floraManager::addFlora(floraMain &newFlora)
+bool FloraManager::addFlora(FloraMain &newFlora)
 {
     for(unsigned int x = 0; x < vFlora.size(); x++)
     {
@@ -31,7 +31,7 @@ bool floraManager::addFlora(floraMain &newFlora)
     return true;
 }
 
-bool floraManager::removeFlora(floraMain *flora)
+bool FloraManager::removeFlora(FloraMain *flora)
 {
     for(unsigned int x = 0; x <= vFlora.size(); x++)
     {
@@ -55,7 +55,7 @@ bool floraManager::removeFlora(floraMain *flora)
     return false; // if we were unable to remove the specified model
 }
 
-void floraManager::removeAllFlora()
+void FloraManager::removeAllFlora()
 {
     Ogre::Entity* entity;
     Ogre::SceneNode* node;
@@ -74,7 +74,7 @@ void floraManager::removeAllFlora()
     //delete node;
 }
 
-float floraManager::getFloraClosestToPoint(Ogre::Vector3 point) // Two dimensional because why not?
+float FloraManager::getFloraClosestToPoint(Ogre::Vector3 point) // Two dimensional because why not?
 {
     float fMinDistance = 100; // Default distance. Nothing should be affecting it at 100 units away.
     float fXDistance;

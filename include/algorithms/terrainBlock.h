@@ -2,11 +2,11 @@
 #define TERRAINBLOCK_H
 
 
-class terrainBlock
+class TerrainBlock
 {
     public:
-        terrainBlock(unsigned int x, unsigned int y, unsigned int blockID);
-        virtual ~terrainBlock();
+        TerrainBlock(unsigned int x, unsigned int y, unsigned int blockID);
+        virtual ~TerrainBlock();
 
         unsigned int iGlobalX;
         unsigned int iGlobalY;

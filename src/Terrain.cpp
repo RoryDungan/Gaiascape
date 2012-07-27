@@ -1,5 +1,5 @@
 #include "Terrain.h"
-#include <math.h> // Needed only temporarily so that dimensions can be calculated without going through the heightmap generator
+#include <cmath> // Needed only temporarily so that dimensions can be calculated without going through the heightmap generator
 #include <QDesktopServices> // Also needed temporarily, so that the heightmap image can be outputted to a directory where ImageViewer can easily find it
 #include <QDir> // Same as QDesktopServices
 
@@ -198,7 +198,7 @@ void Terrain::generateTerrain(signed short x, signed short y)
     short unsigned int iRandomNumber; // A randomly generated number from 0 to 10. Should be changed to 0 to 100 for more depth.
     short unsigned int treesToGenerate = 1000; // A constant that says how many iterations of the for loop we want to go through
     long unsigned int iRandomBlock; // A randomly selected vertex from the terrain used to spawn a tree
-    floraTree* addedTree;
+    FloraTree* addedTree;
 
     mTerrainGroup->getTerrain(0, 0)->getPoint(1%HMHMgen->iDimensions, 1/HMHMgen->iDimensions, &enterPos);
 
@@ -235,13 +235,13 @@ void Terrain::generateTerrain(signed short x, signed short y)
             // Proximity to trees
             // < 90 = 0% prob - We don't want trees spawning too close to each other.
             // 91-450 = +30% prob
-            if(iProbability != -1 && floraManager::getSingletonPtr()->getFloraClosestToPoint(enterPos) <= 90) // 3 is arbitrary and needs to be adjusted to the scale of the model!
+            if(iProbability != -1 && FloraManager::getSingletonPtr()->getFloraClosestToPoint(enterPos) <= 90) // 3 is arbitrary and needs to be adjusted to the scale of the model!
             {
                 // Needs to be bigger
                 iProbability = -1;
                 std::cout << "Too close!\n";
             }
-            if(iProbability != -1 && floraManager::getSingletonPtr()->getFloraClosestToPoint(enterPos) <= 450) // Plants tend to gather together due to factors we don't calculate, so simullate this
+            if(iProbability != -1 && FloraManager::getSingletonPtr()->getFloraClosestToPoint(enterPos) <= 450) // Plants tend to gather together due to factors we don't calculate, so simullate this
             {
                 std::cout << "Pretty close\n";
                 iProbability += 3;
@@ -258,8 +258,8 @@ void Terrain::generateTerrain(signed short x, signed short y)
             if(iRandomNumber <= iProbability)
             {
                 // Create a tree at this point!
-                addedTree = new floraTree("tree" + intToStr(iRandomBlock), mSceneManager, enterPos);
-                floraManager::getSingletonPtr()->addFlora(*addedTree);
+                addedTree = new FloraTree("tree" + intToStr(iRandomBlock), mSceneManager, enterPos);
+                FloraManager::getSingletonPtr()->addFlora(*addedTree);
             }
         }
         catch(std::exception &e)
@@ -294,7 +294,7 @@ void Terrain::clearTerrain()
 {
     // delete all terrain data
     //mTerrainGroup->removeAllTerrains();
-    floraManager::getSingletonPtr()->removeAllFlora();
+    FloraManager::getSingletonPtr()->removeAllFlora();
     delete mTerrainGroup;
     delete mTerrainGlobals;
 }

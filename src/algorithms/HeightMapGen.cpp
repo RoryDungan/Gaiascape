@@ -1,6 +1,6 @@
 #include <iostream>
-#include "algorithms\HeightMapGen.h"
-#include <math.h>
+#include "algorithms/HeightMapGen.h"
+#include <cmath>
 #include <fstream>
 #include <QImage>
 #include <QByteArray>

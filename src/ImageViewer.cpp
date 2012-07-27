@@ -4,13 +4,10 @@
 #include "ImageViewer.h"
 #include "ui_ImageViewer.h"
 
-ImageViewer::ImageViewer(QWidget *parent, QString imageFile) :
+ImageViewer::ImageViewer(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::ImageViewer)
 {
-    // Load image file
-    QImage image(imageFile);
-
     mImageLabel = new QLabel;
     mImageLabel->setBackgroundRole(QPalette::Base);
     mImageLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
@@ -27,14 +24,6 @@ ImageViewer::ImageViewer(QWidget *parent, QString imageFile) :
     mToolGroup->addAction(ui->actionExtrude);
     mToolGroup->addAction(ui->actionIntrude);
 
-    // Show image
-    mImageLabel->setPixmap(QPixmap::fromImage(image));
-
-    // Scale image to fit the window
-    dScaleFactor = 514 / mImageLabel->pixmap()->size().height();
-
-    mImageLabel->resize(514, 514);
-
     ui->scrollArea->setWidgetResizable(false);
 
     // Init variables
@@ -45,6 +34,19 @@ ImageViewer::~ImageViewer()
 {
     if(mImageLabel) delete mImageLabel;
     delete ui;
+}
+
+void ImageViewer::loadImage(QPixmap image)
+{
+    ui->toolBar->setEnabled(true);
+
+    // Show image
+    mImageLabel->setPixmap(image);
+
+    // Scale image to fit the window
+    dScaleFactor = 514 / mImageLabel->pixmap()->size().height();
+
+    mImageLabel->resize(514, 514);
 }
 
 void ImageViewer::mousePressEvent(QMouseEvent * event)
@@ -134,7 +136,3 @@ void ImageViewer::adjustScrollBar(QScrollBar *scrollBar, double factor)
                         + ((factor - 1) * scrollBar->pageStep()/2)));
 }
 
-void ImageViewer::closeEvent(QCloseEvent *)
-{
-    delete this;
-}

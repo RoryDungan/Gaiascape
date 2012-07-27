@@ -53,6 +53,7 @@ public:
     void setFOVy(float fov);
     // Ogre::Real is actually just a typedef of float so it's ok to assign it as one
     void setBrushSize(float size) { mBrushSize = size; }
+    float getBrushSize() { return mBrushSize; }
     Terrain* getTerrain() { return mTerrain; }
     // Each string corrosponds to the path the the image
     //void setSkyBox(QString up, QString dn, QString lf, QString rt, QString fr, QString bk);

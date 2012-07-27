@@ -2,7 +2,7 @@
 #define HEIGHTMAPGEN_H
 
 #include <vector>
-#include "random.h"
+#include "Random.h"
 #include "HMBlock.h"
 
 class HeightMapGen

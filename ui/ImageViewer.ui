@@ -41,6 +41,9 @@
    </layout>
   </widget>
   <widget class="QToolBar" name="toolBar">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="windowTitle">
     <string>toolBar</string>
    </property>
@@ -149,7 +152,7 @@
    </property>
    <property name="icon">
     <iconset resource="../icons.qrc">
-     <normaloff>:/media/24x24/go-up.png</normaloff>:/media/24x24/go-up.png</iconset>
+     <normaloff>:/media/24x24/extrude.png</normaloff>:/media/24x24/extrude.png</iconset>
    </property>
    <property name="text">
     <string>Extrude</string>
@@ -161,7 +164,7 @@
    </property>
    <property name="icon">
     <iconset resource="../icons.qrc">
-     <normaloff>:/media/24x24/go-down.png</normaloff>:/media/24x24/go-down.png</iconset>
+     <normaloff>:/media/24x24/intrude.png</normaloff>:/media/24x24/intrude.png</iconset>
    </property>
    <property name="text">
     <string>Intrude</string>
