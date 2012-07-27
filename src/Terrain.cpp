@@ -111,7 +111,8 @@ void Terrain::generateTerrain(signed short x, signed short y)
     // Convert that to an image
     Ogre::uchar stream[HMHMgen->iDimensions*HMHMgen->iDimensions];
     float* pHeightMap = HMHMgen->getHeightmap();
-    for(long unsigned int i = 0; i < HMHMgen->iFinalX + HMHMgen->iDimensions - 1; ++i)
+    std::cout << HMHMgen->iFinalPoint;
+    for(long unsigned int i = 0; i < HMHMgen->iFinalPoint; ++i)
     {
         stream[i] = (Ogre::uchar)(*(pHeightMap + i)*255); // Probably just put in the above if statement if it works
     }

@@ -19,9 +19,9 @@ SOURCES += src/main.cpp\
     src/algorithms/HMBlock.cpp \
     src/ImageViewer.cpp \
     src/OptionsDialog.cpp \
-    src/ogre/FloraManager.cpp \
-    src/ogre/FloraMain.cpp \
-    src/ogre/FloraTree.cpp
+    src/flora/FloraTree.cpp \
+    src/flora/FloraManager.cpp \
+    src/flora/FloraMain.cpp
 
 HEADERS  += include/algorithms/TerrainBlock.h \
     include/algorithms/Random.h \

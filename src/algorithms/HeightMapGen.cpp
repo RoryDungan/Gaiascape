@@ -10,7 +10,6 @@ HeightMapGen::HeightMapGen(unsigned int size, signed short x, signed short y, fl
     iX = x;
     iY = y;
 
-    iNumberOfBlocks = pow(pow(4.0, size * 0.5), 2) + 1;
     // Rows and columns start at 0, which is unintuitive now but makes the code a hell of a lot easier to read later.
     // In this circumstance iRows and iColumns will always be the same. When this code is converted to its own
     // heightmap generator class, there may be some situation where the dimensions are different.
@@ -26,7 +25,6 @@ HeightMapGen::HeightMapGen(unsigned int size, signed short x, signed short y, fl
     iFinalPoint = iFinalX + iDimensions - 1;
 
     // Create a clear path for pHMBlocks
-    float heightMap[iDimensions*iDimensions];
     for(long unsigned int i = 0; i < iDimensions*iDimensions; i++)
         heightMap[i] = 0;
     pHMBlocks = &heightMap[0];
@@ -279,7 +277,7 @@ void HeightMapGen::transportMaterial(float material, unsigned long int block)
 // Define a row of the terrain which is supplied in one of the arrays. Then run normal generation. Don't do this for NULL arrays.
 // This may cause weird terrain if a weird amount of floats is supplied. It should be obvious if that happens.
 
-void HeightMapGen::generateHeightmap(float talos, float staggerValue, float *northArray, float *eastArray, float *southArray, float *westArray)
+/*void HeightMapGen::generateHeightmap(float talos, float staggerValue, float *northArray, float *eastArray, float *southArray, float *westArray)
 {
     short unsigned int i;
     if(northArray != NULL)
@@ -315,7 +313,7 @@ void HeightMapGen::generateHeightmap(float talos, float staggerValue, float *nor
     }
 
     generateHeightmap(talos, staggerValue);
-}
+}*/
 
 // retrieveHeightmap
 //  talos = the angle at which a slope must be for erosion to take place
@@ -326,7 +324,7 @@ void HeightMapGen::generateHeightmap(float talos, float staggerValue)
 {
     fTalos = talos; // A good default is 4/iNumberOfBlocks, however this will change depending on how eroded the terrain should be.
 
-    fStaggerValue = iNumberOfBlocks*255*staggerValue;
+    fStaggerValue = 1;
 
     // NW corner
     *pHMBlocks = Random::getSingleton().getRand(5, 10);
@@ -361,7 +359,7 @@ void HeightMapGen::generateHeightmap(float talos, float staggerValue)
     iMinHeight = *pHMBlocks;
 
     // Go through the blocks and find out what is the highest and what is the lowest block
-    for(long unsigned int i = 0; i <= iFinalX + iDimensions - 1; i++)
+    for(long unsigned int i = 0; i <= iFinalPoint; i++)
     {
         if(*(pHMBlocks + i) < iMinHeight)
             iMinHeight = *(pHMBlocks + i);
