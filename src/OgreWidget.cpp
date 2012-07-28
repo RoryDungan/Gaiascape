@@ -51,11 +51,13 @@ void THIS::init( std::string logFile,
     bCtrlPressed = false;
     mInteractionMode = IM_SELECT;
     mCurrentState = IS_IDLE;
-    mBrushSize = 0.1;
+    mBrushSize = 0.1f;
+    mBrushWeight = 250;
 
     // Set up resources
     Ogre::ResourceGroupManager::getSingleton().addResourceLocation("media", "FileSystem");
     Ogre::ResourceGroupManager::getSingleton().addResourceLocation("media/models", "FileSystem");
+    Ogre::ResourceGroupManager::getSingleton().addResourceLocation("media/materials", "FileSystem");
     Ogre::ResourceGroupManager::getSingleton().addResourceLocation("media/textures", "FileSystem");
     Ogre::ResourceGroupManager::getSingleton().addResourceLocation("media/textures/nvidia", "FileSystem");
     Ogre::ResourceGroupManager::getSingleton().addResourceLocation("media/textures/irrskybox", "FileSystem");
@@ -316,7 +318,7 @@ void THIS::paintGL()
 
             // Figue out which parts of the terrain this affects
             Ogre::TerrainGroup::TerrainList terrainList;
-            Ogre::Real brushSizeWorldSpace = /* TERRAIN_WORLD_SIZE * mBrushSize */ 240;
+            Ogre::Real brushSizeWorldSpace = mTerrain->getTerrainGroup()->getTerrainWorldSize() * mBrushSize;
             Ogre::Sphere sphere(rayResult.position, brushSizeWorldSpace);
             mTerrain->getTerrainGroup()->sphereIntersects(sphere, &terrainList);
 
@@ -340,7 +342,6 @@ void THIS::paintGL()
         mHeightUpdateCountDown -= 0.017f;//evt.timeSinceLastFrame; - always updates at ~60fps so this can be a constant
         if (mHeightUpdateCountDown <= 0)
         {
-            qDebug() << "Updating terrain";
             mTerrain->getTerrainGroup()->update();
             mHeightUpdateCountDown = 0;
         }
@@ -417,7 +418,7 @@ void THIS::modifyTerrain(Ogre::Terrain* terrain, const Ogre::Vector3 &centerPos,
             Ogre::Real weight = std::min((Ogre::Real)1.0f, Ogre::Math::Sqrt(tsYdist * tsYdist + tsXdist * tsXdist) / Ogre::Real(0.5 * mBrushSize));
             weight = 1.0f - (weight * weight);
 
-            float addedHeight = weight * 250.0f * timeElapsed;
+            float addedHeight = weight * mBrushWeight * timeElapsed;
             float newHeight = mInteractionMode == IM_EXTRUDE
                     ? terrain->getHeightAtPoint(x, y) + addedHeight
                     : terrain->getHeightAtPoint(x, y) - addedHeight;

@@ -51,9 +51,11 @@ public:
     void saveScreenshotToFile(QString filename);
     void setCameraInverted(bool inverted) { bCameraControlsInverted = inverted; }
     void setFOVy(float fov);
-    // Ogre::Real is actually just a typedef of float so it's ok to assign it as one
+    // Ogre::Real is actually just a typedef of float so it's ok to assign it as one. We use standard floats here so that the class can be used without directly referencing any of Ogre3d
     void setBrushSize(float size) { mBrushSize = size; }
     float getBrushSize() { return mBrushSize; }
+    void setBrushWeight(float weight) { mBrushWeight = weight; }
+    float getBrushWeight() { return mBrushWeight; }
     Terrain* getTerrain() { return mTerrain; }
     // Each string corrosponds to the path the the image
     //void setSkyBox(QString up, QString dn, QString lf, QString rt, QString fr, QString bk);
@@ -92,6 +94,7 @@ protected:
 private:
     Terrain* mTerrain;
     Ogre::Real mBrushSize;
+    Ogre::Real mBrushWeight;
     Ogre::Entity* mEditMarker;
     Ogre::SceneNode* mEditNode;
     Ogre::Real mHeightUpdateCountDown;

@@ -1,4 +1,5 @@
 #include "Terrain.h"
+#include <vector>
 #include <cmath> // Needed only temporarily so that dimensions can be calculated without going through the heightmap generator
 #include <QDesktopServices> // Also needed temporarily, so that the heightmap image can be outputted to a directory where ImageViewer can easily find it
 #include <QDir> // Same as QDesktopServices
@@ -30,7 +31,6 @@ void Terrain::createFlatTerrain()
 
     // construct terrain group
     mTerrainGroup = new Ogre::TerrainGroup(mSceneManager, Ogre::Terrain::ALIGN_X_Z, 513, 12000.0f);
-    mTerrainGroup->setFilenameConvention(Ogre::String("Terrain"), Ogre::String("dat"));
     mTerrainGroup->setOrigin(Ogre::Vector3::ZERO);
 
     configureTerrainDefaults(mSun);
@@ -55,13 +55,12 @@ void Terrain::createFlatTerrain()
     mTerrainGroup->freeTemporaryResources();
 }
 
-void Terrain::loadHeightmap()
+void Terrain::loadHeightmap(std::string imageFile)
 {
     mTerrainGlobals = new Ogre::TerrainGlobalOptions();
 
     // construct terrain group
     mTerrainGroup = new Ogre::TerrainGroup(mSceneManager, Ogre::Terrain::ALIGN_X_Z, 513, 12000.0f);
-    mTerrainGroup->setFilenameConvention(Ogre::String("Terrain"), Ogre::String("dat"));
     mTerrainGroup->setOrigin(Ogre::Vector3::ZERO);
 
     configureTerrainDefaults(mSun);
@@ -69,20 +68,17 @@ void Terrain::loadHeightmap()
     // define our terrains and instruct the TerrainGroup to load them all
     for(long x = 0; x <= 0; ++x)
         for(long y = 0; y <= 0; ++y)
-            defineTerrainFromFile(x, y);
+            defineTerrainFromFile(x, y, imageFile);
 
     // sync load since we want everything in place when we start
     mTerrainGroup->loadAllTerrains(true);
 
-    // Now, if we just imported our terrains, we would like our blendmaps to be calculated:
-    if(mTerrainsImported)
+    // Calculate blendmaps for all terrains:
+    Ogre::TerrainGroup::TerrainIterator ti = mTerrainGroup->getTerrainIterator();
+    while(ti.hasMoreElements())
     {
-        Ogre::TerrainGroup::TerrainIterator ti = mTerrainGroup->getTerrainIterator();
-        while(ti.hasMoreElements())
-        {
-            Ogre::Terrain* t = ti.getNext()->instance;
-            initBlendMaps(t);
-        }
+        Ogre::Terrain* t = ti.getNext()->instance;
+        initBlendMaps(t);
     }
 
     // Now, all there is left to do is clean up after the initial terrain creation:
@@ -92,7 +88,6 @@ void Terrain::loadHeightmap()
 
 // x = The x position of the terrain we are generating
 // y = The y position of the terrain we are generating
-
 void Terrain::generateTerrain(signed short x, signed short y)
 {
     // First, check to make sure the terrain doesn't already exist.
@@ -146,7 +141,6 @@ void Terrain::generateTerrain(signed short x, signed short y)
     defaultimp.inputScale = 1800;
     defaultimp.minBatchSize = 129;
     defaultimp.maxBatchSize = 129;
-    // defaultimp.inputFloat = &array[0];
 
     // Add textures
     defaultimp.layerList.resize(3);
@@ -162,20 +156,16 @@ void Terrain::generateTerrain(signed short x, signed short y)
 
     // define our terrains and instruct the TerrainGroup to load them all
     mTerrainGroup->defineTerrain(x, y, &img);
-    mTerrainsImported = true;
 
     // sync load since we want everything in place when we start - Do after all terrains have finished?
     mTerrainGroup->loadAllTerrains(true);
 
-    // Now, if we just imported our terrains, we would like our blendmaps to be calculated:
-    if(mTerrainsImported)
+    // Calculate blendmaps for all terrains:
+    Ogre::TerrainGroup::TerrainIterator ti = mTerrainGroup->getTerrainIterator();
+    while(ti.hasMoreElements())
     {
-        Ogre::TerrainGroup::TerrainIterator ti = mTerrainGroup->getTerrainIterator();
-        while(ti.hasMoreElements())
-        {
-            Ogre::Terrain* t = ti.getNext()->instance;
-            initBlendMaps(t);
-        }
+        Ogre::Terrain* t = ti.getNext()->instance;
+        initBlendMaps(t);
     }
 
     // Now, all there is left to do is clean up after the initial terrain creation:
@@ -193,12 +183,12 @@ void Terrain::generateTerrain(signed short x, signed short y)
     //      Slope
     float slopeMap[HMHMgen->iDimensions*HMHMgen->iDimensions];
     HMHMgen->outputSlopemap(&slopeMap[0]);
-    short signed int iProbability = 0; // Probability a tree will spawn. If random returns equal to or below this number, it spawns.
+    short signed int probability = 0; // Probability a tree will spawn. If random returns equal to or below this number, it spawns.
 
     Ogre::Vector3 enterPos; // The point the flora will be entering.
-    short unsigned int iRandomNumber; // A randomly generated number from 0 to 10. Should be changed to 0 to 100 for more depth.
-    short unsigned int treesToGenerate = 1000; // A constant that says how many iterations of the for loop we want to go through
-    long unsigned int iRandomBlock; // A randomly selected vertex from the terrain used to spawn a tree
+    short unsigned int randomNumber; // A randomly generated number from 0 to 10. Should be changed to 0 to 100 for more depth.
+    unsigned int treesToGenerate = 1000;
+    long unsigned int randomBlock; // A randomly selected vertex from the terrain used to spawn a tree
     FloraTree* addedTree;
 
     mTerrainGroup->getTerrain(0, 0)->getPoint(1%HMHMgen->iDimensions, 1/HMHMgen->iDimensions, &enterPos);
@@ -212,9 +202,9 @@ void Terrain::generateTerrain(signed short x, signed short y)
             // Therefore at any point, the Vector3 position is tC + ((i%256) - 128), 0, tC + (floor(i/256) - 128)
 
             // Set up variables
-            iProbability = 0;
-            iRandomBlock = Random::getSingleton().getRand(0, HMHMgen->iFinalX + HMHMgen->iDimensions - 1);
-            mTerrainGroup->getTerrain(0, 0)->getPoint(iRandomBlock%HMHMgen->iDimensions, (iRandomBlock*2)/HMHMgen->iDimensions, &enterPos); // Puts the vector3 position of what's specified into enterPos
+            probability = 0;
+            randomBlock = Random::getSingleton().getRand(0, HMHMgen->iFinalX + HMHMgen->iDimensions - 1);
+            mTerrainGroup->getTerrain(0, 0)->getPoint(randomBlock%HMHMgen->iDimensions, (randomBlock*2)/HMHMgen->iDimensions, &enterPos); // Puts the vector3 position of what's specified into enterPos
 
             // --------------------------
             // Height probability changes
@@ -224,42 +214,42 @@ void Terrain::generateTerrain(signed short x, signed short y)
             // 11-30% = 40% prob
             // 31-50% = 30% prob
             // 51-90% = 10% prob
-            if(*(pHeightMap + iRandomBlock) <= 0.9) // Put an else iProbability = -1 if you want nothing to spawn above 90%
-                iProbability += 1;
-            if(*(pHeightMap + iRandomBlock) <= 0.5f)
-                iProbability += 2;
-            if(*(pHeightMap + iRandomBlock) <= 0.3f)
-                iProbability += 1;
-            if(*(pHeightMap + iRandomBlock) <= 0.1f)
-                iProbability += 1; // DISABLE if water spawns at a certain level, since we don't want vegetation on sand
+            if(*(pHeightMap + randomBlock) <= 0.9) // Put an else probability = -1 if you want nothing to spawn above 90%
+                probability += 1;
+            if(*(pHeightMap + randomBlock) <= 0.5f)
+                probability += 2;
+            if(*(pHeightMap + randomBlock) <= 0.3f)
+                probability += 1;
+            if(*(pHeightMap + randomBlock) <= 0.1f)
+                probability += 1; // DISABLE if water spawns at a certain level, since we don't want vegetation on sand
 
             // Proximity to trees
             // < 90 = 0% prob - We don't want trees spawning too close to each other.
             // 91-450 = +30% prob
-            if(iProbability != -1 && FloraManager::getSingletonPtr()->getFloraClosestToPoint(enterPos) <= 90) // 3 is arbitrary and needs to be adjusted to the scale of the model!
+            if(probability != -1 && FloraManager::getSingletonPtr()->getFloraClosestToPoint(enterPos) <= 90) // 3 is arbitrary and needs to be adjusted to the scale of the model!
             {
                 // Needs to be bigger
-                iProbability = -1;
+                probability = -1;
                 std::cout << "Too close!\n";
             }
-            if(iProbability != -1 && FloraManager::getSingletonPtr()->getFloraClosestToPoint(enterPos) <= 450) // Plants tend to gather together due to factors we don't calculate, so simullate this
+            if(probability != -1 && FloraManager::getSingletonPtr()->getFloraClosestToPoint(enterPos) <= 450) // Plants tend to gather together due to factors we don't calculate, so simullate this
             {
                 std::cout << "Pretty close\n";
-                iProbability += 3;
+                probability += 3;
             }
 
             // Slope
-            if(slopeMap[iRandomBlock] >= 0.1f)
+            if(slopeMap[randomBlock] >= 0.1f)
             {
-                iProbability = -1;
+                probability = -1;
             }
 
             // Run the probability
-            iRandomNumber = Random::getSingleton().getRand(1, 10);
-            if(iRandomNumber <= iProbability)
+            randomNumber = Random::getSingleton().getRand(1, 10);
+            if(randomNumber <= probability)
             {
                 // Create a tree at this point!
-                addedTree = new FloraTree("tree" + intToStr(iRandomBlock), mSceneManager, enterPos);
+                addedTree = new FloraTree("tree" + intToStr(randomBlock), mSceneManager, enterPos);
                 FloraManager::getSingletonPtr()->addFlora(*addedTree);
             }
         }
@@ -294,32 +284,28 @@ HeightMapGen* Terrain::getByLoc(signed short x, signed short y)
 void Terrain::clearTerrain()
 {
     // delete all terrain data
-    //mTerrainGroup->removeAllTerrains();
     FloraManager::getSingletonPtr()->removeAllFlora();
     delete mTerrainGroup;
     delete mTerrainGlobals;
 }
 
-void Terrain::defineTerrainFromFile(long x, long y)
+void Terrain::defineTerrainFromFile(long x, long y, std::string file)
 {
-    Ogre::String filename = mTerrainGroup->generateFilename(x, y);
-    if(Ogre::ResourceGroupManager::getSingleton().resourceExists(mTerrainGroup->getResourceGroup(), filename))
-        // Define terrain here:
-        mTerrainGroup->defineTerrain(x, y);
-    else
-    {
-        // get terrain image
-        Ogre::Image img;
-        img.load("terrain1.png", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
-        if(x % 2 != 0)
-            img.flipAroundY();
-        if(y % 2 != 0)
-            img.flipAroundX();
+    // If necessary, add resource group in directory
+    QDir directory = QFileInfo(file.c_str()).dir();
+    if(!Ogre::ResourceGroupManager::getSingleton().resourceLocationExists(directory.path().toStdString()))
+        Ogre::ResourceGroupManager::getSingleton().addResourceLocation(directory.path().toStdString(), "FileSystem");
 
-        // Define Terrain here:
-        mTerrainGroup->defineTerrain(x, y, &img);
-        mTerrainsImported = true;
-    }
+    // get terrain image
+    Ogre::Image img;
+    img.load(QFileInfo(file.c_str()).fileName().toStdString(), Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+    if(x % 2 != 0)
+        img.flipAroundY();
+    if(y % 2 != 0)
+        img.flipAroundX();
+
+    // Define Terrain here:
+    mTerrainGroup->defineTerrain(x, y, &img);
 }
 
 void Terrain::initBlendMaps(Ogre::Terrain *terrain)
@@ -386,20 +372,39 @@ void Terrain::configureTerrainDefaults(Ogre::Light *light)
     defaultimp.layerList[2].worldSize = 200;
     defaultimp.layerList[2].textureNames.push_back("growth_weirdfungus-03_diffusespecular.dds");
     defaultimp.layerList[2].textureNames.push_back("growth_weirdfungus-03_normalheight.dds");
-    //defaultimp.layerList[2].textureNames.push_back("grass-01_diffusespecular.png");
 }
 
 void Terrain::configureTextures(Ogre::Terrain::LayerInstanceList& layerList)
 {
+    mTerrainGroup->getDefaultImportSettings().layerList = layerList;
 
 }
 
-void Terrain::setTexture(textureType newTexture, textureCatagory texCat, std::string filepath)
+void Terrain::replaceTexture(unsigned char index, float worldSize, std::string diffuseSpecular, std::string normalHeight)
 {
-    // Change one of the textures
+    // If necessary, add resource group in directories
+    QDir directory1 = QFileInfo(diffuseSpecular.c_str()).dir();
+    if(!Ogre::ResourceGroupManager::getSingleton().resourceLocationExists(directory1.path().toStdString()))
+        Ogre::ResourceGroupManager::getSingleton().addResourceLocation(directory1.path().toStdString(), "FileSystem");
+    QDir directory2 = QFileInfo(diffuseSpecular.c_str()).dir();
+    if(!Ogre::ResourceGroupManager::getSingleton().resourceLocationExists(directory2.path().toStdString()))
+        Ogre::ResourceGroupManager::getSingleton().addResourceLocation(directory2.path().toStdString(), "FileSystem");
+
+    Ogre::StringVector textureNames;
+    textureNames.push_back(QFileInfo(diffuseSpecular.c_str()).fileName().toStdString());
+    textureNames.push_back(QFileInfo(normalHeight.c_str()).fileName().toStdString());
+
+    // Cycle through the the TerrainGroup and change the image on all terrains
+    Ogre::TerrainGroup::TerrainIterator ti = mTerrainGroup->getTerrainIterator();
+    while(ti.hasMoreElements())
+    {
+        Ogre::Terrain* t = ti.getNext()->instance;
+        t->replaceLayer(index, true, worldSize, &textureNames);
+        t->update();
+    }
 }
 
-void Terrain::setTexturePlacementHeight(textureCatagory texCat, int newHeight)
+void Terrain::generateVegetation(unsigned int treesToGenerate)
 {
-    // Recalculate blendmaps, changing the placement height for one texture
+
 }

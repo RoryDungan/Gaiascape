@@ -66,7 +66,6 @@ MainWindow::MainWindow(QWidget *parent) :
     tabifyDockWidget(ui->environmentDockWidget, ui->foliageDockWidget);
     ui->terrainDockWidget->raise();
 
-    ui->texturesTreeWidget->expandAll();
     QColor colour = QColor(230, 230, 230);
     ui->fogColourLabel->setText(colour.name());
     ui->fogColourLabel->setPalette(QPalette(colour));
@@ -102,6 +101,7 @@ MainWindow::MainWindow(QWidget *parent) :
     mSelectedToolButton->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
     mSelectedToolButton->setPopupMode(QToolButton::InstantPopup);
     QMenu* menu = new QMenu(this);
+    // Get menu from the existing action group
     QList<QAction*> actionList = toolGroup->actions();
     foreach(QAction* act, actionList)
         menu->addAction(act);
@@ -109,17 +109,22 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->contextToolBar->addWidget(mSelectedToolButton);
     ui->contextToolBar->addSeparator();
     // Brush properties
+    // Create label, then add the slider
     mBrushSizeLabel = new QLabel(tr("Brush size:"), this);
     ui->contextToolBar->addWidget(mBrushSizeLabel);
     mBrushSizeSlider = new QSlider(Qt::Horizontal, this);
     mBrushSizeSlider->setFixedWidth(60);
     ui->contextToolBar->addWidget(mBrushSizeSlider);
+    // Make the Ogre widget update when the slider is moved
+    connect(mBrushSizeSlider, SIGNAL(valueChanged(int)), this, SLOT(setBrushSize(int)));
     ui->contextToolBar->addSeparator();
+    // Same as above, this time for the brush weight slider
     mBrushWeightLabel = new QLabel(tr("Brush weight:"), this);
     ui->contextToolBar->addWidget(mBrushWeightLabel);
     mBrushWeightSlider = new QSlider(Qt::Horizontal, this);
     mBrushWeightSlider->setFixedWidth(60);
     ui->contextToolBar->addWidget(mBrushWeightSlider);
+    connect(mBrushWeightSlider, SIGNAL(valueChanged(int)), this, SLOT(setBrushWeight(int)));
 
     selectTool(); // This should be the default tool when starting up. Calling this function tells mOgreWidget we want select mode and sets up the context toolbar correctly
 
@@ -158,6 +163,10 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // Set up heightmap viewer
     mHeightmapViewer = new ImageViewer(this);
+
+    // Set up textures panel - this will be removed once we get the program to load a template
+    iCurrentLayerIndex = 0;
+    resetDefaultTextures();
 
     // Set up progress bar
     mStatusProgressBar = new QProgressBar(this);
@@ -271,6 +280,9 @@ void MainWindow::fileNew()
     // TODO: Ask the user if they want to save changes
     clearTerrain();
     // Delete all other data
+
+    // Reset all gui settings
+
 }
 
 void MainWindow::fileOpen()
@@ -346,9 +358,10 @@ void MainWindow::extrudeTool()
     mSelectedToolButton->setText(ui->actionExtrude->text());
     mBrushSizeLabel->setEnabled(true);
     mBrushSizeSlider->setEnabled(true);
-    mBrushSizeSlider->setSliderPosition((int)mOgreWidget->getBrushSize());
+    mBrushSizeSlider->setSliderPosition((int)(mOgreWidget->getBrushSize() * 500));
     mBrushWeightLabel->setEnabled(true);
     mBrushWeightSlider->setEnabled(true);
+    mBrushWeightSlider->setSliderPosition((int)(mOgreWidget->getBrushWeight() / 5));
 }
 
 void MainWindow::intrudeTool()
@@ -360,15 +373,35 @@ void MainWindow::intrudeTool()
     mSelectedToolButton->setText(ui->actionIntrude->text());
     mBrushSizeLabel->setEnabled(true);
     mBrushSizeSlider->setEnabled(true);
+    mBrushSizeSlider->setSliderPosition((int)(mOgreWidget->getBrushSize() * 500));
     mBrushWeightLabel->setEnabled(true);
     mBrushWeightSlider->setEnabled(true);
+    mBrushWeightSlider->setSliderPosition((int)(mOgreWidget->getBrushWeight() / 5));
 }
 
+// Update the Ogre widget when the brush size slider is moved.
+// This adjusts how big an area the selected brush will affect
+void MainWindow::setBrushSize(int size)
+{
+    // The slider goes form 0 to 99 but acceptable values for brush size range from 0.0 to 0.2
+    mOgreWidget->setBrushSize((float)size / 500);
+}
+
+// Update the Ogre widget when the beush weight slider is moved.
+// This adjusts how much effect the selected brush will have
+void MainWindow::setBrushWeight(int weight)
+{
+    // Slider goes from 0 to 99, reasnoble values for brush weight are up to around 500, hence why we multiply it by 5
+    mOgreWidget->setBrushWeight((float)weight * 5);
+}
+
+// Set the 3d view to solid, textures poligons
 void MainWindow::viewSolid()
 {
     mOgreWidget->setViewMode(Ogre::PM_SOLID);
 }
 
+// Set the 3d view mode to wireframe
 void MainWindow::viewWireframe()
 {
     mOgreWidget->setViewMode(Ogre::PM_WIREFRAME);
@@ -396,9 +429,12 @@ void MainWindow::generateTerrain()
 
 void MainWindow::loadTerrain()
 {
+    QString filePath = QFileDialog::getOpenFileName(this, tr("Import heightmap image"), "",
+                                                    tr("PNG image (*.png);;JPEG Image (*.jpg *.jpeg *.jpe);;Targa image (*.tga);;Bitmap image (*.bmp)"));
+    if(filePath.isEmpty()) return; // Cancel if no path was selected
     QApplication::setOverrideCursor(Qt::WaitCursor);
     mOgreWidget->getTerrain()->clearTerrain();
-    mOgreWidget->getTerrain()->loadHeightmap();
+    mOgreWidget->getTerrain()->loadHeightmap(filePath.toStdString());
     QApplication::restoreOverrideCursor();
 }
 
@@ -406,58 +442,6 @@ void MainWindow::clearTerrain()
 {
     mOgreWidget->getTerrain()->clearTerrain();
     mOgreWidget->getTerrain()->createFlatTerrain();
-}
-
-// Slot fo when the user changes one of the texture properties
-void MainWindow::texturePropertyChanged(QTreeWidgetItem* item, int itemNum)
-{
-    // Only second level items need to do things (first level items do not have parents)
-    if(item->parent())
-    {
-        Terrain::textureCatagory texCat;
-        if(item->parent()->text(0) == "Grass")
-            texCat = Terrain::TEX_GRASS;
-        else if(item->parent()->text(0) == "Dirt")
-            texCat = Terrain::TEX_DIRT;
-        else if(item->parent()->text(0) == "Rock")
-            texCat = Terrain::TEX_ROCK;
-        else texCat = Terrain::TEX_GENERIC;
-
-        if(item->text(0) == "Diffuse")
-        {
-            QString filename = QFileDialog::getOpenFileName(this, tr("Open texture file"), item->text(1), tr("Images (*.jpg *.jpeg *.jpe *.png *.tga *.bmp *.raw *.gif *.dds);;JPEG image (*.jpg *.jpeg *.jpe);;PNG image (*.png);;Targa image (*.tga);;Bitmap image (*.bmp);;RAW image (*.raw);;GIF image (*.gif);;DirectDraw surface (*.dds)"));
-            if(filename != 0)
-            {
-                // Convert path to relative
-                filename = QDir::current().relativeFilePath(filename);
-                // Set texture
-                mOgreWidget->getTerrain()->setTexture(Terrain::TT_DIFFUSE, texCat, filename.toStdString());
-                item->setText(1, filename);
-            }
-        }
-        else if(item->text(0) == "Normal map")
-        {
-            QString filename = QFileDialog::getOpenFileName(this, tr("Open texture file"), item->text(1), tr("Images (*.jpg *.jpeg *.jpe *.png *.tga *.bmp *.raw *.gif *.dds);;JPEG image (*.jpg *.jpeg *.jpe);;PNG image (*.png);;Targa image (*.tga);;Bitmap image (*.bmp);;RAW image (*.raw);;GIF image (*.gif);;DirectDraw surface (*.dds)"));
-            if(filename != 0)
-            {
-                // Convert path to relative
-                filename = QDir::current().relativeFilePath(filename);
-                // Set texture
-                mOgreWidget->getTerrain()->setTexture(Terrain::TT_DIFFUSE, texCat, filename.toStdString());
-                item->setText(1, filename);
-            }
-        }
-        else if(item->text(0) == "Placement height")
-        {
-            int height = QInputDialog::getInt(this, tr("Placement height"), tr("Placement height"), item->text(1).toInt());
-            if(height)
-            {
-                mOgreWidget->getTerrain()->setTexturePlacementHeight(texCat, height);
-                QString str;
-                item->setText(1, str.setNum(height));
-            }
-        }
-    }
 }
 
 // Create a new dialog and show the heightmap image in it
@@ -526,12 +510,57 @@ void MainWindow::updateSettings()
 
 void MainWindow::updateTextures()
 {
+    // First save all texture data
+    mLayers[iCurrentLayerIndex].diffuseSpecular = ui->diffuseSpecularLineEdit->text();
+    mLayers[iCurrentLayerIndex].normalHeight = ui->normalHeightLineEdit->text();
+    mLayers[iCurrentLayerIndex].worldSize = ui->textureSizeBox->value();
+    mLayers[iCurrentLayerIndex].fadeDist = ui->texturePlacementHeightBox->value();
 
+    // Update all textures
+    for(unsigned int i = 0; i < 3; i++)
+        mOgreWidget->getTerrain()->replaceTexture(i, mLayers[i].worldSize, mLayers[i].diffuseSpecular.toStdString(), mLayers[i].normalHeight.toStdString());
 }
 
 void MainWindow::resetDefaultTextures()
 {
+    // Replace textures with defaults
+    mLayers[0].diffuseSpecular = "dirt_grayrocky_diffusespecular.dds";
+    mLayers[0].normalHeight = "dirt_grayrocky_normalheight.dds";
+    mLayers[0].worldSize = 100;
+    mLayers[1].diffuseSpecular = "grass_green-01_diffusespecular.dds";
+    mLayers[1].normalHeight = "grass_green-01_normalheight.dds";
+    mLayers[1].worldSize = 30;
+    mLayers[2].diffuseSpecular = "growth_weirdfungus-03_diffusespecular.dds";
+    mLayers[2].normalHeight = "growth_weirdfungus-03_normalheight.dds";
+    mLayers[2].worldSize = 200;
 
+    // Update GUI
+    ui->diffuseSpecularLineEdit->setText(mLayers[iCurrentLayerIndex].diffuseSpecular);
+    ui->normalHeightLineEdit->setText(mLayers[iCurrentLayerIndex].normalHeight);
+    ui->textureSizeBox->setValue(mLayers[iCurrentLayerIndex].worldSize);
+    ui->texturePlacementHeightBox->setValue(mLayers[iCurrentLayerIndex].fadeDist);
+
+    // Update textures - resetting the default textures should just reset the GUI
+    //for(unsigned int i = 0; i < 3; i++)
+    //    mOgreWidget->getTerrain()->replaceTexture(i, mLayers[i].worldSize, mLayers[i].diffuseSpecular.toStdString(), mLayers[i].normalHeight.toStdString());
+}
+
+// Update the rest of the Textures panel when a different one is selected
+void MainWindow::textureSelected(int id)
+{
+    // First save data for the old texture
+    mLayers[iCurrentLayerIndex].diffuseSpecular = ui->diffuseSpecularLineEdit->text();
+    mLayers[iCurrentLayerIndex].normalHeight = ui->normalHeightLineEdit->text();
+    mLayers[iCurrentLayerIndex].worldSize = ui->textureSizeBox->value();
+    mLayers[iCurrentLayerIndex].fadeDist = ui->texturePlacementHeightBox->value();
+
+    // Then set up the new one
+    ui->diffuseSpecularLineEdit->setText(mLayers[id].diffuseSpecular);
+    ui->normalHeightLineEdit->setText(mLayers[id].normalHeight);
+    ui->textureSizeBox->setValue(mLayers[id].worldSize);
+    ui->texturePlacementHeightBox->setValue(mLayers[id].fadeDist);
+
+    iCurrentLayerIndex = id;
 }
 
 void MainWindow::updateEnvironment()
@@ -563,7 +592,8 @@ void MainWindow::resetDefaultEnvironment()
     updateEnvironment();
 }
 
-void MainWindow::loadSkydomeImage()
+// Generic function updating the text in all the cases where there is a line edit box with a button for selecting a path next to it
+void MainWindow::loadImage()
 {
     // Get file path
     QString filePath = QFileDialog::getOpenFileName(this, tr("Open texture file"), QString(), tr("Images (*.jpg *.jpeg *.jpe *.png *.tga *.bmp *.raw *.gif *.dds);;JPEG image (*.jpg *.jpeg *.jpe);;PNG image (*.png);;Targa image (*.tga);;Bitmap image (*.bmp);;RAW image (*.raw);;GIF image (*.gif);;DirectDraw surface (*.dds)"));
@@ -574,8 +604,15 @@ void MainWindow::loadSkydomeImage()
     // Convert path to relative
     filePath = QDir::current().relativeFilePath(filePath);
 
-    /*/ Depracated - Find the appropriate lineEdit box and update it with the new file
-    if(sender() == ui->skyboxBackButton)
+    // Find the appropriate lineEdit box and update it with the new file
+    if(sender() == ui->skydomeButton)
+        ui->skydomeLineEdit->setText(filePath);
+    else if(sender() == ui->diffuseSpecularButton)
+        ui->diffuseSpecularLineEdit->setText(filePath);
+    else if(sender() == ui->normalHeightButton)
+        ui->normalHeightLineEdit->setText(filePath);
+    // Depracated - functions for skyboxes
+    /*else if(sender() == ui->skyboxBackButton)
         ui->skyboxBackLineEdit->setText(filePath);
     else if(sender() == ui->skyboxDownButton)
         ui->skyboxDownLineEdit->setText(filePath);
@@ -587,8 +624,6 @@ void MainWindow::loadSkydomeImage()
         ui->skyboxRightLineEdit->setText(filePath);
     else if(sender() == ui->skyboxUpButton)
         ui->skyboxUpLineEdit->setText(filePath);*/
-
-    ui->skydomeLineEdit->setText(filePath);
 }
 
 void MainWindow::updateFogButtonColour()

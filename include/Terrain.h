@@ -21,14 +21,12 @@ public:
     Ogre::TerrainGroup* getTerrainGroup() { return mTerrainGroup; }
 
     void createFlatTerrain();
-    void loadHeightmap();
+    void loadHeightmap(std::string imageFile);
     void generateTerrain(short signed int x, short signed int y);
 
-    enum textureCatagory { TEX_GRASS, TEX_DIRT, TEX_ROCK, TEX_GENERIC };
-    enum textureType { TT_NORMALMAP, TT_DIFFUSE };
+    void generateVegetation(unsigned int treesToGenerate);
 
-    void setTexture(textureType texType, textureCatagory texCat, std::string filepath);
-    void setTexturePlacementHeight(textureCatagory texCat, int newHeight);
+    void replaceTexture(unsigned char index, float worldSize, std::string diffuseSpecular, std::string normalHeight);
 
     void clearTerrain();
 
@@ -37,11 +35,10 @@ private:
     Ogre::TerrainGlobalOptions* mTerrainGlobals;
     Ogre::TerrainGroup* mTerrainGroup;
     Ogre::Light* mSun;
-    bool mTerrainsImported;
 
     std::string intToStr(int number);
     HeightMapGen* getByLoc(signed short x, signed short y);
-    void defineTerrainFromFile(long x, long y);
+    void defineTerrainFromFile(long x, long y, std::string file);
     void initBlendMaps(Ogre::Terrain* terrain);
     void configureTerrainDefaults(Ogre::Light* light);
     void configureTextures(Ogre::Terrain::LayerInstanceList& layerList);

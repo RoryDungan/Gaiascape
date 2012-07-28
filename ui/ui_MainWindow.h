@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'MainWindow.ui'
 **
-** Created: Fri 27. Jul 15:45:37 2012
+** Created: Sun 29. Jul 00:46:36 2012
 **      by: Qt User Interface Compiler version 4.8.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -34,7 +34,6 @@
 #include <QtGui/QTabWidget>
 #include <QtGui/QToolBar>
 #include <QtGui/QToolButton>
-#include <QtGui/QTreeWidget>
 #include <QtGui/QVBoxLayout>
 #include <QtGui/QWidget>
 
@@ -76,8 +75,22 @@ public:
     QToolBar *toolBar;
     QDockWidget *texturesDockWidget;
     QWidget *dockWidgetContents_2;
-    QVBoxLayout *verticalLayout;
-    QTreeWidget *texturesTreeWidget;
+    QVBoxLayout *verticalLayout_4;
+    QComboBox *textureSelectionBox;
+    QFormLayout *texturePropertiesLayout;
+    QLabel *label_13;
+    QLabel *label_14;
+    QLabel *label_15;
+    QHBoxLayout *horizontalLayout_3;
+    QLineEdit *diffuseSpecularLineEdit;
+    QToolButton *diffuseSpecularButton;
+    QHBoxLayout *horizontalLayout_6;
+    QLineEdit *normalHeightLineEdit;
+    QToolButton *normalHeightButton;
+    QSpinBox *textureSizeBox;
+    QDoubleSpinBox *texturePlacementHeightBox;
+    QLabel *label_16;
+    QSpacerItem *verticalSpacer_3;
     QCommandLinkButton *updateTexturesButton;
     QCommandLinkButton *resetTexturesButton;
     QDockWidget *environmentDockWidget;
@@ -154,7 +167,7 @@ public:
     {
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName(QString::fromUtf8("MainWindow"));
-        MainWindow->resize(868, 743);
+        MainWindow->resize(868, 1069);
         action_New = new QAction(MainWindow);
         action_New->setObjectName(QString::fromUtf8("action_New"));
         QIcon icon;
@@ -291,48 +304,116 @@ public:
         texturesDockWidget->setFeatures(QDockWidget::DockWidgetFloatable|QDockWidget::DockWidgetMovable);
         dockWidgetContents_2 = new QWidget();
         dockWidgetContents_2->setObjectName(QString::fromUtf8("dockWidgetContents_2"));
-        verticalLayout = new QVBoxLayout(dockWidgetContents_2);
-        verticalLayout->setSpacing(6);
-        verticalLayout->setContentsMargins(11, 11, 11, 11);
-        verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
-        texturesTreeWidget = new QTreeWidget(dockWidgetContents_2);
-        QTreeWidgetItem *__qtreewidgetitem = new QTreeWidgetItem(texturesTreeWidget);
-        new QTreeWidgetItem(__qtreewidgetitem);
-        new QTreeWidgetItem(__qtreewidgetitem);
-        new QTreeWidgetItem(__qtreewidgetitem);
-        new QTreeWidgetItem(__qtreewidgetitem);
-        QTreeWidgetItem *__qtreewidgetitem1 = new QTreeWidgetItem(texturesTreeWidget);
-        new QTreeWidgetItem(__qtreewidgetitem1);
-        new QTreeWidgetItem(__qtreewidgetitem1);
-        new QTreeWidgetItem(__qtreewidgetitem1);
-        new QTreeWidgetItem(__qtreewidgetitem1);
-        texturesTreeWidget->setObjectName(QString::fromUtf8("texturesTreeWidget"));
-        texturesTreeWidget->setAlternatingRowColors(true);
-        texturesTreeWidget->header()->setDefaultSectionSize(100);
-        texturesTreeWidget->header()->setHighlightSections(true);
+        verticalLayout_4 = new QVBoxLayout(dockWidgetContents_2);
+        verticalLayout_4->setSpacing(6);
+        verticalLayout_4->setContentsMargins(11, 11, 11, 11);
+        verticalLayout_4->setObjectName(QString::fromUtf8("verticalLayout_4"));
+        textureSelectionBox = new QComboBox(dockWidgetContents_2);
+        textureSelectionBox->setObjectName(QString::fromUtf8("textureSelectionBox"));
 
-        verticalLayout->addWidget(texturesTreeWidget);
+        verticalLayout_4->addWidget(textureSelectionBox);
+
+        texturePropertiesLayout = new QFormLayout();
+        texturePropertiesLayout->setSpacing(6);
+        texturePropertiesLayout->setObjectName(QString::fromUtf8("texturePropertiesLayout"));
+        texturePropertiesLayout->setFieldGrowthPolicy(QFormLayout::AllNonFixedFieldsGrow);
+        texturePropertiesLayout->setLabelAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
+        label_13 = new QLabel(dockWidgetContents_2);
+        label_13->setObjectName(QString::fromUtf8("label_13"));
+
+        texturePropertiesLayout->setWidget(0, QFormLayout::LabelRole, label_13);
+
+        label_14 = new QLabel(dockWidgetContents_2);
+        label_14->setObjectName(QString::fromUtf8("label_14"));
+
+        texturePropertiesLayout->setWidget(1, QFormLayout::LabelRole, label_14);
+
+        label_15 = new QLabel(dockWidgetContents_2);
+        label_15->setObjectName(QString::fromUtf8("label_15"));
+
+        texturePropertiesLayout->setWidget(2, QFormLayout::LabelRole, label_15);
+
+        horizontalLayout_3 = new QHBoxLayout();
+        horizontalLayout_3->setSpacing(0);
+        horizontalLayout_3->setObjectName(QString::fromUtf8("horizontalLayout_3"));
+        diffuseSpecularLineEdit = new QLineEdit(dockWidgetContents_2);
+        diffuseSpecularLineEdit->setObjectName(QString::fromUtf8("diffuseSpecularLineEdit"));
+
+        horizontalLayout_3->addWidget(diffuseSpecularLineEdit);
+
+        diffuseSpecularButton = new QToolButton(dockWidgetContents_2);
+        diffuseSpecularButton->setObjectName(QString::fromUtf8("diffuseSpecularButton"));
+        QIcon icon16;
+        icon16.addFile(QString::fromUtf8(":/media/16x16/document-open.png"), QSize(), QIcon::Normal, QIcon::Off);
+        diffuseSpecularButton->setIcon(icon16);
+
+        horizontalLayout_3->addWidget(diffuseSpecularButton);
+
+
+        texturePropertiesLayout->setLayout(0, QFormLayout::FieldRole, horizontalLayout_3);
+
+        horizontalLayout_6 = new QHBoxLayout();
+        horizontalLayout_6->setSpacing(0);
+        horizontalLayout_6->setObjectName(QString::fromUtf8("horizontalLayout_6"));
+        normalHeightLineEdit = new QLineEdit(dockWidgetContents_2);
+        normalHeightLineEdit->setObjectName(QString::fromUtf8("normalHeightLineEdit"));
+
+        horizontalLayout_6->addWidget(normalHeightLineEdit);
+
+        normalHeightButton = new QToolButton(dockWidgetContents_2);
+        normalHeightButton->setObjectName(QString::fromUtf8("normalHeightButton"));
+        normalHeightButton->setIcon(icon16);
+
+        horizontalLayout_6->addWidget(normalHeightButton);
+
+
+        texturePropertiesLayout->setLayout(1, QFormLayout::FieldRole, horizontalLayout_6);
+
+        textureSizeBox = new QSpinBox(dockWidgetContents_2);
+        textureSizeBox->setObjectName(QString::fromUtf8("textureSizeBox"));
+        textureSizeBox->setMaximum(1000);
+        textureSizeBox->setValue(300);
+
+        texturePropertiesLayout->setWidget(2, QFormLayout::FieldRole, textureSizeBox);
+
+        texturePlacementHeightBox = new QDoubleSpinBox(dockWidgetContents_2);
+        texturePlacementHeightBox->setObjectName(QString::fromUtf8("texturePlacementHeightBox"));
+        texturePlacementHeightBox->setMaximum(255);
+
+        texturePropertiesLayout->setWidget(3, QFormLayout::FieldRole, texturePlacementHeightBox);
+
+        label_16 = new QLabel(dockWidgetContents_2);
+        label_16->setObjectName(QString::fromUtf8("label_16"));
+
+        texturePropertiesLayout->setWidget(3, QFormLayout::LabelRole, label_16);
+
+
+        verticalLayout_4->addLayout(texturePropertiesLayout);
+
+        verticalSpacer_3 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
+
+        verticalLayout_4->addItem(verticalSpacer_3);
 
         updateTexturesButton = new QCommandLinkButton(dockWidgetContents_2);
         updateTexturesButton->setObjectName(QString::fromUtf8("updateTexturesButton"));
-        QIcon icon16;
-        icon16.addFile(QString::fromUtf8(":/media/22x22/dialog-apply.png"), QSize(), QIcon::Normal, QIcon::Off);
-        updateTexturesButton->setIcon(icon16);
+        QIcon icon17;
+        icon17.addFile(QString::fromUtf8(":/media/22x22/dialog-apply.png"), QSize(), QIcon::Normal, QIcon::Off);
+        updateTexturesButton->setIcon(icon17);
         updateTexturesButton->setIconSize(QSize(22, 22));
 
-        verticalLayout->addWidget(updateTexturesButton);
+        verticalLayout_4->addWidget(updateTexturesButton);
 
         resetTexturesButton = new QCommandLinkButton(dockWidgetContents_2);
         resetTexturesButton->setObjectName(QString::fromUtf8("resetTexturesButton"));
-        QIcon icon17;
-        icon17.addFile(QString::fromUtf8(":/media/22x22/document-revert.png"), QSize(), QIcon::Normal, QIcon::Off);
-        resetTexturesButton->setIcon(icon17);
+        QIcon icon18;
+        icon18.addFile(QString::fromUtf8(":/media/22x22/document-revert.png"), QSize(), QIcon::Normal, QIcon::Off);
+        resetTexturesButton->setIcon(icon18);
         resetTexturesButton->setIconSize(QSize(22, 22));
 
-        verticalLayout->addWidget(resetTexturesButton);
+        verticalLayout_4->addWidget(resetTexturesButton);
 
         texturesDockWidget->setWidget(dockWidgetContents_2);
-        MainWindow->addDockWidget(static_cast<Qt::DockWidgetArea>(2), texturesDockWidget);
+        MainWindow->addDockWidget(static_cast<Qt::DockWidgetArea>(1), texturesDockWidget);
         environmentDockWidget = new QDockWidget(MainWindow);
         environmentDockWidget->setObjectName(QString::fromUtf8("environmentDockWidget"));
         environmentDockWidget->setMinimumSize(QSize(225, 519));
@@ -388,9 +469,9 @@ public:
 
         sunColourButton = new QToolButton(groupBox_3);
         sunColourButton->setObjectName(QString::fromUtf8("sunColourButton"));
-        QIcon icon18;
-        icon18.addFile(QString::fromUtf8(":/media/16x16/colour-picker.png"), QSize(), QIcon::Normal, QIcon::Off);
-        sunColourButton->setIcon(icon18);
+        QIcon icon19;
+        icon19.addFile(QString::fromUtf8(":/media/16x16/colour-picker.png"), QSize(), QIcon::Normal, QIcon::Off);
+        sunColourButton->setIcon(icon19);
 
         horizontalLayout_5->addWidget(sunColourButton);
 
@@ -423,9 +504,7 @@ public:
 
         skydomeButton = new QToolButton(groupBox);
         skydomeButton->setObjectName(QString::fromUtf8("skydomeButton"));
-        QIcon icon19;
-        icon19.addFile(QString::fromUtf8(":/media/16x16/document-open.png"), QSize(), QIcon::Normal, QIcon::Off);
-        skydomeButton->setIcon(icon19);
+        skydomeButton->setIcon(icon16);
 
         horizontalLayout_2->addWidget(skydomeButton);
 
@@ -539,7 +618,7 @@ public:
         fogColourButton = new QToolButton(groupBox_2);
         fogColourButton->setObjectName(QString::fromUtf8("fogColourButton"));
         fogColourButton->setEnabled(false);
-        fogColourButton->setIcon(icon18);
+        fogColourButton->setIcon(icon19);
 
         horizontalLayout_4->addWidget(fogColourButton);
 
@@ -555,20 +634,20 @@ public:
 
         updateEnvironmentButton = new QCommandLinkButton(dockWidgetContents_3);
         updateEnvironmentButton->setObjectName(QString::fromUtf8("updateEnvironmentButton"));
-        updateEnvironmentButton->setIcon(icon16);
+        updateEnvironmentButton->setIcon(icon17);
         updateEnvironmentButton->setIconSize(QSize(22, 22));
 
         verticalLayout_3->addWidget(updateEnvironmentButton);
 
         resetEnvironmentButton = new QCommandLinkButton(dockWidgetContents_3);
         resetEnvironmentButton->setObjectName(QString::fromUtf8("resetEnvironmentButton"));
-        resetEnvironmentButton->setIcon(icon17);
+        resetEnvironmentButton->setIcon(icon18);
         resetEnvironmentButton->setIconSize(QSize(22, 22));
 
         verticalLayout_3->addWidget(resetEnvironmentButton);
 
         environmentDockWidget->setWidget(dockWidgetContents_3);
-        MainWindow->addDockWidget(static_cast<Qt::DockWidgetArea>(1), environmentDockWidget);
+        MainWindow->addDockWidget(static_cast<Qt::DockWidgetArea>(2), environmentDockWidget);
         foliageDockWidget = new QDockWidget(MainWindow);
         foliageDockWidget->setObjectName(QString::fromUtf8("foliageDockWidget"));
         foliageDockWidget->setFeatures(QDockWidget::DockWidgetFloatable|QDockWidget::DockWidgetMovable);
@@ -697,13 +776,13 @@ public:
 
         verticalLayout_2->addWidget(tabWidget);
 
-        verticalSpacer_2 = new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::MinimumExpanding);
+        verticalSpacer_2 = new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
 
         verticalLayout_2->addItem(verticalSpacer_2);
 
         generateTerrain = new QCommandLinkButton(dockWidgetContents);
         generateTerrain->setObjectName(QString::fromUtf8("generateTerrain"));
-        generateTerrain->setIcon(icon16);
+        generateTerrain->setIcon(icon17);
         generateTerrain->setIconSize(QSize(22, 22));
 
         verticalLayout_2->addWidget(generateTerrain);
@@ -786,7 +865,6 @@ public:
         QObject::connect(action_Wireframe, SIGNAL(triggered()), MainWindow, SLOT(viewWireframe()));
         QObject::connect(action_Solid, SIGNAL(triggered()), MainWindow, SLOT(viewSolid()));
         QObject::connect(actionTake_screenshot, SIGNAL(triggered()), MainWindow, SLOT(screenshot()));
-        QObject::connect(texturesTreeWidget, SIGNAL(itemDoubleClicked(QTreeWidgetItem*,int)), MainWindow, SLOT(texturePropertyChanged(QTreeWidgetItem*,int)));
         QObject::connect(actionShow_heightmap_image, SIGNAL(triggered()), MainWindow, SLOT(showHeightmapImage()));
         QObject::connect(generateTerrain, SIGNAL(clicked()), MainWindow, SLOT(generateTerrain()));
         QObject::connect(loadTerrain, SIGNAL(clicked()), MainWindow, SLOT(loadTerrain()));
@@ -798,9 +876,12 @@ public:
         QObject::connect(resetTexturesButton, SIGNAL(clicked()), MainWindow, SLOT(resetDefaultTextures()));
         QObject::connect(updateEnvironmentButton, SIGNAL(clicked()), MainWindow, SLOT(updateEnvironment()));
         QObject::connect(resetEnvironmentButton, SIGNAL(clicked()), MainWindow, SLOT(resetDefaultEnvironment()));
-        QObject::connect(skydomeButton, SIGNAL(clicked()), MainWindow, SLOT(loadSkydomeImage()));
+        QObject::connect(skydomeButton, SIGNAL(clicked()), MainWindow, SLOT(loadImage()));
         QObject::connect(fogColourButton, SIGNAL(clicked()), MainWindow, SLOT(updateFogButtonColour()));
         QObject::connect(fogModeComboBox, SIGNAL(currentIndexChanged(int)), MainWindow, SLOT(fogModeChanged(int)));
+        QObject::connect(diffuseSpecularButton, SIGNAL(clicked()), MainWindow, SLOT(loadImage()));
+        QObject::connect(normalHeightButton, SIGNAL(clicked()), MainWindow, SLOT(loadImage()));
+        QObject::connect(textureSelectionBox, SIGNAL(currentIndexChanged(int)), MainWindow, SLOT(textureSelected(int)));
 
         tabWidget->setCurrentIndex(0);
         terrainSizeBox->setCurrentIndex(1);
@@ -850,40 +931,18 @@ public:
         fileToolBar->setWindowTitle(QApplication::translate("MainWindow", "File", 0, QApplication::UnicodeUTF8));
         toolBar->setWindowTitle(QApplication::translate("MainWindow", "Tools", 0, QApplication::UnicodeUTF8));
         texturesDockWidget->setWindowTitle(QApplication::translate("MainWindow", "Textures", 0, QApplication::UnicodeUTF8));
-        QTreeWidgetItem *___qtreewidgetitem = texturesTreeWidget->headerItem();
-        ___qtreewidgetitem->setText(1, QApplication::translate("MainWindow", "Value", 0, QApplication::UnicodeUTF8));
-        ___qtreewidgetitem->setText(0, QApplication::translate("MainWindow", "Property", 0, QApplication::UnicodeUTF8));
-
-        const bool __sortingEnabled = texturesTreeWidget->isSortingEnabled();
-        texturesTreeWidget->setSortingEnabled(false);
-        QTreeWidgetItem *___qtreewidgetitem1 = texturesTreeWidget->topLevelItem(0);
-        ___qtreewidgetitem1->setText(0, QApplication::translate("MainWindow", "Grass", 0, QApplication::UnicodeUTF8));
-        QTreeWidgetItem *___qtreewidgetitem2 = ___qtreewidgetitem1->child(0);
-        ___qtreewidgetitem2->setText(1, QApplication::translate("MainWindow", "growth_weirdfungus-03_diffusespecular.dds", 0, QApplication::UnicodeUTF8));
-        ___qtreewidgetitem2->setText(0, QApplication::translate("MainWindow", "Diffuse", 0, QApplication::UnicodeUTF8));
-        QTreeWidgetItem *___qtreewidgetitem3 = ___qtreewidgetitem1->child(1);
-        ___qtreewidgetitem3->setText(0, QApplication::translate("MainWindow", "Specular", 0, QApplication::UnicodeUTF8));
-        QTreeWidgetItem *___qtreewidgetitem4 = ___qtreewidgetitem1->child(2);
-        ___qtreewidgetitem4->setText(1, QApplication::translate("MainWindow", "growth_weirdfungus-03_normalheight.dds", 0, QApplication::UnicodeUTF8));
-        ___qtreewidgetitem4->setText(0, QApplication::translate("MainWindow", "Normal map", 0, QApplication::UnicodeUTF8));
-        QTreeWidgetItem *___qtreewidgetitem5 = ___qtreewidgetitem1->child(3);
-        ___qtreewidgetitem5->setText(1, QApplication::translate("MainWindow", "200", 0, QApplication::UnicodeUTF8));
-        ___qtreewidgetitem5->setText(0, QApplication::translate("MainWindow", "Placement height", 0, QApplication::UnicodeUTF8));
-        QTreeWidgetItem *___qtreewidgetitem6 = texturesTreeWidget->topLevelItem(1);
-        ___qtreewidgetitem6->setText(0, QApplication::translate("MainWindow", "Dirt", 0, QApplication::UnicodeUTF8));
-        QTreeWidgetItem *___qtreewidgetitem7 = ___qtreewidgetitem6->child(0);
-        ___qtreewidgetitem7->setText(1, QApplication::translate("MainWindow", "dirt_grayrocky_diffusespecular.dds", 0, QApplication::UnicodeUTF8));
-        ___qtreewidgetitem7->setText(0, QApplication::translate("MainWindow", "Diffuse", 0, QApplication::UnicodeUTF8));
-        QTreeWidgetItem *___qtreewidgetitem8 = ___qtreewidgetitem6->child(1);
-        ___qtreewidgetitem8->setText(0, QApplication::translate("MainWindow", "Specular", 0, QApplication::UnicodeUTF8));
-        QTreeWidgetItem *___qtreewidgetitem9 = ___qtreewidgetitem6->child(2);
-        ___qtreewidgetitem9->setText(1, QApplication::translate("MainWindow", "dirt_grayrocky_normalheight.dds", 0, QApplication::UnicodeUTF8));
-        ___qtreewidgetitem9->setText(0, QApplication::translate("MainWindow", "Normal map", 0, QApplication::UnicodeUTF8));
-        QTreeWidgetItem *___qtreewidgetitem10 = ___qtreewidgetitem6->child(3);
-        ___qtreewidgetitem10->setText(1, QApplication::translate("MainWindow", "100", 0, QApplication::UnicodeUTF8));
-        ___qtreewidgetitem10->setText(0, QApplication::translate("MainWindow", "Placement height", 0, QApplication::UnicodeUTF8));
-        texturesTreeWidget->setSortingEnabled(__sortingEnabled);
-
+        textureSelectionBox->clear();
+        textureSelectionBox->insertItems(0, QStringList()
+         << QApplication::translate("MainWindow", "Dirt", 0, QApplication::UnicodeUTF8)
+         << QApplication::translate("MainWindow", "Grass", 0, QApplication::UnicodeUTF8)
+         << QApplication::translate("MainWindow", "Rock", 0, QApplication::UnicodeUTF8)
+        );
+        label_13->setText(QApplication::translate("MainWindow", "Diffuse/specular", 0, QApplication::UnicodeUTF8));
+        label_14->setText(QApplication::translate("MainWindow", "Normal/height", 0, QApplication::UnicodeUTF8));
+        label_15->setText(QApplication::translate("MainWindow", "Texture size", 0, QApplication::UnicodeUTF8));
+        diffuseSpecularLineEdit->setText(QString());
+        normalHeightLineEdit->setText(QString());
+        label_16->setText(QApplication::translate("MainWindow", "Placement height", 0, QApplication::UnicodeUTF8));
         updateTexturesButton->setText(QApplication::translate("MainWindow", "Accept", 0, QApplication::UnicodeUTF8));
         updateTexturesButton->setDescription(QApplication::translate("MainWindow", "Update the terrain with the new texture proprties", 0, QApplication::UnicodeUTF8));
         resetTexturesButton->setText(QApplication::translate("MainWindow", "Reset", 0, QApplication::UnicodeUTF8));
