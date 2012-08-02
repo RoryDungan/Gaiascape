@@ -15,6 +15,11 @@ class Random
         {
             return rand() % (max-min+1) + min; // difference between max and min + 1 + min
         }
+        void seed(unsigned int newSeed)
+        {
+            srand(newSeed);
+        }
+
     protected:
     private:
         Random() // Private constructor

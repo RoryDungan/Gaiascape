@@ -324,7 +324,7 @@ void HeightMapGen::generateHeightmap(float talos, float staggerValue)
 {
     fTalos = talos; // A good default is 4/iNumberOfBlocks, however this will change depending on how eroded the terrain should be.
 
-    fStaggerValue = 1;
+    fStaggerValue = staggerValue;
 
     // NW corner
     *pHMBlocks = Random::getSingleton().getRand(5, 10);

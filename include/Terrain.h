@@ -16,13 +16,13 @@
 class Terrain
 {
 public:
-    Terrain(Ogre::SceneManager* sceneManager, Ogre::Light *light, short unsigned int size, short unsigned int talos, short unsigned int staggerValue);
+    Terrain(Ogre::SceneManager* sceneManager, Ogre::Light *light);
     ~Terrain();
     Ogre::TerrainGroup* getTerrainGroup() { return mTerrainGroup; }
 
     void createFlatTerrain();
     void loadHeightmap(std::string imageFile);
-    void generateTerrain(short signed int x, short signed int y);
+    void generateTerrain(unsigned int seed, unsigned short size, unsigned short talos, unsigned short staggerValue, unsigned short segments = 1);
 
     void generateVegetation(unsigned int treesToGenerate);
 

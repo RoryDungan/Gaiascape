@@ -4,17 +4,10 @@
 #include <QDesktopServices> // Also needed temporarily, so that the heightmap image can be outputted to a directory where ImageViewer can easily find it
 #include <QDir> // Same as QDesktopServices
 
-Terrain::Terrain(Ogre::SceneManager* sceneManager, Ogre::Light *light, short unsigned int size, short unsigned int talos, short unsigned int staggerValue)
+Terrain::Terrain(Ogre::SceneManager* sceneManager, Ogre::Light *light)
 {
-    // Terrain Size must be constant if tiles are to make any sense interacting with each other.
-    iTerrainSize = size;
-    // These do not need to be constant, but for large, consistent terrains, it doesn't make sense otherwise.
-    iTalos = talos;               // Minimum angle where thermal erosion takes place
-    iStaggerValue = staggerValue; // The unevenness of the terrain
-
     mSceneManager = sceneManager;
     mSun = light;
-    //mTerrainGlobals = new Ogre::TerrainGlobalOptions();
 
     createFlatTerrain();
 }
@@ -85,11 +78,20 @@ void Terrain::loadHeightmap(std::string imageFile)
     mTerrainGroup->freeTemporaryResources();
 }
 
-
-// x = The x position of the terrain we are generating
-// y = The y position of the terrain we are generating
-void Terrain::generateTerrain(signed short x, signed short y)
+// Size, talos and staggerValue are only used for generating terrains so they can e moved into this function instead of the Terrain constructor
+void Terrain::generateTerrain(unsigned int seed, unsigned short size, unsigned short talos, unsigned short staggerValue, unsigned short segments)
 {
+    // Terrain Size must be constant if tiles are to make any sense interacting with each other.
+    iTerrainSize = size;
+    // These do not need to be constant, but for large, consistent terrains, it doesn't make sense otherwise.
+    iTalos = talos;               // Minimum angle where thermal erosion takes place
+    iStaggerValue = staggerValue; // The unevenness of the terrain
+
+    // Dylan: I think it's better if this function generates all segments, given a number of segments to generate
+    // x = The x position of the terrain we are generating
+    // y = The y position of the terrain we are generating
+    signed short x = 0, y = 0;
+
     // First, check to make sure the terrain doesn't already exist.
     if(getByLoc(x, y) != NULL)
     {
@@ -101,6 +103,7 @@ void Terrain::generateTerrain(signed short x, signed short y)
     // Firstly, generate the terrain data we're going to be working with
     // The reason why this looks weird is that all HMgen classes must start with what they are calculating,
     // in this case, a HM.
+    Random::getSingleton().seed(seed); // First set the seed we'll be using for our random numbers
     HeightMapGen* HMHMgen = new HeightMapGen(iTerrainSize, x, y, iTalos, iStaggerValue);
 
     // Convert that to an image
@@ -400,6 +403,7 @@ void Terrain::replaceTexture(unsigned char index, float worldSize, std::string d
     {
         Ogre::Terrain* t = ti.getNext()->instance;
         t->replaceLayer(index, true, worldSize, &textureNames);
+        t->dirty();
         t->update();
     }
 }

@@ -51,11 +51,17 @@ public:
     void saveScreenshotToFile(QString filename);
     void setCameraInverted(bool inverted) { bCameraControlsInverted = inverted; }
     void setFOVy(float fov);
+    // Brush size is the area which will be affected by painting on the terrain
     // Ogre::Real is actually just a typedef of float so it's ok to assign it as one. We use standard floats here so that the class can be used without directly referencing any of Ogre3d
     void setBrushSize(float size) { mBrushSize = size; }
     float getBrushSize() { return mBrushSize; }
+    // Brush weight is how much of an effect clicking on the terrain will have
     void setBrushWeight(float weight) { mBrushWeight = weight; }
     float getBrushWeight() { return mBrushWeight; }
+    // Terrain texture layer which will be affected by painting on the terrain
+    void setLayerEdit(unsigned char layer) { mLayerEdit = layer; }
+    unsigned char getLayerEdit() { return mLayerEdit; }
+    // Give outside classes direct access to the terrain
     Terrain* getTerrain() { return mTerrain; }
     // Each string corrosponds to the path the the image
     //void setSkyBox(QString up, QString dn, QString lf, QString rt, QString fr, QString bk);
@@ -82,6 +88,7 @@ protected:
     void init( std::string, std::string);
 
     void modifyTerrain(Ogre::Terrain* terrain, const Ogre::Vector3& centerPos, Ogre::Real timeElapsed);
+    void modifyBlendMaps(Ogre::Terrain* terrain, const Ogre::Vector3& centerPos, Ogre::Real timeElapsed);
 
     virtual Ogre::RenderSystem* chooseRenderer( Ogre::RenderSystemList* );
 
@@ -110,8 +117,7 @@ private:
                  // in order to prevent the user from doing something else while this is going on
         IS_MOVING_CAMERA,
         IS_ROTATING_CAMERA,
-        IS_EXTRUDING,
-        IS_INTRUDING,
+        IS_EDITING_HEIGHT,
         IS_PAINTING,
         IS_PLACING_OBJECTS
     } mCurrentState;

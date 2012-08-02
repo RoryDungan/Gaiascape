@@ -65,6 +65,7 @@ MainWindow::MainWindow(QWidget *parent) :
     tabifyDockWidget(ui->texturesDockWidget, ui->environmentDockWidget);
     tabifyDockWidget(ui->environmentDockWidget, ui->foliageDockWidget);
     ui->terrainDockWidget->raise();
+    randomiseTerrainSeed();
 
     QColor colour = QColor(230, 230, 230);
     ui->fogColourLabel->setText(colour.name());
@@ -422,7 +423,7 @@ void MainWindow::generateTerrain()
     timer.start();
     // This can be spawned at any point. If this function does what I believe it does, later this will be modifyed to create
     // multiple terrain blocks.
-    mOgreWidget->getTerrain()->generateTerrain(0, 0);
+    mOgreWidget->getTerrain()->generateTerrain(ui->randomSeedBox->value(), 8, 1, 255);
     qDebug() << "Terrain genarated in" << timer.elapsed() << "milliseconds";
     QApplication::restoreOverrideCursor();
 }
@@ -561,6 +562,8 @@ void MainWindow::textureSelected(int id)
     ui->texturePlacementHeightBox->setValue(mLayers[id].fadeDist);
 
     iCurrentLayerIndex = id;
+
+    mOgreWidget->setLayerEdit(id);
 }
 
 void MainWindow::updateEnvironment()

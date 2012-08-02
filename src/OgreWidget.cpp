@@ -53,6 +53,7 @@ void THIS::init( std::string logFile,
     mCurrentState = IS_IDLE;
     mBrushSize = 0.1f;
     mBrushWeight = 250;
+    mLayerEdit = 1;
 
     // Set up resources
     Ogre::ResourceGroupManager::getSingleton().addResourceLocation("media", "FileSystem");
@@ -179,10 +180,10 @@ void THIS::mousePressEvent(QMouseEvent * event)
             switch(mInteractionMode)
             {
             case IM_EXTRUDE:
-                mCurrentState = IS_EXTRUDING;
+                mCurrentState = IS_EDITING_HEIGHT;
                 break;
             case IM_INTRUDE:
-                mCurrentState = IS_EXTRUDING;
+                mCurrentState = IS_EDITING_HEIGHT;
                 break;
             case IM_PAINT:
                 mCurrentState = IS_PAINTING;
@@ -286,7 +287,7 @@ void THIS::setupScene()
     // REGARDING RORY - You should be able to use this function to integrate the sliders with modifying the terrain.
     // More functionality will be added, but probably to a different function, from what I can think of at the moment.
     // In order, the variables are terrainSize, talos, and staggerValue (the unevenness of the terrain)
-    mTerrain = new Terrain(mSceneMgr, light, 8, 1, 1);
+    mTerrain = new Terrain(mSceneMgr, light);
 
     mEditMarker = mSceneMgr->createEntity("EditMarker", "sphere.mesh");
     mEditNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
@@ -301,7 +302,7 @@ void THIS::setupScene()
 void THIS::paintGL()
 {
     // If the current state is a state in which the user is interacting with the terrain via the mouse
-    if(mCurrentState == IS_EXTRUDING || mCurrentState == IS_INTRUDING || mCurrentState == IS_PAINTING || mCurrentState == IS_PLACING_OBJECTS)
+    if(mCurrentState == IS_EDITING_HEIGHT || mCurrentState == IS_PAINTING || mCurrentState == IS_PLACING_OBJECTS)
     {
         // Get the 3d point that the cursor is over
         float relPosX = (float)mLastCursorPos.x() / (float)mCamera->getViewport()->getActualWidth();
@@ -324,9 +325,13 @@ void THIS::paintGL()
 
             switch(mCurrentState)
             {
-            case IS_EXTRUDING:
+            case IS_EDITING_HEIGHT:
                 for(Ogre::TerrainGroup::TerrainList::iterator ti = terrainList.begin(); ti != terrainList.end(); ++ti)
                     modifyTerrain(*ti, rayResult.position, 0.017f);
+                break;
+            case IS_PAINTING:
+                for(Ogre::TerrainGroup::TerrainList::iterator ti = terrainList.begin(); ti != terrainList.end(); ++ti)
+                    modifyBlendMaps(*ti, rayResult.position, 0.017f);
                 break;
             default:
                 break;
@@ -427,6 +432,50 @@ void THIS::modifyTerrain(Ogre::Terrain* terrain, const Ogre::Vector3 &centerPos,
     }
     if(mHeightUpdateCountDown == 0)
         mHeightUpdateCountDown = mHeightUpdateRate;
+}
+
+/**
+ * @brief Modify terrain textures/blendmap with paint tool
+ * @author Rory Dungan
+ */
+void THIS::modifyBlendMaps(Ogre::Terrain *terrain, const Ogre::Vector3 &centerPos, Ogre::Real timeElapsed)
+{
+    Ogre::Vector3 tsPos;
+    terrain->getTerrainPosition(centerPos, &tsPos);
+
+    Ogre::TerrainLayerBlendMap* layer = terrain->getLayerBlendMap(mLayerEdit);
+    // we need image coords
+    Ogre::Real imgSize = terrain->getLayerBlendMapSize();
+    long startx = (tsPos.x - mBrushSize) * imgSize;
+    long starty = (tsPos.y - mBrushSize) * imgSize;
+    long endx = (tsPos.x + mBrushSize) * imgSize;
+    long endy= (tsPos.y + mBrushSize) * imgSize;
+    startx = std::max(startx, 0L);
+    starty = std::max(starty, 0L);
+    endx = std::min(endx, (long)imgSize);
+    endy = std::min(endy, (long)imgSize);
+    for (long y = starty; y <= endy; ++y)
+    {
+        for (long x = startx; x <= endx; ++x)
+        {
+            Ogre::Real tsXdist = (x / imgSize) - tsPos.x;
+            Ogre::Real tsYdist = (y / imgSize)  - tsPos.y;
+
+            Ogre::Real weight = std::min((Ogre::Real)1.0f,
+                Ogre::Math::Sqrt(tsYdist * tsYdist + tsXdist * tsXdist) / Ogre::Real(0.5 * mBrushSize));
+            weight = 1.0 - (weight * weight);
+
+            float paint = weight * timeElapsed;
+            size_t imgY = imgSize - y;
+            float val;
+            val = layer->getBlendValue(x, imgY) + paint;
+            val = Ogre::Math::Clamp(val, 0.0f, 1.0f);
+            layer->setBlendValue(x, imgY, val);
+
+        }
+    }
+
+    layer->update();
 }
 
 /**
