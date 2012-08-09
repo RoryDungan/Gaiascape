@@ -27,6 +27,8 @@ MainWindow::MainWindow(QWidget *parent) :
     bQPressed = false;
     bEPressed = false;
     bShiftPressed = false;
+    // temp
+    counter = 1;
 
     ui->setupUi(this);
 
@@ -423,7 +425,16 @@ void MainWindow::generateTerrain()
     timer.start();
     // This can be spawned at any point. If this function does what I believe it does, later this will be modifyed to create
     // multiple terrain blocks.
-    mOgreWidget->getTerrain()->generateTerrain(ui->randomSeedBox->value(), 8, 1, 255);
+    if(counter == 1)
+    {
+        mOgreWidget->getTerrain()->generateTerrain(ui->randomSeedBox->value(), 8, 10, 255);
+        counter = 2;
+    }
+    else
+    {
+        mOgreWidget->getTerrain()->generateTerrain(ui->randomSeedBox->value(), 8, 1, 255);
+        counter = 1;
+    }
     qDebug() << "Terrain genarated in" << timer.elapsed() << "milliseconds";
     QApplication::restoreOverrideCursor();
 }

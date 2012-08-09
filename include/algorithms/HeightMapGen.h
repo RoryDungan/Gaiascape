@@ -29,7 +29,7 @@ class HeightMapGen
 
         void genQuadrant(int xNW, int yNW, int xSE, int ySE, int iteration, int quadrant);
         void erodeBlock(float c, long unsigned int block);
-        void transportMaterial(float material, long unsigned int block);
+        void transportMaterial(unsigned short material, long unsigned int block);
         float getHeightDifference(unsigned long inspectedBlock, unsigned long neighbourBlock);
         void writeMap();
 

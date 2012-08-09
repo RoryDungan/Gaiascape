@@ -26,6 +26,9 @@ public:
     ~MainWindow();
     
 private:
+    // Temporary until we can modify setting using the GUI
+    unsigned short counter;
+
     Ui::MainWindow *ui;
     OgreWidget* mOgreWidget;
     ImageViewer* mHeightmapViewer;
