@@ -22,7 +22,7 @@ public:
 
     void createFlatTerrain();
     void loadHeightmap(std::string imageFile);
-    void generateTerrain(unsigned int seed, unsigned short size, unsigned short talos, unsigned short staggerValue, unsigned short segments = 1);
+    void generateTerrain(unsigned int seed, unsigned short size, unsigned short scale, unsigned short erosionIterations, unsigned short staggerValue, unsigned short treeDensity);
 
     void generateVegetation(unsigned int treesToGenerate);
 
@@ -48,7 +48,7 @@ private:
 
     // These should be defined before the terrain is generated.
     short unsigned int iTerrainSize;
-    short unsigned int iTalos;
+    short unsigned int iErosionIterations;
     short unsigned int iBlocks;
     short unsigned int iStaggerValue;
 };

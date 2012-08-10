@@ -5,10 +5,12 @@
 #include <QImage>
 #include <QByteArray>
 
-HeightMapGen::HeightMapGen(unsigned int size, signed short x, signed short y, float talos, float staggerValue)
+HeightMapGen::HeightMapGen(unsigned int size, signed short x, signed short y, unsigned short erosionIterations, float staggerValue)
 {
     iX = x;
     iY = y;
+
+    fTalos = 0.00006033;
 
     // Rows and columns start at 0, which is unintuitive now but makes the code a hell of a lot easier to read later.
     // In this circumstance iRows and iColumns will always be the same. When this code is converted to its own
@@ -29,7 +31,7 @@ HeightMapGen::HeightMapGen(unsigned int size, signed short x, signed short y, fl
         heightMap[i] = 0;
     pHMBlocks = &heightMap[0];
 
-    generateHeightmap(talos, staggerValue);
+    generateHeightmap(erosionIterations, staggerValue);
 }
 
 void HeightMapGen::genQuadrant(int xNW, int yNW, int xSE, int ySE, int iteration, int quadrant)
@@ -122,10 +124,10 @@ void HeightMapGen::erodeBlock(float c, long unsigned int block)
     // Erode an individual block, and if this passes material down, then calculate erosion for that as well.
     // dNW, dNE etc. = difference in heights at point NW, NE etc. Set as 0 so if the points don't exist they don't cause
     // errors later.
-    float dNW = 0;
-    float dNE = 0;
-    float dSW = 0;
-    float dSE = 0;
+    float dNW = -1;
+    float dNE = -1;
+    float dSW = -1;
+    float dSE = -1;
     // dTotal = The total of all the d's that are above Talos.
     float dTotal = 0;
     // dMax = The highest d value
@@ -135,10 +137,25 @@ void HeightMapGen::erodeBlock(float c, long unsigned int block)
     float tNE = 0;
     float tSE = 0;
     float tSW = 0;
+    // Note that if a block is on the horizontal edge of the terrain, it will loop around to the next point
+    // and think they are adjacent. So we need to check to see if the neighbour and the inspected block are on the same
+    // level if they are only one block away.
+    if(block/iDimensions != (block - 1)/iDimensions)
+    {
+        dNW = 0;
+        dSW = 0;
+    }
+    if(block/iDimensions != (block + 1)/iDimensions)
+    {
+        dNE = 0;
+        dSE = 0;
+    }
     // Define height values
     // Check if the point exists by seeing if is above the max or below the min
     // NW
-    dNW = getHeightDifference(block, block - iDimensions - 1);
+
+    if(dNW == -1)
+        dNW = getHeightDifference(block, block - iDimensions - 1);
     if(dNW > fTalos)
     {
         // Skipping the calculations because we know this if we are at this point dTotal and dMax haven't been set
@@ -149,7 +166,8 @@ void HeightMapGen::erodeBlock(float c, long unsigned int block)
         dNW = 0; // Which later means we will not change this block
 
     // NE
-    dNE = getHeightDifference(block, block + iDimensions - 1);
+    if(dNE == -1)
+        dNE = getHeightDifference(block, block + iDimensions - 1);
     if(dNE > fTalos)
     {
         dTotal += dNE;
@@ -160,7 +178,8 @@ void HeightMapGen::erodeBlock(float c, long unsigned int block)
         dNE = 0; // Which later means we will not change this block
 
     // SE
-    dSE = getHeightDifference(block, block + iDimensions + 1);
+    if(dSE == -1)
+        dSE = getHeightDifference(block, block + iDimensions + 1);
     if(dSE > fTalos)
     {
         dTotal += dSE;
@@ -171,7 +190,8 @@ void HeightMapGen::erodeBlock(float c, long unsigned int block)
         dSE = 0; // Which later means we will not change this block
 
     // SW
-    dSW = getHeightDifference(block, block - iDimensions + 1);
+    if(dSW == -1)
+        dSW = getHeightDifference(block, block - iDimensions + 1);
     if(dSW > fTalos)
     {
         dTotal += dSW;
@@ -184,7 +204,7 @@ void HeightMapGen::erodeBlock(float c, long unsigned int block)
     // Go to each of the corners and apply the equation
     // hi += c(dmax - talos) * di/dtotal
     // NW
-    if(dNW != 0)
+    if(dNW > 0)
     {
         tNW = c * (dMax - fTalos) * (dNW/dTotal);
         *(pHMBlocks + block - iDimensions - 1) -= tNW;
@@ -197,7 +217,7 @@ void HeightMapGen::erodeBlock(float c, long unsigned int block)
             *(pHMBlocks + block - iDimensions - 1) += tNW;
     }
     // NE
-    if(dNE != 0)
+    if(dNE > 0)
     {
         tNE = c * (dMax - fTalos) * (dNE/dTotal);
         *(pHMBlocks + block + iDimensions - 1) -= tNE;
@@ -210,7 +230,7 @@ void HeightMapGen::erodeBlock(float c, long unsigned int block)
             *(pHMBlocks + block + iDimensions - 1) += tNE;
     }
     // SE
-    if(dSE != 0)
+    if(dSE > 0)
     {
         tSE = c * (dMax - fTalos) * (dSE/dTotal);
         *(pHMBlocks + block + iDimensions + 1) -= tSE;
@@ -223,7 +243,7 @@ void HeightMapGen::erodeBlock(float c, long unsigned int block)
             *(pHMBlocks + block + iDimensions + 1) += tSE;
     }
     // SW
-    if(dSW != 0)
+    if(dSW > 0)
     {
         tSW = c * (dMax - fTalos) * (dSW/dTotal);
         *(pHMBlocks + block - iDimensions + 1) -= tSW;
@@ -344,15 +364,14 @@ void HeightMapGen::transportMaterial(unsigned short material, unsigned long int 
 }*/
 
 // retrieveHeightmap
-//  talos = the angle at which a slope must be for erosion to take place
+//  erosionIterations = The amount of times we will run the algorithm algorithm.
 //  heightmapArray = The array we will put the heighmap into.
 //  staggerValue = The degree to which the stagger value will be increased/decreased. 1 = 100% (normal)
 
-void HeightMapGen::generateHeightmap(float talos, float staggerValue)
+void HeightMapGen::generateHeightmap(unsigned short erosionIterations, float staggerValue)
 {
-    fTalos = talos; // A good default is 4/iNumberOfBlocks, however this will change depending on how eroded the terrain should be.
-
     fStaggerValue = staggerValue;
+    iErosionIterations = erosionIterations;
 
     // NW corner
     *pHMBlocks = Random::getSingleton().getRand(5, 10);
@@ -415,7 +434,7 @@ void HeightMapGen::generateHeightmap(float talos, float staggerValue)
     // Talos = The maximum angle allowed for slopes to be before thermal erosion begins taking place.
     // In most cases, we want this to be 4/N, where N = the number of blocks in the terrain set.
     // c = A variable I don't fully understand.
-    fTalos = 0.00006033; // Yet another point where size is taken for granted to be 8
+
     // This uses Thermal Erosion
     // In the future, should probably modify it so that we can also have Rainfall erosion.
     // First we travel through all of the different HMBlocks and calculate the difference in height to
@@ -429,9 +448,12 @@ void HeightMapGen::generateHeightmap(float talos, float staggerValue)
     // This is a default for now but can be defined.
 
     // Use a for statement to call erodeBlock on every block in the array in order
-    for(short unsigned erosionIterations = 1; erosionIterations > 0; erosionIterations--)
+    while(iErosionIterations > 0)
+    {
         for(long unsigned int i = 0; i <= iFinalPoint; i++)
-            erodeBlock(-0.5, i);
+            erodeBlock(-0.5f, i);
+        iErosionIterations--;
+    }
 
     writeMap();
 }
