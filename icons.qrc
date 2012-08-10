@@ -44,5 +44,6 @@
         <file>media/16x16/colour-picker.png</file>
         <file>media/24x24/extrude.png</file>
         <file>media/24x24/intrude.png</file>
+        <file>media/24x24/add-object.png</file>
     </qresource>
 </RCC>

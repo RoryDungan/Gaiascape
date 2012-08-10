@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>868</width>
-    <height>1069</height>
+    <height>1385</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -1060,12 +1060,9 @@ p, li { white-space: pre-wrap; }
    <property name="checkable">
     <bool>true</bool>
    </property>
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
    <property name="icon">
     <iconset resource="../icons.qrc">
-     <normaloff>:/media/24x24/list-add.png</normaloff>:/media/24x24/list-add.png</iconset>
+     <normaloff>:/media/24x24/add-object.png</normaloff>:/media/24x24/add-object.png</iconset>
    </property>
    <property name="text">
     <string>Place entities</string>
@@ -1569,7 +1566,7 @@ p, li { white-space: pre-wrap; }
    <sender>diffuseSpecularButton</sender>
    <signal>clicked()</signal>
    <receiver>MainWindow</receiver>
-   <slot>updateColourButton()</slot>
+   <slot>loadImage()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>288</x>

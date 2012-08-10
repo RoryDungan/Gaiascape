@@ -69,6 +69,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->terrainDockWidget->raise();
     randomiseTerrainSeed();
 
+    QColor colour = QColor(230, 230, 230);
     ui->sunColourLabel->setText(colour.name());
     ui->sunColourLabel->setPalette(QPalette(colour));
     ui->sunColourLabel->setAutoFillBackground(true);
@@ -507,7 +508,7 @@ void MainWindow::statusTextureUpdateInProgress()
 
     // Creating a new terrain while the program is updating the textures causes it to freeze and stop responding untl he texture updae has finished
     // This can givethe impression that the program has crashed, so it is prevented by disabling the buttons to create new terrains temporarily
-    ui->updateTerrainButton->setEnabled(false);
+    //ui->updateTerrainButton->setEnabled(false);
     ui->newTerrainButton->setEnabled(false);
     ui->loadTerrainButton->setEnabled(false);
     ui->clearTerrainButton->setEnabled(false);
@@ -517,7 +518,7 @@ void MainWindow::statusTextreUpdateFinished()
 {
     statusBar()->showMessage(tr("Finished generating terrain."));
     mStatusProgressBar->setVisible(false);
-    ui->updateTerrainButton->setEnabled(true);
+    //ui->updateTerrainButton->setEnabled(true);
     ui->newTerrainButton->setEnabled(true);
     ui->loadTerrainButton->setEnabled(true);
     ui->clearTerrainButton->setEnabled(true);
@@ -648,26 +649,20 @@ void MainWindow::updateColourButton()
 {
     // Open a new colour selection dialog, starting with the currently selected colour
     QColor colour;
-    if(sender() == ui->fogColourButton)
-        colour = QColorDialog::getColor(ui->fogColourLabel->palette().color(QPalette::Button), this);
-    else if(sender() == ui->sunColourButton)
+    if(sender() == ui->sunColourButton)
         colour = QColorDialog::getColor(ui->sunColourLabel->palette().color(QPalette::Button), this);
 
     if(!colour.isValid())
         return;
 
-    if(sender() == ui->fogColourButton)
-    {
-        ui->fogColourLabel->setText(colour.name());
-        ui->fogColourLabel->setPalette(QPalette(colour));
-    }
-    else if(sender() == ui->sunColourButton)
+    if(sender() == ui->sunColourButton)
     {
         ui->sunColourLabel->setText(colour.name());
         ui->sunColourLabel->setPalette(QPalette(colour));
     }
 }
 
-
 void MainWindow::enableUpdateEnvironment() { ui->updateEnvironmentButton->setEnabled(true); }
-void MainWindow::enableUpdateTerrain() { /* enable update terrain button */ }
+void MainWindow::enableUpdateTextures() { ui->updateTexturesButton->setEnabled(true); }
+void MainWindow::enableUpdateTerrain() { ui->updateTerrainButton->setEnabled(true); }
+void MainWindow::enableUpdateFoliage() { /* enable update foliage button */ }

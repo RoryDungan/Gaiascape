@@ -192,7 +192,7 @@ void Terrain::generateTerrain(unsigned int seed, unsigned short size, float talo
     //  Create a probability of a tree spawning there based on:
     //      Altitude
     //      Proximity to other trees
-    /*/      Slope
+    //      Slope
     float slopeMap[HMHMgen->iDimensions*HMHMgen->iDimensions];
     HMHMgen->outputSlopemap(&slopeMap[0]);
     short signed int probability = 0; // Probability a tree will spawn. If random returns equal to or below this number, it spawns.
@@ -273,7 +273,7 @@ void Terrain::generateTerrain(unsigned int seed, unsigned short size, float talo
 
     // Store the heightmap generator for later use. As of this point, this can actually be done fairly early on, but
     // it might be changed later on in this function.
-*/
+
     delete[] pStream; // clean up
 }
 
