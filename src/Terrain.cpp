@@ -88,12 +88,12 @@ void Terrain::loadHeightmap(std::string imageFile)
 }
 
 // Size, talos and staggerValue are only used for generating terrains so they can e moved into this function instead of the Terrain constructor
-void Terrain::generateTerrain(unsigned int seed, unsigned short size, float talos, float staggerValue, float xzScale, float yScale, unsigned short segments)
+void Terrain::generateTerrain(unsigned int seed, unsigned short size, unsigned short scale, unsigned short erosionIterations, unsigned short staggerValue, unsigned short treeDensity)
 {
     // Terrain Size must be constant if tiles are to make any sense interacting with each other.
     iTerrainSize = size;
     // These do not need to be constant, but for large, consistent terrains, it doesn't make sense otherwise.
-    fTalos = talos;               // Minimum angle where thermal erosion takes place
+    iErosionIterations = erosionIterations;               // Number of times we run the erosion algorithm
     fStaggerValue = staggerValue; // The unevenness of the terrain
 
     // Dylan: I think it's better if this function generates all segments, given a number of segments to generate
@@ -109,18 +109,21 @@ void Terrain::generateTerrain(unsigned int seed, unsigned short size, float talo
     }
     mTerrainGlobals = new Ogre::TerrainGlobalOptions();
 
+    //===============================
+    // Generate a random heightmap
+    //===============================
     // Firstly, generate the terrain data we're going to be working with
     // The reason why this looks weird is that all HMgen classes must start with what they are calculating,
     // in this case, a HM.
     Random::getSingleton().seed(seed); // First set the seed we'll be using for our random numbers
-    HeightMapGen* HMHMgen = new HeightMapGen(iTerrainSize, x, y, fTalos, fStaggerValue);
+    HeightMapGen* HMHMgen = new HeightMapGen(iTerrainSize, x, y, iErosionIterations, iStaggerValue);
 
     // Convert that to an image
     Ogre::uchar* pStream = new Ogre::uchar[HMHMgen->iDimensions * HMHMgen->iDimensions];
     //Ogre::uchar stream[HMHMgen->iDimensions*HMHMgen->iDimensions];
     float* pHeightMap = HMHMgen->getHeightmap();
     std::cout << HMHMgen->iFinalPoint;
-    for(long unsigned int i = 0; i < HMHMgen->iFinalPoint; ++i)
+    for(long unsigned int i = 0; i < HMHMgen->iFinalPoint + 1; ++i)
     {
         pStream[i] = (Ogre::uchar)(*(pHeightMap + i)*255); // Probably just put in the above if statement if it works
     }
@@ -129,7 +132,9 @@ void Terrain::generateTerrain(unsigned int seed, unsigned short size, float talo
     img.loadDynamicImage(pStream, HMHMgen->iDimensions, HMHMgen->iDimensions, Ogre::PF_L8); // PF_L8 = 8-pit pixel format, all luminance
     img.save(std::string(QDesktopServices::storageLocation(QDesktopServices::TempLocation).toAscii() + QDir::separator().toAscii() + "gaiascape-heightmap.bmp"));
 
-    // construct terrain group
+    //===============================
+    // Construct terrain group
+    //===============================
     mTerrainGroup = new Ogre::TerrainGroup(mSceneManager, Ogre::Terrain::ALIGN_X_Z, HMHMgen->iDimensions, 12000.0f);
     //mTerrainGroup->setFilenameConvention(Ogre::String("Terrain"), Ogre::String("dat"));
     mTerrainGroup->setOrigin(Ogre::Vector3::ZERO);
@@ -146,7 +151,9 @@ void Terrain::generateTerrain(unsigned int seed, unsigned short size, float talo
     mTerrainGlobals->setCompositeMapAmbient(mSceneManager->getAmbientLight());
     mTerrainGlobals->setCompositeMapDiffuse(mSun->getDiffuseColour());
 
+    //====================================================================
     // Configure default import settings for if we use imported image
+    //====================================================================
     Ogre::Terrain::ImportData& defaultimp = mTerrainGroup->getDefaultImportSettings();
     defaultimp.terrainSize = HMHMgen->iDimensions;
     defaultimp.worldSize = xzScale;
@@ -166,6 +173,9 @@ void Terrain::generateTerrain(unsigned int seed, unsigned short size, float talo
     defaultimp.layerList[2].textureNames.push_back("growth_weirdfungus-03_diffusespecular.dds");
     defaultimp.layerList[2].textureNames.push_back("growth_weirdfungus-03_normalheight.dds");
 
+    //===========================
+    // Construct Ogre terrain
+    //===========================
     // define our terrains and instruct the TerrainGroup to load them all
     mTerrainGroup->defineTerrain(x, y, &img);
 
@@ -183,9 +193,9 @@ void Terrain::generateTerrain(unsigned int seed, unsigned short size, float talo
     // Now, all there is left to do is clean up after the initial terrain creation:
     mTerrainGroup->freeTemporaryResources();
 
-    // -----------------
+    //=======================
     // Create Vegetation
-    // -----------------
+    //=======================
     // This could be put before here depending on how texturing based on the slopemap will work.
     // Generate a slopemap based on heightMap
     // For each point in heightMap
@@ -199,13 +209,12 @@ void Terrain::generateTerrain(unsigned int seed, unsigned short size, float talo
 
     Ogre::Vector3 enterPos; // The point the flora will be entering.
     short unsigned int randomNumber; // A randomly generated number from 0 to 10. Should be changed to 0 to 100 for more depth.
-    unsigned int treesToGenerate = 1000;
     long unsigned int randomBlock; // A randomly selected vertex from the terrain used to spawn a tree
     FloraTree* addedTree;
 
     mTerrainGroup->getTerrain(0, 0)->getPoint(1%HMHMgen->iDimensions, 1/HMHMgen->iDimensions, &enterPos);
 
-    for(long unsigned int i = 0; i < treesToGenerate; ++i)
+    for(long unsigned int i = 0; i < treeDensity; ++i)
     {
         try
         {
@@ -226,13 +235,13 @@ void Terrain::generateTerrain(unsigned int seed, unsigned short size, float talo
             // 11-30% = 40% prob
             // 31-50% = 30% prob
             // 51-90% = 10% prob
-            if(*(pHeightMap + randomBlock) <= 0.9) // Put an else probability = -1 if you want nothing to spawn above 90%
+            if(*(pHeightMap + randomBlock) <= 0.9f/(scale/1800)) // Put an else probability = -1 if you want nothing to spawn above 90%
                 probability += 1;
-            if(*(pHeightMap + randomBlock) <= 0.5f)
+            if(*(pHeightMap + randomBlock) <= 0.5f/(scale/1800))
                 probability += 2;
-            if(*(pHeightMap + randomBlock) <= 0.3f)
+            if(*(pHeightMap + randomBlock) <= 0.3f/(scale/1800))
                 probability += 1;
-            if(*(pHeightMap + randomBlock) <= 0.1f)
+            if(*(pHeightMap + randomBlock) <= 0.1f/(scale/1800))
                 probability += 1; // DISABLE if water spawns at a certain level, since we don't want vegetation on sand
 
             // Proximity to trees
@@ -251,7 +260,7 @@ void Terrain::generateTerrain(unsigned int seed, unsigned short size, float talo
             }
 
             // Slope
-            if(slopeMap[randomBlock] >= 0.1f)
+            if(slopeMap[randomBlock] >= 0.1f/(scale/1800))
             {
                 probability = -1;
             }

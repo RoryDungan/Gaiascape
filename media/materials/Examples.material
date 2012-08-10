@@ -26,3 +26,17 @@ material Flora/Shrub1
                 }
         }
 }
+
+material Flora/DeadTree
+{
+        technique
+        {
+                pass
+                {
+                        texture_unit
+                        {
+                                texture tree1tex.png
+                        }
+                }
+        }
+}

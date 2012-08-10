@@ -28,6 +28,8 @@ MainWindow::MainWindow(QWidget *parent) :
     bEPressed = false;
     bShiftPressed = false;
     iCurrentLayerIndex = 0;
+    // temp
+    counter = 1;
 
     ui->setupUi(this);
 
@@ -428,7 +430,7 @@ void MainWindow::updateTerrain()
     timer.start();
     // This can be spawned at any point. If this function does what I believe it does, later this will be modifyed to create
     // multiple terrain blocks.
-    mOgreWidget->getTerrain()->generateTerrain(ui->randomSeedBox->value(), 8, ui->terrainErosionSlider->value(), 255, ui->terrainSlopeSlider->value());
+    mOgreWidget->getTerrain()->generateTerrain(ui->randomSeedBox->value(), 8, ui->terrainScaleSpinBox->value()*1800, ui->erosionSlider->value(), ui->ramdomFactorSlider->value(), ui->treeDensity->value());
     qDebug() << "Terrain genarated in" << timer.elapsed() << "milliseconds";
     QApplication::restoreOverrideCursor();
 
