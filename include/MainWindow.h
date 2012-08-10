@@ -101,8 +101,10 @@ public slots:
     void loadImage();
     void updateEnvironment();
     void resetDefaultEnvironment();
-    void updateFogButtonColour();
-    void fogModeChanged(int);
+    void enableUpdateTextures();
+    void enableUpdateEnvironment();
+    void enableUpdateTerrain();
+    void enableUpdateFoliage();
 };
 
 #endif // MAINWINDOW_H

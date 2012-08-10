@@ -79,13 +79,13 @@ void Terrain::loadHeightmap(std::string imageFile)
 }
 
 // Size, talos and staggerValue are only used for generating terrains so they can e moved into this function instead of the Terrain constructor
-void Terrain::generateTerrain(unsigned int seed, unsigned short size, unsigned short talos, unsigned short staggerValue, unsigned short segments)
+void Terrain::generateTerrain(unsigned int seed, unsigned short size, float talos, float staggerValue, unsigned short segments)
 {
     // Terrain Size must be constant if tiles are to make any sense interacting with each other.
     iTerrainSize = size;
     // These do not need to be constant, but for large, consistent terrains, it doesn't make sense otherwise.
-    iTalos = talos;               // Minimum angle where thermal erosion takes place
-    iStaggerValue = staggerValue; // The unevenness of the terrain
+    fTalos = talos;               // Minimum angle where thermal erosion takes place
+    fStaggerValue = staggerValue; // The unevenness of the terrain
 
     // Dylan: I think it's better if this function generates all segments, given a number of segments to generate
     // x = The x position of the terrain we are generating
@@ -104,7 +104,7 @@ void Terrain::generateTerrain(unsigned int seed, unsigned short size, unsigned s
     // The reason why this looks weird is that all HMgen classes must start with what they are calculating,
     // in this case, a HM.
     Random::getSingleton().seed(seed); // First set the seed we'll be using for our random numbers
-    HeightMapGen* HMHMgen = new HeightMapGen(iTerrainSize, x, y, iTalos, iStaggerValue);
+    HeightMapGen* HMHMgen = new HeightMapGen(iTerrainSize, x, y, fTalos, fStaggerValue);
 
     // Convert that to an image
     Ogre::uchar stream[HMHMgen->iDimensions*HMHMgen->iDimensions];
@@ -183,7 +183,7 @@ void Terrain::generateTerrain(unsigned int seed, unsigned short size, unsigned s
     //  Create a probability of a tree spawning there based on:
     //      Altitude
     //      Proximity to other trees
-    //      Slope
+    /*/      Slope
     float slopeMap[HMHMgen->iDimensions*HMHMgen->iDimensions];
     HMHMgen->outputSlopemap(&slopeMap[0]);
     short signed int probability = 0; // Probability a tree will spawn. If random returns equal to or below this number, it spawns.
@@ -264,7 +264,7 @@ void Terrain::generateTerrain(unsigned int seed, unsigned short size, unsigned s
 
     // Store the heightmap generator for later use. As of this point, this can actually be done fairly early on, but
     // it might be changed later on in this function.
-
+*/
 }
 
 std::string Terrain::intToStr(int number)

@@ -180,6 +180,7 @@ void THIS::mousePressEvent(QMouseEvent * event)
             switch(mInteractionMode)
             {
             case IM_EXTRUDE:
+                mPaintTimer.start();
                 mCurrentState = IS_EDITING_HEIGHT;
                 break;
             case IM_INTRUDE:
@@ -216,6 +217,13 @@ void THIS::mousePressEvent(QMouseEvent * event)
  */
 void THIS::mouseReleaseEvent(QMouseEvent * event)
 {
+    switch(mInteractionMode)
+    {
+    case IS_EDITING_HEIGHT:
+
+        break;
+    }
+
     mCurrentState = IS_IDLE;
 }
 
@@ -263,8 +271,8 @@ void THIS::setInteractionMode(interactionModes i)
 void THIS::setupScene()
 {
     // Set up camera
-    mCamera->setPosition(Ogre::Vector3(1683, 50, 2116));
-    mCamera->lookAt(Ogre::Vector3(1963, 50, 1660));
+    mCamera->setPosition(Ogre::Vector3(-4000, 1500, 4000));
+    mCamera->lookAt(Ogre::Vector3(2000, 50, -3000));
 
     // Set up skybox
     //mSceneMgr->setSkyBox(true, "irrSky");
@@ -289,10 +297,26 @@ void THIS::setupScene()
     // In order, the variables are terrainSize, talos, and staggerValue (the unevenness of the terrain)
     mTerrain = new Terrain(mSceneMgr, light);
 
+    // Set up indicator for terrain
+    mDecalFrustum = new Ogre::Frustum();
+    mProjectorNode = mSceneMgr->getRootSceneNode()->createChildSceneNode("DecalProjectorNode");
+    mProjectorNode->attachObject(mDecalFrustum);
+    mProjectorNode->setPosition(0, 100, 0);
     mEditMarker = mSceneMgr->createEntity("EditMarker", "sphere.mesh");
     mEditNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
     mEditNode->attachObject(mEditMarker);
     mEditNode->setScale(0.05, 0.05, 0.05);
+
+    // Set up material for indicator
+    Ogre::Pass* pass = mTerrain->getTerrainGroup()->getTerrain(0,0)->getMaterial()->getTechnique(0)->createPass();
+    pass->setSceneBlending(Ogre::SBT_TRANSPARENT_ALPHA);
+    pass->setDepthBias(1);
+    pass->setLightingEnabled(false);
+
+    Ogre::TextureUnitState* texState = pass->createTextureUnitState("terrainmarker.png");
+    texState->setProjectiveTexturing(true, mDecalFrustum);
+    texState->setTextureAddressingMode(Ogre::TextureUnitState::TAM_CLAMP);
+    texState->setTextureFiltering(Ogre::FO_POINT, Ogre::FO_LINEAR, Ogre::FO_NONE);
 }
 
 /**
@@ -327,7 +351,7 @@ void THIS::paintGL()
             {
             case IS_EDITING_HEIGHT:
                 for(Ogre::TerrainGroup::TerrainList::iterator ti = terrainList.begin(); ti != terrainList.end(); ++ti)
-                    modifyTerrain(*ti, rayResult.position, 0.017f);
+                    modifyTerrain(*ti, rayResult.position, mBrushSize, mBrushWeight * 0.017f, mInteractionMode == IM_EXTRUDE);
                 break;
             case IS_PAINTING:
                 for(Ogre::TerrainGroup::TerrainList::iterator ti = terrainList.begin(); ti != terrainList.end(); ++ti)
@@ -398,17 +422,17 @@ Ogre::RenderSystem* THIS::chooseRenderer( Ogre::RenderSystemList *renderers )
  * @brief Modify the terrain with one of the terrain modification tools
  * @author Rory Dungan
  */
-void THIS::modifyTerrain(Ogre::Terrain* terrain, const Ogre::Vector3 &centerPos, Ogre::Real timeElapsed)
+void THIS::modifyTerrain(Ogre::Terrain* terrain, const Ogre::Vector3 &centerPos, float brushSize, float brushWeight, bool extrude)
 {
     Ogre::Vector3 tsPos;
     terrain->getTerrainPosition(centerPos, &tsPos);
 
     // We need point coords
     Ogre::Real terrainSize = (terrain->getSize() -1);
-    long startx = (tsPos.x - mBrushSize) * terrainSize;
-    long starty = (tsPos.y - mBrushSize) * terrainSize;
-    long endx = (tsPos.x + mBrushSize) * terrainSize;
-    long endy = (tsPos.y + mBrushSize) * terrainSize;
+    long startx = (tsPos.x - brushSize) * terrainSize;
+    long starty = (tsPos.y - brushSize) * terrainSize;
+    long endx = (tsPos.x + brushSize) * terrainSize;
+    long endy = (tsPos.y + brushSize) * terrainSize;
     startx = std::max(startx, 0L);
     starty = std::max(starty, 0L);
     endx = std::min(endx, (long)terrainSize);
@@ -423,8 +447,8 @@ void THIS::modifyTerrain(Ogre::Terrain* terrain, const Ogre::Vector3 &centerPos,
             Ogre::Real weight = std::min((Ogre::Real)1.0f, Ogre::Math::Sqrt(tsYdist * tsYdist + tsXdist * tsXdist) / Ogre::Real(0.5 * mBrushSize));
             weight = 1.0f - (weight * weight);
 
-            float addedHeight = weight * mBrushWeight * timeElapsed;
-            float newHeight = mInteractionMode == IM_EXTRUDE
+            float addedHeight = weight * brushWeight;
+            float newHeight = extrude
                     ? terrain->getHeightAtPoint(x, y) + addedHeight
                     : terrain->getHeightAtPoint(x, y) - addedHeight;
             terrain->setHeightAtPoint(x, y, newHeight);

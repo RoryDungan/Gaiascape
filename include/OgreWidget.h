@@ -10,6 +10,7 @@
 #endif // WIN32
 #include <QMouseEvent>
 #include <QColor>
+#include <QElapsedTimer>
 #include "Terrain.h"
 
 class OgreWidget : public QGLWidget
@@ -51,6 +52,7 @@ public:
     void saveScreenshotToFile(QString filename);
     void setCameraInverted(bool inverted) { bCameraControlsInverted = inverted; }
     void setFOVy(float fov);
+    //void createStaticObject(std::string filepath, Ogre::Vector3 position);
     // Brush size is the area which will be affected by painting on the terrain
     // Ogre::Real is actually just a typedef of float so it's ok to assign it as one. We use standard floats here so that the class can be used without directly referencing any of Ogre3d
     void setBrushSize(float size) { mBrushSize = size; }
@@ -87,7 +89,7 @@ protected:
 
     void init( std::string, std::string);
 
-    void modifyTerrain(Ogre::Terrain* terrain, const Ogre::Vector3& centerPos, Ogre::Real timeElapsed);
+    void modifyTerrain(Ogre::Terrain* terrain, const Ogre::Vector3 &centerPos, float brushSize, float brushWeight, bool extrude);
     void modifyBlendMaps(Ogre::Terrain* terrain, const Ogre::Vector3& centerPos, Ogre::Real timeElapsed);
 
     virtual Ogre::RenderSystem* chooseRenderer( Ogre::RenderSystemList* );
@@ -102,12 +104,16 @@ private:
     Terrain* mTerrain;
     Ogre::Real mBrushSize;
     Ogre::Real mBrushWeight;
+    QElapsedTimer mPaintTimer; // stores the amount of time we've been modifying the terrain or painting for
     Ogre::Entity* mEditMarker;
     Ogre::SceneNode* mEditNode;
     Ogre::Real mHeightUpdateCountDown;
     Ogre::Real mHeightUpdateRate;
     Ogre::Vector3 mTerrainPos;
     Ogre::uint8 mLayerEdit;
+    Ogre::SceneNode* mProjectorNode;
+    Ogre::Frustum* mDecalFrustum;
+    Ogre::Frustum* mFilterFrustum;
 
     // Corrosponds to what the user is doing right now
     enum interactionStates

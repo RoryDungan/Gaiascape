@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>868</width>
-    <height>720</height>
+    <height>1069</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -130,7 +130,19 @@
    <widget class="QWidget" name="dockWidgetContents_2">
     <layout class="QVBoxLayout" name="verticalLayout_4">
      <item>
-      <widget class="QComboBox" name="textureSelectionBox">
+      <widget class="QListWidget" name="textureSelectionList">
+       <property name="maximumSize">
+        <size>
+         <width>16777215</width>
+         <height>100</height>
+        </size>
+       </property>
+       <property name="alternatingRowColors">
+        <bool>true</bool>
+       </property>
+       <property name="currentRow">
+        <number>0</number>
+       </property>
        <item>
         <property name="text">
          <string>Dirt</string>
@@ -262,8 +274,11 @@
      </item>
      <item>
       <widget class="QCommandLinkButton" name="updateTexturesButton">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="text">
-        <string>Accept</string>
+        <string>Update</string>
        </property>
        <property name="icon">
         <iconset resource="../icons.qrc">
@@ -276,7 +291,7 @@
         </size>
        </property>
        <property name="description">
-        <string>Update the terrain with the new texture proprties</string>
+        <string>Apply the new textures to the terrain</string>
        </property>
       </widget>
      </item>
@@ -475,168 +490,6 @@
       </widget>
      </item>
      <item>
-      <widget class="QGroupBox" name="groupBox_2">
-       <property name="title">
-        <string>Fog</string>
-       </property>
-       <layout class="QFormLayout" name="formLayout_4">
-        <property name="fieldGrowthPolicy">
-         <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
-        </property>
-        <property name="labelAlignment">
-         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-        </property>
-        <item row="0" column="0">
-         <widget class="QLabel" name="fogModeLabel">
-          <property name="text">
-           <string>Fog mode</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="1">
-         <widget class="QComboBox" name="fogModeComboBox">
-          <item>
-           <property name="text">
-            <string>Disabled</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>Linear</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>Exponential</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>Exponential squared</string>
-           </property>
-          </item>
-         </widget>
-        </item>
-        <item row="1" column="0">
-         <widget class="QLabel" name="fogStartLabel">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="text">
-           <string>Start</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="1">
-         <widget class="QSpinBox" name="fogStartSpinBox">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="suffix">
-           <string>%</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="0">
-         <widget class="QLabel" name="fogEndLabel">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="text">
-           <string>End</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="1">
-         <widget class="QSpinBox" name="fogEndSpinBox">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="suffix">
-           <string>%</string>
-          </property>
-          <property name="maximum">
-           <number>100</number>
-          </property>
-          <property name="value">
-           <number>100</number>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="0">
-         <widget class="QLabel" name="fogDensityLabel">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="text">
-           <string>Density</string>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="1">
-         <widget class="QDoubleSpinBox" name="fogDensitySpinBox">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="decimals">
-           <number>3</number>
-          </property>
-          <property name="minimum">
-           <double>0.001000000000000</double>
-          </property>
-          <property name="maximum">
-           <double>1.000000000000000</double>
-          </property>
-          <property name="singleStep">
-           <double>0.010000000000000</double>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="0">
-         <widget class="QLabel" name="fogColourLabel_0">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="text">
-           <string>Colour</string>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="1">
-         <layout class="QHBoxLayout" name="horizontalLayout_4">
-          <item>
-           <widget class="QLabel" name="fogColourLabel">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-            <property name="frameShape">
-             <enum>QFrame::StyledPanel</enum>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QToolButton" name="fogColourButton">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-            <property name="icon">
-             <iconset resource="../icons.qrc">
-              <normaloff>:/media/16x16/colour-picker.png</normaloff>:/media/16x16/colour-picker.png</iconset>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-       </layout>
-      </widget>
-     </item>
-     <item>
       <spacer name="verticalSpacer">
        <property name="orientation">
         <enum>Qt::Vertical</enum>
@@ -651,8 +504,11 @@
      </item>
      <item>
       <widget class="QCommandLinkButton" name="updateEnvironmentButton">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="text">
-        <string>Accept</string>
+        <string>Update</string>
        </property>
        <property name="icon">
         <iconset resource="../icons.qrc">
@@ -665,7 +521,7 @@
         </size>
        </property>
        <property name="description">
-        <string>Update the world and load the new skybox</string>
+        <string>Apply the new settings to the terrain</string>
        </property>
       </widget>
      </item>
@@ -1709,38 +1565,6 @@
    </hints>
   </connection>
   <connection>
-   <sender>fogColourButton</sender>
-   <signal>clicked()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>updateFogButtonColour()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>232</x>
-     <y>273</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>433</x>
-     <y>339</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>fogModeComboBox</sender>
-   <signal>currentIndexChanged(int)</signal>
-   <receiver>MainWindow</receiver>
-   <slot>fogModeChanged(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>175</x>
-     <y>245</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>433</x>
-     <y>339</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>diffuseSpecularButton</sender>
    <signal>clicked()</signal>
    <receiver>MainWindow</receiver>
@@ -1773,14 +1597,174 @@
    </hints>
   </connection>
   <connection>
-   <sender>textureSelectionBox</sender>
-   <signal>currentIndexChanged(int)</signal>
+   <sender>textureSelectionList</sender>
+   <signal>currentRowChanged(int)</signal>
    <receiver>MainWindow</receiver>
    <slot>textureSelected(int)</slot>
    <hints>
     <hint type="sourcelabel">
      <x>167</x>
-     <y>107</y>
+     <y>173</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>433</x>
+     <y>534</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>diffuseSpecularLineEdit</sender>
+   <signal>textChanged(QString)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>enableUpdateTextures()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>200</x>
+     <y>216</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>433</x>
+     <y>534</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>normalHeightLineEdit</sender>
+   <signal>textChanged(QString)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>enableUpdateTextures()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>200</x>
+     <y>246</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>433</x>
+     <y>534</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>textureSizeBox</sender>
+   <signal>valueChanged(QString)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>enableUpdateTextures()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>211</x>
+     <y>274</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>433</x>
+     <y>534</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>texturePlacementHeightBox</sender>
+   <signal>valueChanged(QString)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>enableUpdateTextures()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>211</x>
+     <y>300</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>433</x>
+     <y>534</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>sunAltitudeSpinBox</sender>
+   <signal>valueChanged(QString)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>enableUpdateEnvironment()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>754</x>
+     <y>130</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>433</x>
+     <y>534</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>sunAngleSpinBox</sender>
+   <signal>valueChanged(QString)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>enableUpdateEnvironment()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>754</x>
+     <y>156</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>433</x>
+     <y>534</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>sunColourButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>enableUpdateEnvironment()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>836</x>
+     <y>184</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>433</x>
+     <y>534</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>skydomeLineEdit</sender>
+   <signal>textChanged(QString)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>enableUpdateEnvironment()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>748</x>
+     <y>247</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>433</x>
+     <y>534</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>skydomeTilingSpinBox</sender>
+   <signal>valueChanged(QString)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>enableUpdateEnvironment()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>760</x>
+     <y>301</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>433</x>
+     <y>534</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>skyCurvatureSpinBox</sender>
+   <signal>valueChanged(QString)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>enableUpdateEnvironment()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>760</x>
+     <y>275</y>
     </hint>
     <hint type="destinationlabel">
      <x>433</x>
@@ -1820,5 +1804,7 @@
   <slot>updateFogButtonColour()</slot>
   <slot>fogModeChanged(int)</slot>
   <slot>textureSelected(int)</slot>
+  <slot>enableUpdateTextures()</slot>
+  <slot>enableUpdateEnvironment()</slot>
  </slots>
 </ui>
