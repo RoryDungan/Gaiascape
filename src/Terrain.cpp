@@ -107,7 +107,9 @@ void Terrain::generateTerrain(unsigned int seed, unsigned short size, unsigned s
     // The reason why this looks weird is that all HMgen classes must start with what they are calculating,
     // in this case, a HM.
     Random::getSingleton().seed(seed); // First set the seed we'll be using for our random numbers
-    HeightMapGen* HMHMgen = new HeightMapGen(iTerrainSize, x, y, iErosionIterations, iStaggerValue);
+
+    delete HMHMgen;
+    HMHMgen = new HeightMapGen(iTerrainSize, x, y, iErosionIterations, iStaggerValue, scale);
 
     // Convert that to an image
     Ogre::uchar stream[HMHMgen->iDimensions*HMHMgen->iDimensions];
@@ -184,6 +186,13 @@ void Terrain::generateTerrain(unsigned int seed, unsigned short size, unsigned s
     // Now, all there is left to do is clean up after the initial terrain creation:
     mTerrainGroup->freeTemporaryResources();
 
+    // Store the heightmap generator for later use. As of this point, this can actually be done fairly early on, but
+    // it might be changed later on in this function.
+
+}
+
+void Terrain::generateVegetation(unsigned int treesToGenerate, signed int x, signed int y)
+{
     //=======================
     // Create Vegetation
     //=======================
@@ -194,18 +203,21 @@ void Terrain::generateTerrain(unsigned int seed, unsigned short size, unsigned s
     //      Altitude
     //      Proximity to other trees
     //      Slope
+
+    float* pHeightMap = HMHMgen->getHeightmap();
+
     float slopeMap[HMHMgen->iDimensions*HMHMgen->iDimensions];
     HMHMgen->outputSlopemap(&slopeMap[0]);
-    short signed int probability = 0; // Probability a tree will spawn. If random returns equal to or below this number, it spawns.
 
-    Ogre::Vector3 enterPos; // The point the flora will be entering.
-    short unsigned int randomNumber; // A randomly generated number from 0 to 10. Should be changed to 0 to 100 for more depth.
-    long unsigned int randomBlock; // A randomly selected vertex from the terrain used to spawn a tree
-    FloraTree* addedTree;
+    short signed int probability = 0;   // Probability a tree will spawn. If random returns equal to or below this number, it spawns.
+    Ogre::Vector3 enterPos;             // The point the flora will be entering.
+    short unsigned int randomNumber;    // A randomly generated number from 0 to 10. Should be changed to 0 to 100 for more depth.
+    long unsigned int randomBlock;      // A randomly selected vertex from the terrain used to spawn a tree
+    FloraTree* addedTree = NULL;
 
-    mTerrainGroup->getTerrain(0, 0)->getPoint(1%HMHMgen->iDimensions, 1/HMHMgen->iDimensions, &enterPos);
+    mTerrainGroup->getTerrain(x, y)->getPoint(1%HMHMgen->iDimensions, 1/HMHMgen->iDimensions, &enterPos);
 
-    for(long unsigned int i = 0; i < treeDensity; ++i)
+    for(long unsigned int i = 0; i < treesToGenerate; ++i)
     {
         try
         {
@@ -216,7 +228,7 @@ void Terrain::generateTerrain(unsigned int seed, unsigned short size, unsigned s
             // Set up variables
             probability = 0;
             randomBlock = Random::getSingleton().getRand(0, HMHMgen->iFinalX + HMHMgen->iDimensions - 1);
-            mTerrainGroup->getTerrain(0, 0)->getPoint(randomBlock%HMHMgen->iDimensions, (randomBlock*2)/HMHMgen->iDimensions, &enterPos); // Puts the vector3 position of what's specified into enterPos
+            mTerrainGroup->getTerrain(x, y)->getPoint(randomBlock%HMHMgen->iDimensions, (randomBlock*2)/HMHMgen->iDimensions, &enterPos); // Puts the vector3 position of what's specified into enterPos
 
             // --------------------------
             // Height probability changes
@@ -226,13 +238,13 @@ void Terrain::generateTerrain(unsigned int seed, unsigned short size, unsigned s
             // 11-30% = 40% prob
             // 31-50% = 30% prob
             // 51-90% = 10% prob
-            if(*(pHeightMap + randomBlock) <= 0.9f/(scale/1800)) // Put an else probability = -1 if you want nothing to spawn above 90%
+            if(*(pHeightMap + randomBlock) <= 0.9f/(HMHMgen->fScale/1800)) // Put an else probability = -1 if you want nothing to spawn above 90%
                 probability += 1;
-            if(*(pHeightMap + randomBlock) <= 0.5f/(scale/1800))
+            if(*(pHeightMap + randomBlock) <= 0.5f/(HMHMgen->fScale/1800))
                 probability += 2;
-            if(*(pHeightMap + randomBlock) <= 0.3f/(scale/1800))
+            if(*(pHeightMap + randomBlock) <= 0.3f/(HMHMgen->fScale/1800))
                 probability += 1;
-            if(*(pHeightMap + randomBlock) <= 0.1f/(scale/1800))
+            if(*(pHeightMap + randomBlock) <= 0.1f/(HMHMgen->fScale/1800))
                 probability += 1; // DISABLE if water spawns at a certain level, since we don't want vegetation on sand
 
             // Proximity to trees
@@ -251,7 +263,7 @@ void Terrain::generateTerrain(unsigned int seed, unsigned short size, unsigned s
             }
 
             // Slope
-            if(slopeMap[randomBlock] >= 0.1f/(scale/1800))
+            if(slopeMap[randomBlock] >= 0.1f/(HMHMgen->fScale/1800))
             {
                 probability = -1;
             }
@@ -267,13 +279,9 @@ void Terrain::generateTerrain(unsigned int seed, unsigned short size, unsigned s
         }
         catch(std::exception &e)
         {
-            std::cout << "Weird error occured\n"; // This hasn't been called for a while and may not be necessary any more
+            std::cout << "Weird error occured\n";
         }
     }
-
-    // Store the heightmap generator for later use. As of this point, this can actually be done fairly early on, but
-    // it might be changed later on in this function.
-
 }
 
 std::string Terrain::intToStr(int number)
@@ -285,12 +293,13 @@ std::string Terrain::intToStr(int number)
 
 HeightMapGen* Terrain::getByLoc(signed short x, signed short y)
 {
-    for(unsigned short i = 0; i < HMblocks.size(); i++)
+    /*for(unsigned short i = 0; i < HMblocks.size(); i++)
     {
         if(HMblocks[i]->getX() == x && HMblocks[i]->getY() == y)
             return HMblocks[i];
     }
-    return NULL;
+    return NULL;*/
+    // STUB because this vector isn't in use yet
 }
 
 void Terrain::clearTerrain()
@@ -415,9 +424,4 @@ void Terrain::replaceTexture(unsigned char index, float worldSize, std::string d
         t->dirty();
         t->update();
     }
-}
-
-void Terrain::generateVegetation(unsigned int treesToGenerate)
-{
-
 }
