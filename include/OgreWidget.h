@@ -66,6 +66,9 @@ public:
     // Each string corrosponds to the path the the image
     //void setSkyBox(QString up, QString dn, QString lf, QString rt, QString fr, QString bk);
     void setSkyDome(QString filepath, float curvature = 10.0f, float tiling = 8.0f);
+    void setSunPosition(double altitude, double angle);
+    double getSunAlitude() { return mSunAltitude; }
+    double getSunAngle() { return mSunAngle; }
     void setFog(int fogType, QColor colour, float density = 0.001, float start = 50, float end = 500);
     // Camera movement with the keyboard
     void setCameraMovementDirection(bool forward, bool back, bool left, bool right, bool up, bool down, bool sprint);
@@ -76,6 +79,8 @@ public:
 signals:
     void textureUpdateInProgress();
     void textureUpdateFinished();
+
+    void heightUpdated();
 
 protected:
     virtual void initializeGL();
@@ -108,6 +113,9 @@ private:
     Ogre::Real mHeightUpdateRate;
     Ogre::Vector3 mTerrainPos;
     Ogre::uint8 mLayerEdit;
+    Ogre::Light* mSun;
+    double mSunAngle;
+    double mSunAltitude;
 
     // Corrosponds to what the user is doing right now
     enum interactionStates

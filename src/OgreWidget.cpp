@@ -274,11 +274,11 @@ void THIS::setupScene()
     Ogre::Vector3 lightdir(0.55, -0.3, 0.75);
     lightdir.normalise();
 
-    Ogre::Light* light = mSceneMgr->createLight("tstLight");
-    light->setType(Ogre::Light::LT_DIRECTIONAL);
-    light->setDirection(lightdir);
-    light->setDiffuseColour(Ogre::ColourValue::White);
-    light->setSpecularColour(Ogre::ColourValue(0.4, 0.4, 0.4));
+    mSun = mSceneMgr->createLight("tstLight");
+    mSun->setType(Ogre::Light::LT_DIRECTIONAL);
+    mSun->setDirection(lightdir);
+    mSun->setDiffuseColour(Ogre::ColourValue::White);
+    mSun->setSpecularColour(Ogre::ColourValue(0.4, 0.4, 0.4));
 
     mSceneMgr->setAmbientLight(Ogre::ColourValue(0.2, 0.2, 0.2));
 
@@ -287,7 +287,7 @@ void THIS::setupScene()
     // REGARDING RORY - You should be able to use this function to integrate the sliders with modifying the terrain.
     // More functionality will be added, but probably to a different function, from what I can think of at the moment.
     // In order, the variables are terrainSize, talos, and staggerValue (the unevenness of the terrain)
-    mTerrain = new Terrain(mSceneMgr, light);
+    mTerrain = new Terrain(mSceneMgr, mSun);
 
     mEditMarker = mSceneMgr->createEntity("EditMarker", "sphere.mesh");
     mEditNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
@@ -561,5 +561,29 @@ void THIS::setFog(int fogType, QColor colour, float density, float start, float 
         mSceneMgr->setFog(Ogre::FOG_EXP2, Ogre::ColourValue(colour.redF(), colour.greenF(), colour.blueF()), density, start, end);
         break;
     default: break;
+    }
+}
+
+/**
+ * @brief
+ * @author Rory Dungan
+ */
+void THIS::setSunPosition(double altitude, double angle)
+{
+    mSunAngle = angle;
+    mSunAltitude = altitude;
+    // Convert degrees to radians
+    double angleRads = mSunAngle * (M_PI/180);
+    double altitudeRads = mSunAltitude * (M_PI/180);
+    //
+    double realDist = cos(altitudeRads);
+    mSun->setDirection(Ogre::Vector3::ZERO - Ogre::Vector3(sin(angleRads) * realDist, sin(altitudeRads), cos(angleRads) * realDist));
+    // Update terrain
+    Ogre::TerrainGroup::TerrainIterator ti = mTerrain->getTerrainGroup()->getTerrainIterator();
+    while(ti.hasMoreElements())
+    {
+        Ogre::Terrain* t = ti.getNext()->instance;
+        t->dirty();
+        t->update();
     }
 }

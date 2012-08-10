@@ -85,6 +85,7 @@ public slots:
     void viewWireframe();
     void viewSolid();
     void screenshot();
+    void updateTerrain();
     void generateTerrain();
     void loadTerrain();
     void clearTerrain();
@@ -92,6 +93,7 @@ public slots:
     void resetDefaultTextures();
     void textureSelected(int);
     void showHeightmapImage();
+    void reloadHeightmap();
     void randomiseTerrainSeed();
     void showAboutBox();
     void options();
@@ -101,7 +103,7 @@ public slots:
     void loadImage();
     void updateEnvironment();
     void resetDefaultEnvironment();
-    void updateFogButtonColour();
+    void updateColourButton();
     void fogModeChanged(int);
 };
 

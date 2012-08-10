@@ -125,7 +125,7 @@
     <string>Textures</string>
    </property>
    <attribute name="dockWidgetArea">
-    <number>1</number>
+    <number>2</number>
    </attribute>
    <widget class="QWidget" name="dockWidgetContents_2">
     <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -744,31 +744,90 @@
          <property name="labelAlignment">
           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
          </property>
-         <item row="0" column="0">
-          <widget class="QLabel" name="label_3">
-           <property name="text">
-            <string>Random factor</string>
-           </property>
-          </widget>
-         </item>
          <item row="1" column="0">
           <widget class="QLabel" name="label_5">
            <property name="text">
-            <string>Erosion</string>
+            <string>Erosion factor</string>
            </property>
           </widget>
          </item>
-         <item row="2" column="0">
+         <item row="3" column="0">
           <widget class="QLabel" name="label_2">
            <property name="text">
             <string>Terrain scale</string>
            </property>
           </widget>
          </item>
-         <item row="3" column="0">
-          <widget class="QLabel" name="label_9">
+         <item row="3" column="1">
+          <widget class="QDoubleSpinBox" name="terrainScaleSpinBox">
+           <property name="toolTip">
+            <string>Total length of the terrain to be generated</string>
+           </property>
+           <property name="maximum">
+            <double>100000.000000000000000</double>
+           </property>
+           <property name="value">
+            <double>5000.000000000000000</double>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QSlider" name="terrainErosionSlider">
+           <property name="toolTip">
+            <string>Amount of effect erosion has on the terrain</string>
+           </property>
+           <property name="maximum">
+            <number>100</number>
+           </property>
+           <property name="sliderPosition">
+            <number>50</number>
+           </property>
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QSlider" name="terrainSlopeSlider">
+           <property name="toolTip">
+            <string>Higher values will produce steeper slopes, taller hills and deeper valleys</string>
+           </property>
+           <property name="maximum">
+            <number>3600</number>
+           </property>
+           <property name="value">
+            <number>1800</number>
+           </property>
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="0">
+          <widget class="QLabel" name="label_3">
            <property name="text">
-            <string>Segments</string>
+            <string>Slope angle</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="label_17">
+           <property name="text">
+            <string>Erosion passes</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QSpinBox" name="terrainErosionPassesBox">
+           <property name="toolTip">
+            <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Number of times to run the erosion algorithm on terrain (0 to disable erosion entirely)&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
+           <property name="value">
+            <number>1</number>
            </property>
           </widget>
          </item>
@@ -804,96 +863,6 @@
              <string>Massive (4097x4097)</string>
             </property>
            </item>
-          </widget>
-         </item>
-         <item row="3" column="1">
-          <widget class="QComboBox" name="comboBox">
-           <item>
-            <property name="text">
-             <string>1</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>4 (2x2)</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>9 (3x3)</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>16 (4x4)</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>25 (5x5)</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>36 (6x6)</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>49 (7x7)</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>64 (8x8)</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>81 (9x9)</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>100 (10x10)</string>
-            </property>
-           </item>
-          </widget>
-         </item>
-         <item row="2" column="1">
-          <widget class="QDoubleSpinBox" name="terrainScaleSpinBox">
-           <property name="maximum">
-            <double>100000.000000000000000</double>
-           </property>
-           <property name="value">
-            <double>5000.000000000000000</double>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="1">
-          <widget class="QSlider" name="horizontalSlider">
-           <property name="maximum">
-            <number>100</number>
-           </property>
-           <property name="sliderPosition">
-            <number>50</number>
-           </property>
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="1">
-          <widget class="QSlider" name="ramdomFactorSlider">
-           <property name="maximum">
-            <number>100</number>
-           </property>
-           <property name="value">
-            <number>50</number>
-           </property>
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
           </widget>
          </item>
         </layout>
@@ -962,9 +931,12 @@
       </spacer>
      </item>
      <item>
-      <widget class="QCommandLinkButton" name="generateTerrain">
+      <widget class="QCommandLinkButton" name="updateTerrainButton">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="text">
-        <string>Generate new terrain</string>
+        <string>Update</string>
        </property>
        <property name="icon">
         <iconset resource="../icons.qrc">
@@ -977,12 +949,32 @@
         </size>
        </property>
        <property name="description">
-        <string>Create a terrain according to the specified parameters</string>
+        <string>Modify the terrain according to the specified parameters</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QCommandLinkButton" name="loadTerrain">
+      <widget class="QCommandLinkButton" name="newTerrainButton">
+       <property name="text">
+        <string>New terrain</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../icons.qrc">
+         <normaloff>:/media/22x22/document-new.png</normaloff>:/media/22x22/document-new.png</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>22</width>
+         <height>22</height>
+        </size>
+       </property>
+       <property name="description">
+        <string>Create a new, random terrain</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCommandLinkButton" name="loadTerrainButton">
        <property name="text">
         <string>Import terrain from file</string>
        </property>
@@ -1002,7 +994,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QCommandLinkButton" name="clearTerrain">
+      <widget class="QCommandLinkButton" name="clearTerrainButton">
        <property name="text">
         <string>Clear terrain</string>
        </property>
@@ -1270,6 +1262,15 @@
     <string>&amp;Options</string>
    </property>
   </action>
+  <action name="actionReload_heightmap">
+   <property name="icon">
+    <iconset resource="../icons.qrc">
+     <normaloff>:/media/16x16/view-refresh.png</normaloff>:/media/16x16/view-refresh.png</iconset>
+   </property>
+   <property name="text">
+    <string>Reload heightmap</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources>
@@ -1533,14 +1534,14 @@
    </hints>
   </connection>
   <connection>
-   <sender>generateTerrain</sender>
+   <sender>newTerrainButton</sender>
    <signal>clicked()</signal>
    <receiver>MainWindow</receiver>
    <slot>generateTerrain()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>671</x>
-     <y>193</y>
+     <x>169</x>
+     <y>741</y>
     </hint>
     <hint type="destinationlabel">
      <x>399</x>
@@ -1549,7 +1550,7 @@
    </hints>
   </connection>
   <connection>
-   <sender>loadTerrain</sender>
+   <sender>loadTerrainButton</sender>
    <signal>clicked()</signal>
    <receiver>MainWindow</receiver>
    <slot>loadTerrain()</slot>
@@ -1565,7 +1566,7 @@
    </hints>
   </connection>
   <connection>
-   <sender>clearTerrain</sender>
+   <sender>clearTerrainButton</sender>
    <signal>clicked()</signal>
    <receiver>MainWindow</receiver>
    <slot>clearTerrain()</slot>
@@ -1712,7 +1713,7 @@
    <sender>fogColourButton</sender>
    <signal>clicked()</signal>
    <receiver>MainWindow</receiver>
-   <slot>updateFogButtonColour()</slot>
+   <slot>updateColourButton()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>232</x>
@@ -1788,6 +1789,150 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>updateTerrainButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>updateTerrain()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>169</x>
+     <y>678</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>433</x>
+     <y>453</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionReload_heightmap</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>reloadHeightmap()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>433</x>
+     <y>453</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>sunColourButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>updateColourButton()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>836</x>
+     <y>469</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>433</x>
+     <y>463</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>terrainSlopeSlider</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>enableUpdateTerrain()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>207</x>
+     <y>160</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>433</x>
+     <y>463</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>terrainErosionSlider</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>enableUpdateTerrain()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>207</x>
+     <y>185</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>433</x>
+     <y>463</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>terrainErosionPassesBox</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>enableUpdateTerrain()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>207</x>
+     <y>210</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>433</x>
+     <y>463</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>textureSizeBox</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>enableUpdateTerrain()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>778</x>
+     <y>186</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>433</x>
+     <y>463</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>terrainScaleSpinBox</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>enableUpdateTerrain()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>207</x>
+     <y>236</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>433</x>
+     <y>463</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>randomSeedBox</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>enableUpdateTerrain()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>189</x>
+     <y>162</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>433</x>
+     <y>463</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>selectTool()</slot>
@@ -1817,8 +1962,11 @@
   <slot>updateEnvironment()</slot>
   <slot>resetDefaultEnvironment()</slot>
   <slot>loadImage()</slot>
-  <slot>updateFogButtonColour()</slot>
+  <slot>updateColourButton()</slot>
   <slot>fogModeChanged(int)</slot>
   <slot>textureSelected(int)</slot>
+  <slot>updateTerrain()</slot>
+  <slot>reloadHeightmap()</slot>
+  <slot>enableUpdateTerrain()</slot>
  </slots>
 </ui>

@@ -50,10 +50,19 @@ void Terrain::createFlatTerrain()
 
 void Terrain::loadHeightmap(std::string imageFile)
 {
+    // If necessary, add resource group in directory
+    QDir directory = QFileInfo(imageFile.c_str()).dir();
+    if(!Ogre::ResourceGroupManager::getSingleton().resourceLocationExists(directory.path().toStdString()))
+        Ogre::ResourceGroupManager::getSingleton().addResourceLocation(directory.path().toStdString(), "FileSystem");
+
+    // Load image
+    Ogre::Image img;
+    img.load(QFileInfo(imageFile.c_str()).fileName().toStdString(), Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+
     mTerrainGlobals = new Ogre::TerrainGlobalOptions();
 
     // construct terrain group
-    mTerrainGroup = new Ogre::TerrainGroup(mSceneManager, Ogre::Terrain::ALIGN_X_Z, 513, 12000.0f);
+    mTerrainGroup = new Ogre::TerrainGroup(mSceneManager, Ogre::Terrain::ALIGN_X_Z, img.getWidth(), 12000.0f);
     mTerrainGroup->setOrigin(Ogre::Vector3::ZERO);
 
     configureTerrainDefaults(mSun);
@@ -61,7 +70,7 @@ void Terrain::loadHeightmap(std::string imageFile)
     // define our terrains and instruct the TerrainGroup to load them all
     for(long x = 0; x <= 0; ++x)
         for(long y = 0; y <= 0; ++y)
-            defineTerrainFromFile(x, y, imageFile);
+            defineTerrainFromFile(x, y, img);
 
     // sync load since we want everything in place when we start
     mTerrainGroup->loadAllTerrains(true);
@@ -79,7 +88,7 @@ void Terrain::loadHeightmap(std::string imageFile)
 }
 
 // Size, talos and staggerValue are only used for generating terrains so they can e moved into this function instead of the Terrain constructor
-void Terrain::generateTerrain(unsigned int seed, unsigned short size, unsigned short talos, unsigned short staggerValue, unsigned short segments)
+void Terrain::generateTerrain(unsigned int seed, unsigned short size, float talos, float staggerValue, float xzScale, float yScale, unsigned short segments)
 {
     // Terrain Size must be constant if tiles are to make any sense interacting with each other.
     iTerrainSize = size;
@@ -107,14 +116,14 @@ void Terrain::generateTerrain(unsigned int seed, unsigned short size, unsigned s
     HeightMapGen* HMHMgen = new HeightMapGen(iTerrainSize, x, y, iTalos, iStaggerValue);
 
     // Convert that to an image
-    Ogre::uchar stream[HMHMgen->iDimensions*HMHMgen->iDimensions];
+    Ogre::uchar* pStream = new Ogre::uchar[HMHMgen->iDimensions * HMHMgen->iDimensions];
+    //Ogre::uchar stream[HMHMgen->iDimensions*HMHMgen->iDimensions];
     float* pHeightMap = HMHMgen->getHeightmap();
     std::cout << HMHMgen->iFinalPoint;
     for(long unsigned int i = 0; i < HMHMgen->iFinalPoint; ++i)
     {
-        stream[i] = (Ogre::uchar)(*(pHeightMap + i)*255); // Probably just put in the above if statement if it works
+        pStream[i] = (Ogre::uchar)(*(pHeightMap + i)*255); // Probably just put in the above if statement if it works
     }
-    Ogre::uchar* pStream = &stream[0];
 
     Ogre::Image img;
     img.loadDynamicImage(pStream, HMHMgen->iDimensions, HMHMgen->iDimensions, Ogre::PF_L8); // PF_L8 = 8-pit pixel format, all luminance
@@ -140,8 +149,8 @@ void Terrain::generateTerrain(unsigned int seed, unsigned short size, unsigned s
     // Configure default import settings for if we use imported image
     Ogre::Terrain::ImportData& defaultimp = mTerrainGroup->getDefaultImportSettings();
     defaultimp.terrainSize = HMHMgen->iDimensions;
-    defaultimp.worldSize = 12000.0f;
-    defaultimp.inputScale = 1800;
+    defaultimp.worldSize = xzScale;
+    defaultimp.inputScale = yScale;
     defaultimp.minBatchSize = 129;
     defaultimp.maxBatchSize = 129;
 
@@ -265,6 +274,7 @@ void Terrain::generateTerrain(unsigned int seed, unsigned short size, unsigned s
     // Store the heightmap generator for later use. As of this point, this can actually be done fairly early on, but
     // it might be changed later on in this function.
 
+    delete[] pStream; // clean up
 }
 
 std::string Terrain::intToStr(int number)
@@ -292,16 +302,9 @@ void Terrain::clearTerrain()
     delete mTerrainGlobals;
 }
 
-void Terrain::defineTerrainFromFile(long x, long y, std::string file)
+void Terrain::defineTerrainFromFile(long x, long y, Ogre::Image& img)
 {
-    // If necessary, add resource group in directory
-    QDir directory = QFileInfo(file.c_str()).dir();
-    if(!Ogre::ResourceGroupManager::getSingleton().resourceLocationExists(directory.path().toStdString()))
-        Ogre::ResourceGroupManager::getSingleton().addResourceLocation(directory.path().toStdString(), "FileSystem");
-
     // get terrain image
-    Ogre::Image img;
-    img.load(QFileInfo(file.c_str()).fileName().toStdString(), Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
     if(x % 2 != 0)
         img.flipAroundY();
     if(y % 2 != 0)
@@ -407,6 +410,37 @@ void Terrain::replaceTexture(unsigned char index, float worldSize, std::string d
         t->update();
     }
 }
+
+QImage Terrain::getQImage(long xIndex, long yIndex)
+{
+    // Get the terrain we will be exporting
+    Ogre::Terrain* terrain = mTerrainGroup->getTerrain(xIndex, yIndex);
+
+    // Convert the array of floats to an array of unsigned chars (values between 0 and 255)
+    float minHeight = terrain->getMinHeight(); // this will be 0
+    float scale = 255.f / terrain->getMaxHeight(); // highest point in the terrain will be 255
+
+    // Transfer the data
+    uchar* image = new uchar[terrain->getSize() * terrain->getSize() * 3 + 1]; // 3 channels
+    int pixelIndex = 0;
+    for(int x = 0; x < terrain->getSize() * terrain->getSize(); x++)
+    {
+        float data = terrain->getHeightData()[x];// *(terrain->getHeightData() + x);
+        uchar converted = (data - minHeight) * scale;
+        // 3 times, once for the Red channel, one for Green and one for Blue
+        image[pixelIndex] = converted;  pixelIndex++;
+        std::cout << (int)converted << '\n';
+        //image[pixelIndex] = converted;  pixelIndex++;
+        //image[pixelIndex] = converted;  pixelIndex++;
+    }
+
+    QImage final(image, terrain->getSize(), terrain->getSize(), QImage::Format_Indexed8);
+
+    delete[] image; // clean up
+
+    return final;
+}
+
 
 void Terrain::generateVegetation(unsigned int treesToGenerate)
 {

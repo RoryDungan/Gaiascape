@@ -12,6 +12,7 @@
 #include "algorithms/HeightMapGen.h"
 #include "FloraManager.h"
 #include "FloraTree.h" // Probably just have this included in FloraMain and include that instead
+#include <QImage>
 
 class Terrain
 {
@@ -20,9 +21,11 @@ public:
     ~Terrain();
     Ogre::TerrainGroup* getTerrainGroup() { return mTerrainGroup; }
 
+    QImage getQImage(long xIndex, long yIndex);
+
     void createFlatTerrain();
     void loadHeightmap(std::string imageFile);
-    void generateTerrain(unsigned int seed, unsigned short size, unsigned short talos, unsigned short staggerValue, unsigned short segments = 1);
+    void generateTerrain(unsigned int seed, unsigned short size, float talos = 1, float staggerValue = 255, float xzScale = 5000.f, float yScale = 1800.f, unsigned short segments = 1);
 
     void generateVegetation(unsigned int treesToGenerate);
 
@@ -38,7 +41,7 @@ private:
 
     std::string intToStr(int number);
     HeightMapGen* getByLoc(signed short x, signed short y);
-    void defineTerrainFromFile(long x, long y, std::string file);
+    void defineTerrainFromFile(long x, long y, Ogre::Image &img);
     void initBlendMaps(Ogre::Terrain* terrain);
     void configureTerrainDefaults(Ogre::Light* light);
     void configureTextures(Ogre::Terrain::LayerInstanceList& layerList);

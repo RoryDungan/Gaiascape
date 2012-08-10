@@ -56,6 +56,7 @@ MainWindow::MainWindow(QWidget *parent) :
     mOgreWidget = new OgreWidget(this, mApplicationDataDir + "ogre.log", mSettings->value("Renderer/RenderingSubsystem").toString());
 
     setCentralWidget(mOgreWidget);
+    mOgreWidget->setFocus();
     mOgreWidget->setCameraInverted(mSettings->value("Renderer/CameraInverted", false).toBool());
     //mOgreWidget->setFOVy(mSettings->value("Renderer/FOV", 45).toInt());
 
@@ -71,6 +72,9 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->fogColourLabel->setText(colour.name());
     ui->fogColourLabel->setPalette(QPalette(colour));
     ui->fogColourLabel->setAutoFillBackground(true);
+    ui->sunColourLabel->setText(colour.name());
+    ui->sunColourLabel->setPalette(QPalette(colour));
+    ui->sunColourLabel->setAutoFillBackground(true);
 
     // Set up action group for tool buttons
     QActionGroup* toolGroup = new QActionGroup(this);
@@ -187,6 +191,10 @@ MainWindow::MainWindow(QWidget *parent) :
     statusBar()->showMessage(tr("Ready"));
 
     if(mSettings->value("MainWindow/Maximized", false).toBool()) this->showMaximized();
+
+    ui->updateEnvironmentButton->setEnabled(false);
+    ui->updateTerrainButton->setEnabled(false);
+    ui->updateTexturesButton->setEnabled(false);
 }
 
 MainWindow::~MainWindow()
@@ -415,7 +423,7 @@ void MainWindow::screenshot()
                                              "", tr("PNG image (*.png);;JPEG Image (*.jpg *.jpeg *.jpe);;Targa image (*.tga);;Bitmap image (*.bmp)")));
 }
 
-void MainWindow::generateTerrain()
+void MainWindow::updateTerrain()
 {
     QApplication::setOverrideCursor(Qt::WaitCursor);
     QElapsedTimer timer;
@@ -423,9 +431,18 @@ void MainWindow::generateTerrain()
     timer.start();
     // This can be spawned at any point. If this function does what I believe it does, later this will be modifyed to create
     // multiple terrain blocks.
-    mOgreWidget->getTerrain()->generateTerrain(ui->randomSeedBox->value(), 8, 1, 255);
+    mOgreWidget->getTerrain()->generateTerrain(ui->randomSeedBox->value(), 8, ui->terrainErosionSlider->value(), 255, ui->terrainSlopeSlider->value());
     qDebug() << "Terrain genarated in" << timer.elapsed() << "milliseconds";
     QApplication::restoreOverrideCursor();
+
+    ui->updateTerrainButton->setEnabled(false);
+}
+
+void MainWindow::generateTerrain()
+{
+    randomiseTerrainSeed();
+    // reset everything
+    updateTerrain();
 }
 
 void MainWindow::loadTerrain()
@@ -451,6 +468,12 @@ void MainWindow::showHeightmapImage()
     QImage image(QDesktopServices::storageLocation(QDesktopServices::TempLocation) + QDir::separator() + "gaiascape-heightmap.bmp");
     if(!image.isNull()) mHeightmapViewer->loadImage(QPixmap::fromImage(image)); // Todo: make it copy the image directly from mmory rather than reading from a file
     mHeightmapViewer->showNormal();
+}
+
+//
+void MainWindow::reloadHeightmap()
+{
+    mHeightmapViewer->loadImage(QPixmap::fromImage(mOgreWidget->getTerrain()->getQImage(0, 0)));
 }
 
 // Create a new random seed value
@@ -488,18 +511,20 @@ void MainWindow::statusTextureUpdateInProgress()
 
     // Creating a new terrain while the program is updating the textures causes it to freeze and stop responding untl he texture updae has finished
     // This can givethe impression that the program has crashed, so it is prevented by disabling the buttons to create new terrains temporarily
-    ui->generateTerrain->setEnabled(false);
-    ui->loadTerrain->setEnabled(false);
-    ui->clearTerrain->setEnabled(false);
+    ui->updateTerrainButton->setEnabled(false);
+    ui->newTerrainButton->setEnabled(false);
+    ui->loadTerrainButton->setEnabled(false);
+    ui->clearTerrainButton->setEnabled(false);
 }
 
 void MainWindow::statusTextreUpdateFinished()
 {
     statusBar()->showMessage(tr("Finished generating terrain."));
     mStatusProgressBar->setVisible(false);
-    ui->generateTerrain->setEnabled(true);
-    ui->loadTerrain->setEnabled(true);
-    ui->clearTerrain->setEnabled(true);
+    ui->updateTerrainButton->setEnabled(true);
+    ui->newTerrainButton->setEnabled(true);
+    ui->loadTerrainButton->setEnabled(true);
+    ui->clearTerrainButton->setEnabled(true);
     QApplication::restoreOverrideCursor();
 }
 
@@ -576,6 +601,8 @@ void MainWindow::updateEnvironment()
                         ui->fogDensitySpinBox->value(),
                         ui->fogStartSpinBox->value(),
                         ui->fogEndSpinBox->value());
+    mOgreWidget->setSunPosition(ui->sunAltitudeSpinBox->value(),
+                                ui->sunAngleSpinBox->value());
 }
 
 void MainWindow::resetDefaultEnvironment()
@@ -629,14 +656,27 @@ void MainWindow::loadImage()
         ui->skyboxUpLineEdit->setText(filePath);*/
 }
 
-void MainWindow::updateFogButtonColour()
+void MainWindow::updateColourButton()
 {
     // Open a new colour selection dialog, starting with the currently selected colour
-    QColor colour = QColorDialog::getColor(ui->fogColourLabel->palette().color(QPalette::Button), this);
-    if(colour.isValid())
+    QColor colour;
+    if(sender() == ui->fogColourButton)
+        colour = QColorDialog::getColor(ui->fogColourLabel->palette().color(QPalette::Button), this);
+    else if(sender() == ui->sunColourButton)
+        colour = QColorDialog::getColor(ui->sunColourLabel->palette().color(QPalette::Button), this);
+
+    if(!colour.isValid())
+        return;
+
+    if(sender() == ui->fogColourButton)
     {
         ui->fogColourLabel->setText(colour.name());
         ui->fogColourLabel->setPalette(QPalette(colour));
+    }
+    else if(sender() == ui->sunColourButton)
+    {
+        ui->sunColourLabel->setText(colour.name());
+        ui->sunColourLabel->setPalette(QPalette(colour));
     }
 }
 
