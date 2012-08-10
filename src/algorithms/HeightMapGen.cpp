@@ -124,10 +124,10 @@ void HeightMapGen::erodeBlock(float c, long unsigned int block)
     // Erode an individual block, and if this passes material down, then calculate erosion for that as well.
     // dNW, dNE etc. = difference in heights at point NW, NE etc. Set as 0 so if the points don't exist they don't cause
     // errors later.
-    float dNW = -1;
-    float dNE = -1;
-    float dSW = -1;
-    float dSE = -1;
+    float dNW = 0;
+    float dNE = 0;
+    float dSW = 0;
+    float dSE = 0;
     // dTotal = The total of all the d's that are above Talos.
     float dTotal = 0;
     // dMax = The highest d value
@@ -140,66 +140,59 @@ void HeightMapGen::erodeBlock(float c, long unsigned int block)
     // Note that if a block is on the horizontal edge of the terrain, it will loop around to the next point
     // and think they are adjacent. So we need to check to see if the neighbour and the inspected block are on the same
     // level if they are only one block away.
-    if(block/iDimensions != (block - 1)/iDimensions)
+    if(block/iDimensions == (block - 1)/iDimensions)
     {
-        dNW = 0;
-        dSW = 0;
-    }
-    if(block/iDimensions != (block + 1)/iDimensions)
-    {
-        dNE = 0;
-        dSE = 0;
-    }
-    // Define height values
-    // Check if the point exists by seeing if is above the max or below the min
-    // NW
-
-    if(dNW == -1)
         dNW = getHeightDifference(block, block - iDimensions - 1);
-    if(dNW > fTalos)
-    {
-        // Skipping the calculations because we know this if we are at this point dTotal and dMax haven't been set
-        dTotal = dNW;
-        dMax = dNW;
+        if(dNW > fTalos)
+        {
+            // Skipping the calculations because we know this if we are at this point dTotal and dMax haven't been set
+            dTotal = dNW;
+            dMax = dNW;
+        }
+        else
+            dNW = 0; // Which later means we will not change this block
+
+        dSW = getHeightDifference(block, block + iDimensions - 1);
+        if(dSW > fTalos)
+        {
+            dTotal += dSW;
+            if(dSW > dMax)
+                dMax = dSW;
+        }
+        else
+            dSW = 0; // Which later means we will not change this block
     }
     else
-        dNW = 0; // Which later means we will not change this block
-
-    // NE
-    if(dNE == -1)
-        dNE = getHeightDifference(block, block + iDimensions - 1);
-    if(dNE > fTalos)
     {
-        dTotal += dNE;
-        if(dNE > dMax)
-            dMax = dNE;
+        std::cout << "foo\n";
     }
-    else
-        dNE = 0; // Which later means we will not change this block
 
-    // SE
-    if(dSE == -1)
+    if(block/iDimensions == (block + 1)/iDimensions)
+    {
+        dNE = getHeightDifference(block, block - iDimensions + 1);
+        if(dNE > fTalos)
+        {
+            dTotal += dNE;
+            if(dNE > dMax)
+                dMax = dNE;
+        }
+        else
+            dNE = 0; // Which later means we will not change this block
+
         dSE = getHeightDifference(block, block + iDimensions + 1);
-    if(dSE > fTalos)
-    {
-        dTotal += dSE;
-        if(dSE > dMax)
-            dMax = dSE;
+        if(dSE > fTalos)
+        {
+            dTotal += dSE;
+            if(dSE > dMax)
+                dMax = dSE;
+        }
+        else
+            dSE = 0; // Which later means we will not change this block
     }
     else
-        dSE = 0; // Which later means we will not change this block
-
-    // SW
-    if(dSW == -1)
-        dSW = getHeightDifference(block, block - iDimensions + 1);
-    if(dSW > fTalos)
     {
-        dTotal += dSW;
-        if(dSW > dMax)
-            dMax = dSW;
+        std::cout << "foo\n";
     }
-    else
-        dSW = 0; // Which later means we will not change this block
 
     // Go to each of the corners and apply the equation
     // hi += c(dmax - talos) * di/dtotal
@@ -215,19 +208,31 @@ void HeightMapGen::erodeBlock(float c, long unsigned int block)
             *(pHMBlocks + block) -= tNW;
         if (*(pHMBlocks + block - iDimensions - 1) < 0 || *(pHMBlocks + block - iDimensions - 1) > 1 )
             *(pHMBlocks + block - iDimensions - 1) += tNW;
+
+        // DEBUG
+        if(block/iDimensions != (block - 1)/iDimensions)
+        {
+            std::cout << "foo\n";
+        }
     }
     // NE
     if(dNE > 0)
     {
         tNE = c * (dMax - fTalos) * (dNE/dTotal);
-        *(pHMBlocks + block + iDimensions - 1) -= tNE;
+        *(pHMBlocks + block - iDimensions + 1) -= tNE;
         *(pHMBlocks + block) += tNE;
         // This may seem counter-intuitive but in this situation, tNW will be negative.
         // Check to see we haven't gone above or below the scope. If so, undo.
         if (*(pHMBlocks + block) < 0 || *(pHMBlocks + block) > 1 )
             *(pHMBlocks + block) -= tNE;
-        if (*(pHMBlocks + block + iDimensions - 1) < 0 || *(pHMBlocks + block + iDimensions - 1) > 1 )
-            *(pHMBlocks + block + iDimensions - 1) += tNE;
+        if (*(pHMBlocks + block - iDimensions + 1) < 0 || *(pHMBlocks + block - iDimensions + 1) > 1 )
+            *(pHMBlocks + block - iDimensions + 1) += tNE;
+
+        // DEBUG
+        if(block/iDimensions != (block + 1)/iDimensions)
+        {
+            std::cout << "foo\n";
+        }
     }
     // SE
     if(dSE > 0)
@@ -241,22 +246,32 @@ void HeightMapGen::erodeBlock(float c, long unsigned int block)
             *(pHMBlocks + block) -= tSE;
         if (*(pHMBlocks + block + iDimensions + 1) < 0 || *(pHMBlocks + block + iDimensions + 1) > 1 )
             *(pHMBlocks + block + iDimensions + 1) += tSE;
+
+        // DEBUG
+        if(block/iDimensions != (block + 1)/iDimensions)
+        {
+            std::cout << "foo\n";
+        }
     }
     // SW
     if(dSW > 0)
     {
         tSW = c * (dMax - fTalos) * (dSW/dTotal);
-        *(pHMBlocks + block - iDimensions + 1) -= tSW;
+        *(pHMBlocks + block + iDimensions - 1) -= tSW;
         *(pHMBlocks + block) += tSW;
         // This may seem counter-intuitive but in this situation, tNW will be negative.
         // Check to see we haven't gone above or below the scope. If so, undo.
         if (*(pHMBlocks + block) < 0 || *(pHMBlocks + block) > 1 )
             *(pHMBlocks + block) -= tSW;
-        if (*(pHMBlocks + block - iDimensions + 1) < 0 || *(pHMBlocks + block - iDimensions + 1) > 1 )
-            *(pHMBlocks + block - iDimensions + 1) += tSW;
-    }
-    // ToDo; remove material transported?
+        if (*(pHMBlocks + block + iDimensions - 1) < 0 || *(pHMBlocks + block + iDimensions - 1) > 1 )
+            *(pHMBlocks + block + iDimensions - 1) += tSW;
 
+        // DEBUG
+        if(block/iDimensions != (block - 1)/iDimensions)
+        {
+            std::cout << "foo\n";
+        }
+    }
     // Move the transported material to lower pastures
     /*if(tNW != 0)
         transportMaterial(tNW, block - iDimensions - 1);
