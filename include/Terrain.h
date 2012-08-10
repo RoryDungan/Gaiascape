@@ -51,9 +51,9 @@ private:
 
     // These should be defined before the terrain is generated.
     short unsigned int iTerrainSize;
-    short unsigned int iTalos;
+    float fTalos;
+    float fStaggerValue;
     short unsigned int iBlocks;
-    short unsigned int iStaggerValue;
 };
 
 #endif // TERRAIN_H

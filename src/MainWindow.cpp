@@ -27,6 +27,7 @@ MainWindow::MainWindow(QWidget *parent) :
     bQPressed = false;
     bEPressed = false;
     bShiftPressed = false;
+    iCurrentLayerIndex = 0;
 
     ui->setupUi(this);
 
@@ -36,7 +37,7 @@ MainWindow::MainWindow(QWidget *parent) :
     if (mApplicationDataDir.isEmpty())
         mApplicationDataDir = QDir::homePath() + "/." + QCoreApplication::applicationName();
     mApplicationDataDir.append(QDir::separator());
-    // the first time I am saving data
+    // the first time we are saving data
     if (!QFile::exists(mApplicationDataDir))
     {
         QDir dir;
@@ -68,10 +69,6 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->terrainDockWidget->raise();
     randomiseTerrainSeed();
 
-    QColor colour = QColor(230, 230, 230);
-    ui->fogColourLabel->setText(colour.name());
-    ui->fogColourLabel->setPalette(QPalette(colour));
-    ui->fogColourLabel->setAutoFillBackground(true);
     ui->sunColourLabel->setText(colour.name());
     ui->sunColourLabel->setPalette(QPalette(colour));
     ui->sunColourLabel->setAutoFillBackground(true);
@@ -170,7 +167,6 @@ MainWindow::MainWindow(QWidget *parent) :
     mHeightmapViewer = new ImageViewer(this);
 
     // Set up textures panel - this will be removed once we get the program to load a template
-    iCurrentLayerIndex = 0;
     resetDefaultTextures();
 
     // Set up progress bar
@@ -545,6 +541,8 @@ void MainWindow::updateTextures()
     // Update all textures
     for(unsigned int i = 0; i < 3; i++)
         mOgreWidget->getTerrain()->replaceTexture(i, mLayers[i].worldSize, mLayers[i].diffuseSpecular.toStdString(), mLayers[i].normalHeight.toStdString());
+
+    ui->updateTexturesButton->setEnabled(false);
 }
 
 void MainWindow::resetDefaultTextures()
@@ -596,13 +594,10 @@ void MainWindow::updateEnvironment()
     mOgreWidget->setSkyDome(ui->skydomeLineEdit->text(),
                             ui->skyCurvatureSpinBox->value(),
                             ui->skydomeTilingSpinBox->value());
-    mOgreWidget->setFog(ui->fogModeComboBox->currentIndex(),
-                        ui->fogColourLabel->palette().color(QPalette::Button),
-                        ui->fogDensitySpinBox->value(),
-                        ui->fogStartSpinBox->value(),
-                        ui->fogEndSpinBox->value());
     mOgreWidget->setSunPosition(ui->sunAltitudeSpinBox->value(),
                                 ui->sunAngleSpinBox->value());
+    ui->updateEnvironmentButton->setEnabled(false);
+
 }
 
 void MainWindow::resetDefaultEnvironment()
@@ -611,13 +606,6 @@ void MainWindow::resetDefaultEnvironment()
     ui->skydomeLineEdit->setText("media/textures/clouds.jpg");
     ui->skyCurvatureSpinBox->setValue(10.0);
     ui->skydomeTilingSpinBox->setValue(8);
-    ui->fogModeComboBox->setCurrentIndex(0);
-    QColor colour = QColor(230, 230, 230);
-    ui->fogColourLabel->setText(colour.name());
-    ui->fogColourLabel->setPalette(QPalette(colour));
-    ui->fogDensitySpinBox->setValue(0.001);
-    ui->fogStartSpinBox->setValue(0);
-    ui->fogEndSpinBox->setValue(0);
 
     updateEnvironment();
 }
@@ -680,42 +668,6 @@ void MainWindow::updateColourButton()
     }
 }
 
-void MainWindow::fogModeChanged(int mode)
-{
-    switch(mode)
-    {
-    case 0: // Disabled - disable all fog controls
-        ui->fogColourButton->setEnabled(false);
-        ui->fogColourLabel->setEnabled(false);
-        ui->fogColourLabel_0->setEnabled(false);
-        ui->fogDensityLabel->setEnabled(false);
-        ui->fogDensitySpinBox->setEnabled(false);
-        ui->fogEndLabel->setEnabled(false);
-        ui->fogEndSpinBox->setEnabled(false);
-        ui->fogStartLabel->setEnabled(false);
-        ui->fogStartSpinBox->setEnabled(false);
-        break;
-    case 1: // Linear fog
-        ui->fogColourButton->setEnabled(true);
-        ui->fogColourLabel->setEnabled(true);
-        ui->fogColourLabel_0->setEnabled(true);
-        ui->fogDensityLabel->setEnabled(false);
-        ui->fogDensitySpinBox->setEnabled(false);
-        ui->fogEndLabel->setEnabled(true);
-        ui->fogEndSpinBox->setEnabled(true);
-        ui->fogStartLabel->setEnabled(true);
-        ui->fogStartSpinBox->setEnabled(true);
-        break;
-    default: // Exponential fog
-        ui->fogColourButton->setEnabled(true);
-        ui->fogColourLabel->setEnabled(true);
-        ui->fogColourLabel_0->setEnabled(true);
-        ui->fogDensityLabel->setEnabled(true);
-        ui->fogDensitySpinBox->setEnabled(true);
-        ui->fogEndLabel->setEnabled(false);
-        ui->fogEndSpinBox->setEnabled(false);
-        ui->fogStartLabel->setEnabled(false);
-        ui->fogStartSpinBox->setEnabled(false);
-        break;
-    }
-}
+
+void MainWindow::enableUpdateEnvironment() { ui->updateEnvironmentButton->setEnabled(true); }
+void MainWindow::enableUpdateTerrain() { /* enable update terrain button */ }

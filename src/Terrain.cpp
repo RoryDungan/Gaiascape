@@ -93,8 +93,8 @@ void Terrain::generateTerrain(unsigned int seed, unsigned short size, float talo
     // Terrain Size must be constant if tiles are to make any sense interacting with each other.
     iTerrainSize = size;
     // These do not need to be constant, but for large, consistent terrains, it doesn't make sense otherwise.
-    iTalos = talos;               // Minimum angle where thermal erosion takes place
-    iStaggerValue = staggerValue; // The unevenness of the terrain
+    fTalos = talos;               // Minimum angle where thermal erosion takes place
+    fStaggerValue = staggerValue; // The unevenness of the terrain
 
     // Dylan: I think it's better if this function generates all segments, given a number of segments to generate
     // x = The x position of the terrain we are generating
@@ -113,7 +113,7 @@ void Terrain::generateTerrain(unsigned int seed, unsigned short size, float talo
     // The reason why this looks weird is that all HMgen classes must start with what they are calculating,
     // in this case, a HM.
     Random::getSingleton().seed(seed); // First set the seed we'll be using for our random numbers
-    HeightMapGen* HMHMgen = new HeightMapGen(iTerrainSize, x, y, iTalos, iStaggerValue);
+    HeightMapGen* HMHMgen = new HeightMapGen(iTerrainSize, x, y, fTalos, fStaggerValue);
 
     // Convert that to an image
     Ogre::uchar* pStream = new Ogre::uchar[HMHMgen->iDimensions * HMHMgen->iDimensions];
@@ -192,7 +192,7 @@ void Terrain::generateTerrain(unsigned int seed, unsigned short size, float talo
     //  Create a probability of a tree spawning there based on:
     //      Altitude
     //      Proximity to other trees
-    //      Slope
+    /*/      Slope
     float slopeMap[HMHMgen->iDimensions*HMHMgen->iDimensions];
     HMHMgen->outputSlopemap(&slopeMap[0]);
     short signed int probability = 0; // Probability a tree will spawn. If random returns equal to or below this number, it spawns.
@@ -273,7 +273,7 @@ void Terrain::generateTerrain(unsigned int seed, unsigned short size, float talo
 
     // Store the heightmap generator for later use. As of this point, this can actually be done fairly early on, but
     // it might be changed later on in this function.
-
+*/
     delete[] pStream; // clean up
 }
 

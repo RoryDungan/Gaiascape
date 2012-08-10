@@ -21,7 +21,8 @@ SOURCES += src/main.cpp\
     src/OptionsDialog.cpp \
     src/flora/FloraManager.cpp \
     src/flora/FloraMain.cpp \
-    src/flora/FloraTree.cpp
+    src/flora/FloraTree.cpp \
+    src/AddObjectDialog.cpp
 
 HEADERS  += include/algorithms/TerrainBlock.h \
     include/algorithms/Random.h \
@@ -35,7 +36,8 @@ HEADERS  += include/algorithms/TerrainBlock.h \
     include/FloraManager.h \
     include/FloraMain.h \
     include/FloraTree.h \
-    include/AboutBox.h
+    include/AboutBox.h \
+    include/AddObjectDialog.h
 
 INCLUDEPATH += include/ \
     include/OGRE/ \
@@ -45,7 +47,8 @@ UI_DIR = ui/
 
 FORMS    += ui/MainWindow.ui \
     ui/ImageViewer.ui \
-    ui/OptionsDialog.ui
+    ui/OptionsDialog.ui \
+    ui/AddObjectDialog.ui
 
 LIBS += -L. -lOgreMain -lOgreTerrain
 
