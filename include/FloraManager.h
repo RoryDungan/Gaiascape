@@ -5,6 +5,9 @@
 
 #include "FloraMain.h" // Includes OgreRoot
 
+#include "OgreStaticGeometry.h"
+#include "OgreManualObject.h"
+
 class FloraManager
 {
     public:
@@ -16,9 +19,12 @@ class FloraManager
         void removeAllFlora(); // To be done every time we generate new terrain
 
         float getFloraClosestToPoint(Ogre::Vector3 point);
+        void spawnGrass(Ogre::SceneManager* mSceneMgr);
     private:
         std::vector<FloraMain*> vFlora;
         static FloraManager* sInstance;
+
+        void createGrassMesh();
 };
 
 #endif // FLORAMANAGER_H

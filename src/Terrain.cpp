@@ -282,6 +282,8 @@ void Terrain::generateVegetation(unsigned int treesToGenerate, signed int x, sig
             std::cout << "Weird error occured\n";
         }
     }
+
+    FloraManager::getSingletonPtr()->spawnGrass(mSceneManager);
 }
 
 std::string Terrain::intToStr(int number)
