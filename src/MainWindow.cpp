@@ -3,6 +3,7 @@
 #include "algorithms/random.h"
 #include "OptionsDialog.h"
 #include "AboutBox.h"
+#include "NewFileWizard.h"
 #include <QTimer>
 #include <QElapsedTimer>
 #include <QFileDialog>
@@ -13,6 +14,7 @@
 #include <QDir>
 #include <QDesktopServices>
 #include <QColorDialog>
+#include <QMessageBox>
 #include <QDebug>
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -27,7 +29,8 @@ MainWindow::MainWindow(QWidget *parent) :
     bQPressed = false;
     bEPressed = false;
     bShiftPressed = false;
-    iCurrentLayerIndex = 0;
+    bSaved = true;
+    filepath = "";
     // temp
     counter = 1;
 
@@ -170,7 +173,9 @@ MainWindow::MainWindow(QWidget *parent) :
     mHeightmapViewer = new ImageViewer(this);
 
     // Set up textures panel - this will be removed once we get the program to load a template
+    iCurrentLayerIndex = 0;
     resetDefaultTextures();
+    ui->textureSelectionList->setCurrentRow(0);
 
     // Set up progress bar
     mStatusProgressBar = new QProgressBar(this);
@@ -194,6 +199,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->updateEnvironmentButton->setEnabled(false);
     ui->updateTerrainButton->setEnabled(false);
     ui->updateTexturesButton->setEnabled(false);
+
+    ui->groupBox_3->setVisible(false);
 }
 
 MainWindow::~MainWindow()
@@ -285,27 +292,51 @@ void MainWindow::keyReleaseEvent(QKeyEvent * event)
 // Slots
 void MainWindow::fileNew()
 {
-    // TODO: Ask the user if they want to save changes
-    clearTerrain();
-    // Delete all other data
+    if(!bSaved)
+    {
+        QMessageBox::StandardButton reply;
 
-    // Reset all gui settings
+        reply = QMessageBox::question(this, tr("Save"),
+                                      tr("Do you want to save changes?"),
+                                        QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
+        if (reply == QMessageBox::Yes)
+            fileSave();
+        else if (reply == QMessageBox::Cancel)
+            return;
+        // if reply == No, continue
+    }
 
+    // Create new terrain from wizard
+    NewFileWizard* wizard = new NewFileWizard(this);
+    connect(wizard, SIGNAL(createdFile(WorldOptions)), this, SLOT(loadFromWorldOptions(WorldOptions)));
+    wizard->show();
+
+    bSaved = false;
 }
 
 void MainWindow::fileOpen()
 {
-
+    QString tmppath = QFileDialog::getOpenFileName(this, tr("Open file"), "", tr("Gaiascape files (*.gsw);;All files (*.*)"));
+    if(tmppath.isNull()) return;
+    else filepath = tmppath;
+    loadWorldOptionsFromFile(filepath);
 }
 
 void MainWindow::fileSave()
 {
-
+    if(filepath.isEmpty()) fileSaveAs();
+    else
+    {
+        //saveWorldOptionsToFile();
+    }
 }
 
 void MainWindow::fileSaveAs()
 {
-
+    QString tmppath = QFileDialog::getSaveFileName(this, tr("Save file"), "", tr("Gaiascape files (*.gsw)"));
+    if(tmppath.isNull()) return;
+    else filepath = tmppath;
+    fileSave();
 }
 
 void MainWindow::editUndo()
@@ -430,7 +461,7 @@ void MainWindow::updateTerrain()
     timer.start();
     // This can be spawned at any point. If this function does what I believe it does, later this will be modifyed to create
     // multiple terrain blocks.
-    mOgreWidget->getTerrain()->generateTerrain(ui->randomSeedBox->value(), 8, ui->terrainScaleSpinBox->value()*1800, ui->erosionSlider->value(), ui->ramdomFactorSlider->value(), ui->treeDensity->value());
+    mOgreWidget->getTerrain()->generateTerrain(ui->randomSeedBox->value(), 8, ui->terrainScaleSlider->value(), ui->terrainErosionSlider->value(), ui->randomFactorSlider->value(), ui->treeDensitySlider->value());
     qDebug() << "Terrain genarated in" << timer.elapsed() << "milliseconds";
     QApplication::restoreOverrideCursor();
 
@@ -511,7 +542,6 @@ void MainWindow::statusTextureUpdateInProgress()
     // Creating a new terrain while the program is updating the textures causes it to freeze and stop responding untl he texture updae has finished
     // This can givethe impression that the program has crashed, so it is prevented by disabling the buttons to create new terrains temporarily
     //ui->updateTerrainButton->setEnabled(false);
-    ui->newTerrainButton->setEnabled(false);
     ui->loadTerrainButton->setEnabled(false);
     ui->clearTerrainButton->setEnabled(false);
 }
@@ -521,7 +551,6 @@ void MainWindow::statusTextreUpdateFinished()
     statusBar()->showMessage(tr("Finished generating terrain."));
     mStatusProgressBar->setVisible(false);
     //ui->updateTerrainButton->setEnabled(true);
-    ui->newTerrainButton->setEnabled(true);
     ui->loadTerrainButton->setEnabled(true);
     ui->clearTerrainButton->setEnabled(true);
     QApplication::restoreOverrideCursor();
@@ -663,6 +692,23 @@ void MainWindow::updateColourButton()
         ui->sunColourLabel->setPalette(QPalette(colour));
     }
 }
+
+void MainWindow::loadFromWorldOptions(WorldOptions options)
+{
+    ui->randomSeedBox->setValue(options.terrainSeed);
+    ui->randomFactorSlider->setValue(options.terrainRandomFactor);
+    ui->terrainScaleSlider->setValue(options.terrainScale);
+    ui->terrainSizeSpinBox->setValue(options.terrainSize);
+    ui->terrainErosionSlider->setValue(options.erosionPasses);
+    updateTerrain();
+}
+
+void MainWindow::saveWorldOptionsToFile(QString filepath, WorldOptions& options)
+{
+
+}
+
+WorldOptions* MainWindow::loadWorldOptionsFromFile(QString filepath) {}
 
 void MainWindow::enableUpdateEnvironment() { ui->updateEnvironmentButton->setEnabled(true); }
 void MainWindow::enableUpdateTextures() { ui->updateTexturesButton->setEnabled(true); }

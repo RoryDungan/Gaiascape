@@ -225,6 +225,7 @@ void THIS::mouseReleaseEvent(QMouseEvent * event)
     }
 
     mCurrentState = IS_IDLE;
+    mEditMarker->setVisible(false);
 }
 
 /**
@@ -297,17 +298,17 @@ void THIS::setupScene()
     // In order, the variables are terrainSize, talos, and staggerValue (the unevenness of the terrain)
     mTerrain = new Terrain(mSceneMgr, mSun);
 
-    // Set up indicator for terrain
+    /*/ Set up indicator for terrain
     mDecalFrustum = new Ogre::Frustum();
     mProjectorNode = mSceneMgr->getRootSceneNode()->createChildSceneNode("DecalProjectorNode");
     mProjectorNode->attachObject(mDecalFrustum);
-    mProjectorNode->setPosition(0, 100, 0);
+    mProjectorNode->setPosition(0, 100, 0);*/
     mEditMarker = mSceneMgr->createEntity("EditMarker", "sphere.mesh");
     mEditNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
     mEditNode->attachObject(mEditMarker);
     mEditNode->setScale(0.05, 0.05, 0.05);
 
-    // Set up material for indicator
+    /*/ Set up material for indicator
     Ogre::Pass* pass = mTerrain->getTerrainGroup()->getTerrain(0,0)->getMaterial()->getTechnique(0)->createPass();
     pass->setSceneBlending(Ogre::SBT_TRANSPARENT_ALPHA);
     pass->setDepthBias(1);
@@ -316,7 +317,7 @@ void THIS::setupScene()
     Ogre::TextureUnitState* texState = pass->createTextureUnitState("terrainmarker.png");
     texState->setProjectiveTexturing(true, mDecalFrustum);
     texState->setTextureAddressingMode(Ogre::TextureUnitState::TAM_CLAMP);
-    texState->setTextureFiltering(Ogre::FO_POINT, Ogre::FO_LINEAR, Ogre::FO_NONE);
+    texState->setTextureFiltering(Ogre::FO_POINT, Ogre::FO_LINEAR, Ogre::FO_NONE);*/
 }
 
 /**
@@ -357,6 +358,8 @@ void THIS::paintGL()
                 for(Ogre::TerrainGroup::TerrainList::iterator ti = terrainList.begin(); ti != terrainList.end(); ++ti)
                     modifyBlendMaps(*ti, rayResult.position, 0.017f);
                 break;
+            case IS_PLACING_OBJECTS:
+
             default:
                 break;
             }
@@ -539,7 +542,7 @@ void THIS::setCameraMovementDirection(bool forward, bool back, bool left, bool r
     float movementSpeed = sprint ? -30.0f : -15.0f;
 
     mCameraMovement = Ogre::Vector3((left ? movementSpeed : 0.0f) - (right ? movementSpeed : 0.0f),
-                                    (up ? movementSpeed : 0.0f) - (down ? movementSpeed : 0.0f),
+                                    (down ? movementSpeed : 0.0f) - (up ? movementSpeed : 0.0f),
                                     (forward ? movementSpeed : 0.0f) - (back ? movementSpeed : 0.0f));
 }
 
@@ -610,4 +613,20 @@ void THIS::setSunPosition(double altitude, double angle)
         t->dirty();
         t->update();
     }
+}
+
+void THIS::loadModel(QString filepath)
+{
+    // If necessary, add resource group in directory
+    QDir directory = QFileInfo(filepath).dir();
+    if(!Ogre::ResourceGroupManager::getSingleton().resourceLocationExists(directory.path().toStdString()))
+        Ogre::ResourceGroupManager::getSingleton().addResourceLocation(directory.path().toStdString(), "FileSystem");
+
+    Ogre::SceneNode* mNode = mSceneMgr->getRootSceneNode()->createChildSceneNode(filepath.toStdString() + "_main");
+
+    Ogre::Entity* mEnt = mSceneMgr->createEntity(filepath.toStdString() + "_entity", QFileInfo(filepath).fileName().toStdString());
+    mEnt->setMaterialName("Shrub-Material");
+    mNode->attachObject(mEnt);
+
+    mNode->setPosition(mEditNode->getPosition());
 }

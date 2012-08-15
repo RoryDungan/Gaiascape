@@ -12,6 +12,8 @@
 #include <QLabel>
 #include "OgreWidget.h"
 #include "ImageViewer.h"
+#include "NewFileWizard.h"
+#include "WorldOptions.h"
 
 namespace Ui {
 class MainWindow;
@@ -60,6 +62,10 @@ private:
     // Called when the program is first run; creates a config file with default settings
     void createNewConfigFile();
 
+    // Used by the save and load functions
+    void saveWorldOptionsToFile(QString filepath, WorldOptions& options);
+    WorldOptions* loadWorldOptionsFromFile(QString filepath);
+
     bool bWPressed;
     bool bAPressed;
     bool bSPressed;
@@ -67,6 +73,8 @@ private:
     bool bQPressed;
     bool bEPressed;
     bool bShiftPressed;
+    bool bSaved;
+    QString filepath;
 
     virtual void keyPressEvent(QKeyEvent *);
     virtual void keyReleaseEvent(QKeyEvent *);
@@ -111,6 +119,7 @@ public slots:
     void enableUpdateEnvironment();
     void enableUpdateTerrain();
     void enableUpdateFoliage();
+    void loadFromWorldOptions(WorldOptions options);
 };
 
 #endif // MAINWINDOW_H

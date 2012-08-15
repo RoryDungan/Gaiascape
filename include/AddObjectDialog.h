@@ -10,10 +10,18 @@ class AddObjectDialog;
 class AddObjectDialog : public QDialog
 {
     Q_OBJECT
-    
+
 public:
     explicit AddObjectDialog(QWidget *parent = 0);
     ~AddObjectDialog();
+
+    void accept();
+
+signals:
+    void textureSelected(QString);
+
+public slots:
+    void loadTexture();
     
 private:
     Ui::AddObjectDialog *ui;

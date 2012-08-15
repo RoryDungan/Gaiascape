@@ -116,7 +116,7 @@ void Terrain::generateTerrain(unsigned int seed, unsigned short size, unsigned s
     // The reason why this looks weird is that all HMgen classes must start with what they are calculating,
     // in this case, a HM.
     Random::getSingleton().seed(seed); // First set the seed we'll be using for our random numbers
-    HeightMapGen* HMHMgen = new HeightMapGen(iTerrainSize, x, y, iErosionIterations, iStaggerValue);
+    HeightMapGen* HMHMgen = new HeightMapGen(iTerrainSize, x, y, iErosionIterations, fStaggerValue);
 
     // Convert that to an image
     Ogre::uchar* pStream = new Ogre::uchar[HMHMgen->iDimensions * HMHMgen->iDimensions];
@@ -156,8 +156,8 @@ void Terrain::generateTerrain(unsigned int seed, unsigned short size, unsigned s
     //====================================================================
     Ogre::Terrain::ImportData& defaultimp = mTerrainGroup->getDefaultImportSettings();
     defaultimp.terrainSize = HMHMgen->iDimensions;
-    defaultimp.worldSize = xzScale;
-    defaultimp.inputScale = yScale;
+    defaultimp.worldSize = size;
+    defaultimp.inputScale = scale;
     defaultimp.minBatchSize = 129;
     defaultimp.maxBatchSize = 129;
 

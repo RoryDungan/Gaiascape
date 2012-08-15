@@ -22,7 +22,8 @@ SOURCES += src/main.cpp\
     src/flora/FloraManager.cpp \
     src/flora/FloraMain.cpp \
     src/flora/FloraTree.cpp \
-    src/AddObjectDialog.cpp
+    src/AddObjectDialog.cpp \
+    src/NewFileWizard.cpp
 
 HEADERS  += include/algorithms/TerrainBlock.h \
     include/algorithms/Random.h \
@@ -37,7 +38,9 @@ HEADERS  += include/algorithms/TerrainBlock.h \
     include/FloraMain.h \
     include/FloraTree.h \
     include/AboutBox.h \
-    include/AddObjectDialog.h
+    include/AddObjectDialog.h \
+    include/NewFileWizard.h \
+    include/WorldOptions.h
 
 INCLUDEPATH += include/ \
     include/OGRE/ \

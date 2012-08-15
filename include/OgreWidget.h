@@ -13,6 +13,7 @@
 #include <QElapsedTimer>
 #include "Terrain.h"
 
+
 class OgreWidget : public QGLWidget
 {
     Q_OBJECT
@@ -83,6 +84,9 @@ signals:
     void textureUpdateFinished();
 
     void heightUpdated();
+
+public slots:
+    void loadModel(QString);
 
 protected:
     virtual void initializeGL();
