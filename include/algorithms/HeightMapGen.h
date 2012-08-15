@@ -8,12 +8,14 @@
 class HeightMapGen
 {
     public:
-        HeightMapGen(unsigned int size, signed short x, signed short y, unsigned short erosionIterations, float staggerValue);
+        // Scale is really only required for terrain.cpp, but is put here because when we are generating vegetation we need the stored scale.
+        // But really this is more appropriate for terrain.cpp
+        HeightMapGen(unsigned int size, signed short x, signed short y, unsigned short erosionIterations, float staggerValue, float scale);
 
         short unsigned int retrieveDimensions();
 
-        void outputSlopemap(float *slopemapArray);
         float* getHeightmap() { return pHMBlocks; }
+        void outputSlopemap(float *slopemapArray);
         signed short getX() { return iX; }
         signed short getY() { return iY; }
 
@@ -21,6 +23,7 @@ class HeightMapGen
         long unsigned int iFinalPoint;
         short unsigned int iDimensions;
         short unsigned int iQuadrants;
+        float fScale;
 
     private:
         // An overload which allows a row to be already defined. Useful when we are generating a terrain next to one which already exists.

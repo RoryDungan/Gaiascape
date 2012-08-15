@@ -27,7 +27,7 @@ public:
     void loadHeightmap(std::string imageFile);
     void generateTerrain(unsigned int seed, unsigned short size, unsigned short scale, unsigned short erosionIterations, unsigned short staggerValue, unsigned short treeDensity);
 
-    void generateVegetation(unsigned int treesToGenerate);
+    void generateVegetation(unsigned int treesToGenerate, signed int x, signed int y);
 
     void replaceTexture(unsigned char index, float worldSize, std::string diffuseSpecular, std::string normalHeight);
 
@@ -47,8 +47,8 @@ private:
     void configureTextures(Ogre::Terrain::LayerInstanceList& layerList);
 
     // List of heightmaps we have
-    std::vector<HeightMapGen*> HMblocks;
-
+    //std::vector<HeightMapGen*> HMblocks; - DISABLED SINCE ITS USELESS AND CAUSING PROBLEMS
+    HeightMapGen* HMHMgen;
     // These should be defined before the terrain is generated.
     short unsigned int iTerrainSize;
     float fTalos;

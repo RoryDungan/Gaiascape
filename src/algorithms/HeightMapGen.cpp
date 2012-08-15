@@ -5,10 +5,11 @@
 #include <QImage>
 #include <QByteArray>
 
-HeightMapGen::HeightMapGen(unsigned int size, signed short x, signed short y, unsigned short erosionIterations, float staggerValue)
+HeightMapGen::HeightMapGen(unsigned int size, signed short x, signed short y, unsigned short erosionIterations, float staggerValue, float scale)
 {
     iX = x;
     iY = y;
+    fScale = scale;
 
     fTalos = 0.00006033;
 

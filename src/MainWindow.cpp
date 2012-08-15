@@ -463,6 +463,8 @@ void MainWindow::updateTerrain()
     // multiple terrain blocks.
     mOgreWidget->getTerrain()->generateTerrain(ui->randomSeedBox->value(), 8, ui->terrainScaleSlider->value(), ui->terrainErosionSlider->value(), ui->randomFactorSlider->value(), ui->treeDensitySlider->value());
     qDebug() << "Terrain genarated in" << timer.elapsed() << "milliseconds";
+    // This should be moved to a different function so trees can be generated seperately.
+    mOgreWidget->getTerrain()->generateVegetation(ui->treeDensity->value(), 0, 0); // x and y are 0 until new segments are added
     QApplication::restoreOverrideCursor();
 
     ui->updateTerrainButton->setEnabled(false);
