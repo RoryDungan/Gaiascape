@@ -3,6 +3,8 @@
 #include <cmath> // Needed only temporarily so that dimensions can be calculated without going through the heightmap generator
 #include <QDesktopServices> // Also needed temporarily, so that the heightmap image can be outputted to a directory where ImageViewer can easily find it
 #include <QDir> // Same as QDesktopServices
+#include <QElapsedTimer> // Used for profiling
+#include <QDebug>
 
 Terrain::Terrain(Ogre::SceneManager* sceneManager, Ogre::Light *light)
 {
@@ -90,6 +92,10 @@ void Terrain::loadHeightmap(std::string imageFile)
 // Size, talos and staggerValue are only used for generating terrains so they can e moved into this function instead of the Terrain constructor
 void Terrain::generateTerrain(unsigned int seed, unsigned short size, unsigned short scale, unsigned short erosionIterations, unsigned short staggerValue, unsigned short treeDensity)
 {
+    // Timer for profiling
+    QElapsedTimer timer;
+    timer.start();
+
     // Terrain Size must be constant if tiles are to make any sense interacting with each other.
     iTerrainSize = size;
     // These do not need to be constant, but for large, consistent terrains, it doesn't make sense otherwise.
@@ -109,30 +115,40 @@ void Terrain::generateTerrain(unsigned int seed, unsigned short size, unsigned s
     }
     mTerrainGlobals = new Ogre::TerrainGlobalOptions();
 
+    qDebug() << "About to generate terrain -" << timer.elapsed() << "ms";
+
     //===============================
     // Generate a random heightmap
     //===============================
     // Firstly, generate the terrain data we're going to be working with
     // The reason why this looks weird is that all HMgen classes must start with what they are calculating,
     // in this case, a HM.
+
     Random::getSingleton().seed(seed); // First set the seed we'll be using for our random numbers
 
     delete HMHMgen;
-    HMHMgen = new HeightMapGen(iTerrainSize, x, y, iErosionIterations, iStaggerValue, scale);
+    HMHMgen = new HeightMapGen(iTerrainSize, x, y, iErosionIterations, fStaggerValue, scale);
 
     // Convert that to an image
     Ogre::uchar* pStream = new Ogre::uchar[HMHMgen->iDimensions * HMHMgen->iDimensions];
     //Ogre::uchar stream[HMHMgen->iDimensions*HMHMgen->iDimensions];
     float* pHeightMap = HMHMgen->getHeightmap();
-    std::cout << HMHMgen->iFinalPoint;
+    std::cout << HMHMgen->iFinalPoint << std::endl;
     for(long unsigned int i = 0; i < HMHMgen->iFinalPoint + 1; ++i)
     {
         pStream[i] = (Ogre::uchar)(*(pHeightMap + i)*255); // Probably just put in the above if statement if it works
     }
 
+    qDebug() << "Terrain created -" << timer.elapsed() << "ms";
+
     Ogre::Image img;
     img.loadDynamicImage(pStream, HMHMgen->iDimensions, HMHMgen->iDimensions, Ogre::PF_L8); // PF_L8 = 8-pit pixel format, all luminance
+
+    qDebug() << "Converted to Ogre::Image -" << timer.elapsed() <<  "ms";
+
     img.save(std::string(QDesktopServices::storageLocation(QDesktopServices::TempLocation).toAscii() + QDir::separator().toAscii() + "gaiascape-heightmap.bmp"));
+
+    qDebug() << "Image saved -" << timer.elapsed() << "ms";
 
     //===============================
     // Construct terrain group
@@ -152,6 +168,8 @@ void Terrain::generateTerrain(unsigned int seed, unsigned short size, unsigned s
     mTerrainGlobals->setLightMapDirection(mSun->getDerivedDirection());
     mTerrainGlobals->setCompositeMapAmbient(mSceneManager->getAmbientLight());
     mTerrainGlobals->setCompositeMapDiffuse(mSun->getDiffuseColour());
+
+    qDebug() << "Constructed terrain group -" << timer.elapsed() << "ms";
 
     //====================================================================
     // Configure default import settings for if we use imported image
@@ -175,6 +193,8 @@ void Terrain::generateTerrain(unsigned int seed, unsigned short size, unsigned s
     defaultimp.layerList[2].textureNames.push_back("growth_weirdfungus-03_diffusespecular.dds");
     defaultimp.layerList[2].textureNames.push_back("growth_weirdfungus-03_normalheight.dds");
 
+    qDebug() << "Configured default import settings -" << timer.elapsed() << "ms";
+
     //===========================
     // Construct Ogre terrain
     //===========================
@@ -192,12 +212,17 @@ void Terrain::generateTerrain(unsigned int seed, unsigned short size, unsigned s
         initBlendMaps(t);
     }
 
+    qDebug() << "Loaded terrain -" << timer.elapsed() <<  "ms";
+
     // Now, all there is left to do is clean up after the initial terrain creation:
     mTerrainGroup->freeTemporaryResources();
 
     // Store the heightmap generator for later use. As of this point, this can actually be done fairly early on, but
     // it might be changed later on in this function.
 
+    delete[] pStream; // clean up
+
+    qDebug() << "Finished cleaning up -" << timer.elapsed() << "ms";
 }
 
 void Terrain::generateVegetation(unsigned int treesToGenerate, signed int x, signed int y)
@@ -215,8 +240,8 @@ void Terrain::generateVegetation(unsigned int treesToGenerate, signed int x, sig
 
     float* pHeightMap = HMHMgen->getHeightmap();
 
-    float slopeMap[HMHMgen->iDimensions*HMHMgen->iDimensions];
-    HMHMgen->outputSlopemap(&slopeMap[0]);
+    float* slopeMap = new float[HMHMgen->iDimensions * HMHMgen->iDimensions];
+    HMHMgen->outputSlopemap(slopeMap);
 
     short signed int probability = 0;   // Probability a tree will spawn. If random returns equal to or below this number, it spawns.
     Ogre::Vector3 enterPos;             // The point the flora will be entering.
@@ -293,7 +318,7 @@ void Terrain::generateVegetation(unsigned int treesToGenerate, signed int x, sig
     }
 
     FloraManager::getSingletonPtr()->spawnGrass(mSceneManager);
-    delete[] pStream; // clean up
+    delete[] slopeMap; // clean up
 }
 
 std::string Terrain::intToStr(int number)
@@ -309,8 +334,8 @@ HeightMapGen* Terrain::getByLoc(signed short x, signed short y)
     {
         if(HMblocks[i]->getX() == x && HMblocks[i]->getY() == y)
             return HMblocks[i];
-    }
-    return NULL;*/
+    }*/
+    return NULL;
     // STUB because this vector isn't in use yet
 }
 

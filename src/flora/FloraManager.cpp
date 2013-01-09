@@ -85,10 +85,10 @@ float FloraManager::getFloraClosestToPoint(Ogre::Vector3 point) // Two dimension
         Ogre::Vector3 floraPos;
         floraPos = vFlora[x]->getPosition();
         // Calculating distance...
-        long signed int mXDistance = floraPos.x - point.x;
-        long signed int mZDistance = floraPos.z - point.z;
+        float mXDistance = floraPos.x - point.x;
+        float mZDistance = floraPos.z - point.z;
 
-        float distance = sqrt( pow(mXDistance,2) + pow(mZDistance,2) ); // Using pythagoram's a^2 + b^2 = c^2
+        float distance = sqrt( pow(mXDistance, 2) + pow(mZDistance,2) ); // Using pythagoram's a^2 + b^2 = c^2
         if(distance < fMinDistance)
         {
             fMinDistance = distance;
@@ -102,8 +102,8 @@ void FloraManager::spawnGrass(Ogre::SceneManager *mSceneMgr)
     Ogre::Entity *grass = mSceneMgr->createEntity("grass", "GrassBladesMesh");
     Ogre::StaticGeometry *sg = mSceneMgr->createStaticGeometry("GrassArea");
 
-    const int size = 375;
-    const int amount = 20;
+    const float size = 375;
+    const float amount = 20;
 
     sg->setRegionDimensions(Ogre::Vector3(size, size, size));
     sg->setOrigin(Ogre::Vector3(-size/2, 0, -size/2));
@@ -112,7 +112,7 @@ void FloraManager::spawnGrass(Ogre::SceneManager *mSceneMgr)
     {
             for (int z = -size/2; z < size/2; z += (size/amount))
             {
-                    Ogre::Real r = size / (float)amount / 2;
+                    Ogre::Real r = size / amount / 2;
                     Ogre::Vector3 pos(x + Ogre::Math::RangeRandom(-r, r), 0, z + Ogre::Math::RangeRandom(-r, r));
                     Ogre::Vector3 scale(1, Ogre::Math::RangeRandom(0.9, 1.1), 1);
                     Ogre::Quaternion orientation;

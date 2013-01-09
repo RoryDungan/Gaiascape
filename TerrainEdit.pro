@@ -23,7 +23,8 @@ SOURCES += src/main.cpp\
     src/flora/FloraMain.cpp \
     src/flora/FloraTree.cpp \
     src/AddObjectDialog.cpp \
-    src/NewFileWizard.cpp
+    src/NewFileWizard.cpp \
+    src/WorldOptions.cpp
 
 HEADERS  += include/algorithms/TerrainBlock.h \
     include/algorithms/Random.h \

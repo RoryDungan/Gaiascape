@@ -456,15 +456,13 @@ void MainWindow::screenshot()
 void MainWindow::updateTerrain()
 {
     QApplication::setOverrideCursor(Qt::WaitCursor);
-    QElapsedTimer timer;
     mOgreWidget->getTerrain()->clearTerrain();
+    QElapsedTimer timer;
     timer.start();
     // This can be spawned at any point. If this function does what I believe it does, later this will be modifyed to create
     // multiple terrain blocks.
     mOgreWidget->getTerrain()->generateTerrain(ui->randomSeedBox->value(), 8, ui->terrainScaleSlider->value(), ui->terrainErosionSlider->value(), ui->randomFactorSlider->value(), ui->treeDensitySlider->value());
     qDebug() << "Terrain genarated in" << timer.elapsed() << "milliseconds";
-    // This should be moved to a different function so trees can be generated seperately.
-    mOgreWidget->getTerrain()->generateVegetation(ui->treeDensity->value(), 0, 0); // x and y are 0 until new segments are added
     QApplication::restoreOverrideCursor();
 
     ui->updateTerrainButton->setEnabled(false);
@@ -484,7 +482,10 @@ void MainWindow::loadTerrain()
     if(filePath.isEmpty()) return; // Cancel if no path was selected
     QApplication::setOverrideCursor(Qt::WaitCursor);
     mOgreWidget->getTerrain()->clearTerrain();
+    QElapsedTimer timer;
+    timer.start();
     mOgreWidget->getTerrain()->loadHeightmap(filePath.toStdString());
+    qDebug() << "Terrain loaded in" << timer.elapsed() << "milliseconds";
     QApplication::restoreOverrideCursor();
 }
 
@@ -705,14 +706,9 @@ void MainWindow::loadFromWorldOptions(WorldOptions options)
     updateTerrain();
 }
 
-void MainWindow::saveWorldOptionsToFile(QString filepath, WorldOptions& options)
-{
-
-}
-
-WorldOptions* MainWindow::loadWorldOptionsFromFile(QString filepath) {}
-
 void MainWindow::enableUpdateEnvironment() { ui->updateEnvironmentButton->setEnabled(true); }
 void MainWindow::enableUpdateTextures() { ui->updateTexturesButton->setEnabled(true); }
 void MainWindow::enableUpdateTerrain() { ui->updateTerrainButton->setEnabled(true); }
 void MainWindow::enableUpdateFoliage() { /* enable update foliage button */ }
+
+WorldOptions* MainWindow::loadWorldOptionsFromFile(QString filepath) {}

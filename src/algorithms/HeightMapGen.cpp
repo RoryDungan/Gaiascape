@@ -165,7 +165,7 @@ void HeightMapGen::erodeBlock(float c, long unsigned int block)
     }
     else
     {
-        std::cout << "foo\n";
+        //std::cout << "foo\n";
     }
 
     if(block/iDimensions == (block + 1)/iDimensions)
@@ -192,7 +192,7 @@ void HeightMapGen::erodeBlock(float c, long unsigned int block)
     }
     else
     {
-        std::cout << "foo\n";
+        //std::cout << "foo\n";
     }
 
     // Go to each of the corners and apply the equation
@@ -213,7 +213,7 @@ void HeightMapGen::erodeBlock(float c, long unsigned int block)
         // DEBUG
         if(block/iDimensions != (block - 1)/iDimensions)
         {
-            std::cout << "foo\n";
+            //std::cout << "foo\n";
         }
     }
     // NE
@@ -232,7 +232,7 @@ void HeightMapGen::erodeBlock(float c, long unsigned int block)
         // DEBUG
         if(block/iDimensions != (block + 1)/iDimensions)
         {
-            std::cout << "foo\n";
+            //std::cout << "foo\n";
         }
     }
     // SE
@@ -251,7 +251,7 @@ void HeightMapGen::erodeBlock(float c, long unsigned int block)
         // DEBUG
         if(block/iDimensions != (block + 1)/iDimensions)
         {
-            std::cout << "foo\n";
+            //std::cout << "foo\n";
         }
     }
     // SW
@@ -270,7 +270,7 @@ void HeightMapGen::erodeBlock(float c, long unsigned int block)
         // DEBUG
         if(block/iDimensions != (block - 1)/iDimensions)
         {
-            std::cout << "foo\n";
+            //std::cout << "foo\n";
         }
     }
     // Move the transported material to lower pastures

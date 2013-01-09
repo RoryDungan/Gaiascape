@@ -18,12 +18,6 @@ ImageViewer::ImageViewer(QWidget *parent) :
     ui->scrollArea->setBackgroundRole(QPalette::Dark);
     ui->scrollArea->setWidget(mImageLabel);
 
-    // Set up action group for tool buttons
-    QActionGroup* mToolGroup = new QActionGroup(this);
-    mToolGroup->addAction(ui->actionPan);
-    mToolGroup->addAction(ui->actionExtrude);
-    mToolGroup->addAction(ui->actionIntrude);
-
     ui->scrollArea->setWidgetResizable(false);
 
     // Init variables

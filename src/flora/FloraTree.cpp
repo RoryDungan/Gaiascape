@@ -12,7 +12,7 @@ FloraTree::FloraTree(std::string name, Ogre::SceneManager *sceneMgr, Ogre::Vecto
 
     // Scale starts at a base number of 85 - 95, and each individual dimension may vary by 5.
     short unsigned int baseScale = Random::getSingleton().getRand(85, 95);
-    mNode->setScale(0.9, 0.9, 0.9);
+    mNode->setScale(0.9f, 0.9f, 0.9f);
 
     mNode->setPosition(location);
     // Also add a random rotation
