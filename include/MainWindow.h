@@ -49,7 +49,7 @@ private:
     // All variables in here corrospond to the same internal Ogre ones
     struct TerrainTextureLayer
     {
-        int worldSize;
+        int textureScale;
         double minHeight;
         double fadeDist;
         QString diffuseSpecular;
@@ -59,13 +59,6 @@ private:
 
     QString mApplicationDataDir;
 
-    // Called when the program is first run; creates a config file with default settings
-    void createNewConfigFile();
-
-    // Used by the save and load functions
-    void saveWorldOptionsToFile(QString filepath, WorldOptions& options);
-    WorldOptions* loadWorldOptionsFromFile(QString filepath);
-
     bool bWPressed;
     bool bAPressed;
     bool bSPressed;
@@ -74,7 +67,7 @@ private:
     bool bEPressed;
     bool bShiftPressed;
     bool bSaved;
-    QString filepath;
+    QString mFilepath;
 
     virtual void keyPressEvent(QKeyEvent *);
     virtual void keyReleaseEvent(QKeyEvent *);

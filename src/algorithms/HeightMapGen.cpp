@@ -2,8 +2,6 @@
 #include "algorithms/HeightMapGen.h"
 #include <cmath>
 #include <fstream>
-#include <QImage>
-#include <QByteArray>
 
 HeightMapGen::HeightMapGen(unsigned int size, signed short x, signed short y, unsigned short erosionIterations, float staggerValue, float scale)
 {

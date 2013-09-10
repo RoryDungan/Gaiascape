@@ -72,6 +72,7 @@ Section "install"
 	File media\textures\nvidia\TextureUsageAgreement.txt
 	
 	# Create shortcuts and uninstaller
+    SetOutPath "$INSTDIR"
 	CreateShortCut "$SMPROGRAMS\Gaiascape.lnk" "$INSTDIR\Gaiascape.exe"
 
 	WriteUninstaller $INSTDIR\uninstaller.exe

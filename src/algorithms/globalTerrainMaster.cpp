@@ -1,5 +1,5 @@
 #include <iostream>
-#include "include/algorithms/globalTerrainMaster.h"
+#include "algorithms/globalTerrainMaster.h"
 #include <math.h>
 
 globalTerrainMaster::globalTerrainMaster(unsigned int size)

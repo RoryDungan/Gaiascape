@@ -30,7 +30,7 @@ MainWindow::MainWindow(QWidget *parent) :
     bEPressed = false;
     bShiftPressed = false;
     bSaved = true;
-    filepath = "";
+    mFilepath = "";
     // temp
     counter = 1;
 
@@ -53,11 +53,22 @@ MainWindow::MainWindow(QWidget *parent) :
     mSettings = new QSettings(mApplicationDataDir + "settings.ini", QSettings::IniFormat, this);
 
     if(!mSettings->contains("Renderer/RenderingSubsystem"))
+    {
 #ifdef _WIN32 // Default to Direct3D on Windows, OpenGL on everything else
         mSettings->setValue("Renderer/RenderingSubsystem", "Direct3D9");
 #else
         mSettings->setValue("Renderer/RenderingSubsystem", "OpenGL");
 #endif
+    }
+
+    if(!mSettings->contains("MainWindow/Width"))
+    {
+        mSettings->setValue("MainWindow/Width", 1024);
+    }
+    if(!mSettings->contains("MainWindow/Height"))
+    {
+        mSettings->setValue("MainWindow/Height", 768);
+    }
 
     mOgreWidget = new OgreWidget(this, mApplicationDataDir + "ogre.log", mSettings->value("Renderer/RenderingSubsystem").toString());
 
@@ -191,14 +202,22 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(mOgreWidget, SIGNAL(textureUpdateInProgress()), this, SLOT(statusTextureUpdateInProgress()));
     connect(mOgreWidget, SIGNAL(textureUpdateFinished()), this, SLOT(statusTextreUpdateFinished()));
 
-    // Ready for work
-    statusBar()->showMessage(tr("Ready"));
-
-    if(mSettings->value("MainWindow/Maximized", false).toBool()) this->showMaximized();
+    // Set window size based on settings ini
+    if(mSettings->value("MainWindow/Maximized", false).toBool())
+    {
+        this->showMaximized();
+    }
+    else
+    {
+        this->resize(mSettings->value("MainWindow/Width", 1024).toInt(), mSettings->value("MainWindow/Height", 768).toInt());
+    }
 
     ui->updateEnvironmentButton->setEnabled(false);
     ui->updateTerrainButton->setEnabled(false);
     ui->updateTexturesButton->setEnabled(false);
+
+    // Ready for work
+    statusBar()->showMessage(tr("Ready"));
 
     ui->groupBox_3->setVisible(false);
 }
@@ -207,6 +226,11 @@ MainWindow::~MainWindow()
 {
     // Save settings
     mSettings->setValue("MainWindow/Maximized", this->isMaximized());
+    if(!this->isMaximized())
+    {
+        mSettings->setValue("MainWindow/Width", this->size().width());
+        mSettings->setValue("MainWindow/Height", this->size().height());
+    }
 
     // Clean up temporty files
     QFile::remove(QDesktopServices::storageLocation(QDesktopServices::TempLocation) + QDir::separator() + "gaiascape-heightmap.bmp");
@@ -318,16 +342,94 @@ void MainWindow::fileOpen()
 {
     QString tmppath = QFileDialog::getOpenFileName(this, tr("Open file"), "", tr("Gaiascape files (*.gsw);;All files (*.*)"));
     if(tmppath.isNull()) return;
-    else filepath = tmppath;
-    loadWorldOptionsFromFile(filepath);
+    else mFilepath = tmppath;
+
+    QFile file(mFilepath);
+    if(!file.open(QFile::ReadOnly | QFile::Text))
+    {
+        QMessageBox::warning(this, tr("Gaiascape"), tr("Cannot read file %1:\n%2.").arg(mFilepath).arg(file.errorString()));
+        return;
+    }
+
+    QApplication::setOverrideCursor(Qt::WaitCursor);
+
+    QTextStream content(&file);
+    WorldOptions options;
+    if(options.loadAttributesFromXml(content.readAll()))
+    {
+        ui->randomSeedBox->setValue(options.terrainSeed);
+        ui->randomFactorSlider->setValue(options.terrainRandomFactor);
+        ui->terrainScaleSlider->setValue(options.terrainScale);
+        ui->terrainErosionSlider->setValue(options.erosionPasses);
+        // terrainSize and worldSize
+        for(int i = 0; i <3; i++)
+        {
+            mLayers[i].diffuseSpecular = options.layers[i].diffuseSpecular;
+            mLayers[i].normalHeight = options.layers[i].normalHeight;
+            mLayers[i].fadeDist = options.layers[i].fadeDist;
+            mLayers[i].minHeight = options.layers[i].minHeight;
+            mLayers[i].textureScale = options.layers[i].textureScale;
+        }
+        ui->skydomeLineEdit->setText(options.skyDome);
+        ui->skyCurvatureSpinBox->setValue(options.skyCurvature);
+        ui->skydomeTilingSpinBox->setValue(options.skyTiling);
+        ui->treeDensitySlider->setValue(options.foliageDensisty);
+        // Update textures widget
+        textureSelected(0);
+
+        // Update scene
+        updateTerrain();
+        updateTextures();
+        updateEnvironment();
+    }
+    else
+    {
+        QMessageBox::warning(this, tr("Gaiascape"), tr("Cannot read file %1.").arg(mFilepath));
+    }
+
+    QApplication::restoreOverrideCursor();
 }
 
 void MainWindow::fileSave()
 {
-    if(filepath.isEmpty()) fileSaveAs();
+    if(mFilepath.isEmpty())
+        fileSaveAs();
     else
     {
-        //saveWorldOptionsToFile();
+        QFile file(mFilepath);
+        if(!file.open(QFile::WriteOnly | QFile::Truncate | QFile::Text))
+        {
+            QMessageBox::warning(this, tr("Gaiascape"), tr("Cannot write file %1:\n%2.").arg(mFilepath).arg(file.errorString()));
+            return;
+        }
+
+        QApplication::setOverrideCursor(Qt::WaitCursor);
+        QTextStream out(&file);
+
+        WorldOptions options;
+        options.terrainSeed = ui->randomSeedBox->value();
+        options.terrainRandomFactor = ui->randomFactorSlider->value();
+        options.terrainScale = ui->terrainScaleSlider->value();
+        options.erosionPasses = ui->terrainErosionSlider->value();
+        //options.terrainSize = ui->terrainSizeBox-;
+        options.worldSize = 0.0;
+        for(int i = 0; i <3; i++)
+        {
+            options.layers[i].diffuseSpecular = mLayers[i].diffuseSpecular;
+            options.layers[i].normalHeight = mLayers[i].normalHeight;
+            options.layers[i].textureScale = mLayers[i].textureScale;
+            options.layers[i].fadeDist = mLayers[i].fadeDist;
+            options.layers[i].minHeight = mLayers[i].minHeight;
+        }
+        options.skyDome = ui->skydomeLineEdit->text();
+        options.skyCurvature = ui->skyCurvatureSpinBox->value();
+        options.skyTiling = ui->skydomeTilingSpinBox->value();
+        options.foliageDensisty = ui->treeDensitySlider->value();
+
+        out << options.writeToXml();
+        QApplication::restoreOverrideCursor();
+
+        statusBar()->showMessage(tr("File saved"), 2000);
     }
 }
 
@@ -335,7 +437,7 @@ void MainWindow::fileSaveAs()
 {
     QString tmppath = QFileDialog::getSaveFileName(this, tr("Save file"), "", tr("Gaiascape files (*.gsw)"));
     if(tmppath.isNull()) return;
-    else filepath = tmppath;
+    else mFilepath = tmppath;
     fileSave();
 }
 
@@ -570,12 +672,12 @@ void MainWindow::updateTextures()
     // First save all texture data
     mLayers[iCurrentLayerIndex].diffuseSpecular = ui->diffuseSpecularLineEdit->text();
     mLayers[iCurrentLayerIndex].normalHeight = ui->normalHeightLineEdit->text();
-    mLayers[iCurrentLayerIndex].worldSize = ui->textureSizeBox->value();
+    mLayers[iCurrentLayerIndex].textureScale = ui->textureSizeBox->value();
     mLayers[iCurrentLayerIndex].fadeDist = ui->texturePlacementHeightBox->value();
 
     // Update all textures
     for(unsigned int i = 0; i < 3; i++)
-        mOgreWidget->getTerrain()->replaceTexture(i, mLayers[i].worldSize, mLayers[i].diffuseSpecular.toStdString(), mLayers[i].normalHeight.toStdString());
+        mOgreWidget->getTerrain()->replaceTexture(i, mLayers[i].textureScale, mLayers[i].diffuseSpecular.toStdString(), mLayers[i].normalHeight.toStdString());
 
     ui->updateTexturesButton->setEnabled(false);
 }
@@ -585,18 +687,18 @@ void MainWindow::resetDefaultTextures()
     // Replace textures with defaults
     mLayers[0].diffuseSpecular = "dirt_grayrocky_diffusespecular.dds";
     mLayers[0].normalHeight = "dirt_grayrocky_normalheight.dds";
-    mLayers[0].worldSize = 100;
+    mLayers[0].textureScale = 100;
     mLayers[1].diffuseSpecular = "grass_green-01_diffusespecular.dds";
     mLayers[1].normalHeight = "grass_green-01_normalheight.dds";
-    mLayers[1].worldSize = 30;
+    mLayers[1].textureScale = 30;
     mLayers[2].diffuseSpecular = "growth_weirdfungus-03_diffusespecular.dds";
     mLayers[2].normalHeight = "growth_weirdfungus-03_normalheight.dds";
-    mLayers[2].worldSize = 200;
+    mLayers[2].textureScale = 200;
 
     // Update GUI
     ui->diffuseSpecularLineEdit->setText(mLayers[iCurrentLayerIndex].diffuseSpecular);
     ui->normalHeightLineEdit->setText(mLayers[iCurrentLayerIndex].normalHeight);
-    ui->textureSizeBox->setValue(mLayers[iCurrentLayerIndex].worldSize);
+    ui->textureSizeBox->setValue(mLayers[iCurrentLayerIndex].textureScale);
     ui->texturePlacementHeightBox->setValue(mLayers[iCurrentLayerIndex].fadeDist);
 
     // Update textures - resetting the default textures should just reset the GUI
@@ -610,13 +712,13 @@ void MainWindow::textureSelected(int id)
     // First save data for the old texture
     mLayers[iCurrentLayerIndex].diffuseSpecular = ui->diffuseSpecularLineEdit->text();
     mLayers[iCurrentLayerIndex].normalHeight = ui->normalHeightLineEdit->text();
-    mLayers[iCurrentLayerIndex].worldSize = ui->textureSizeBox->value();
+    mLayers[iCurrentLayerIndex].textureScale = ui->textureSizeBox->value();
     mLayers[iCurrentLayerIndex].fadeDist = ui->texturePlacementHeightBox->value();
 
     // Then set up the new one
     ui->diffuseSpecularLineEdit->setText(mLayers[id].diffuseSpecular);
     ui->normalHeightLineEdit->setText(mLayers[id].normalHeight);
-    ui->textureSizeBox->setValue(mLayers[id].worldSize);
+    ui->textureSizeBox->setValue(mLayers[id].textureScale);
     ui->texturePlacementHeightBox->setValue(mLayers[id].fadeDist);
 
     iCurrentLayerIndex = id;
@@ -710,5 +812,3 @@ void MainWindow::enableUpdateEnvironment() { ui->updateEnvironmentButton->setEna
 void MainWindow::enableUpdateTextures() { ui->updateTexturesButton->setEnabled(true); }
 void MainWindow::enableUpdateTerrain() { ui->updateTerrainButton->setEnabled(true); }
 void MainWindow::enableUpdateFoliage() { /* enable update foliage button */ }
-
-WorldOptions* MainWindow::loadWorldOptionsFromFile(QString filepath) {}

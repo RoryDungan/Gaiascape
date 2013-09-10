@@ -1,5 +1,5 @@
 #include <iostream>
-#include "include/algorithms/terrainBlock.h"
+#include "algorithms/terrainBlock.h"
 
 terrainBlock::terrainBlock(unsigned int x, unsigned int y, unsigned int blockID)
 {
