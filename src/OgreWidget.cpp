@@ -2,6 +2,7 @@
 #include <QDebug>
 #include <QFileInfo>
 #include <QDir>
+#define M_PI 3.141593
 
 #define THIS OgreWidget
 

@@ -1,8 +1,10 @@
 #ifndef FLORAMAIN_H
 #define FLORAMAIN_H
 
+#ifndef Q_MOC_RUN
 #include <OgreRoot.h>
 #include <OgreEntity.h>
+#endif // Q_MOC_RUN
 
 #include "algorithms/Random.h" // Also used by Terrain.h
 

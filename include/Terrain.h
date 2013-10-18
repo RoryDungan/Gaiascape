@@ -1,10 +1,12 @@
 #ifndef TERRAIN_H
 #define TERRAIN_H
 
+#ifndef Q_MOC_RUN
 #include <OGRE/Ogre.h>
 #include <OGRE/Terrain/OgreTerrain.h>
 #include <OGRE/Terrain/OgreTerrainGroup.h>
 #include <OGRE/OgreImage.h>
+#endif // Q_MOC_RUN
 
 #include <sstream> // For intToStr. Move if the function is required somewhere else.
 #include <vector> // For the HMblocks vector

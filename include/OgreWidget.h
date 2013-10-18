@@ -1,7 +1,9 @@
 #ifndef OGREWIDGET_H
 #define OGREWIDGET_H
 
+#ifndef Q_MOC_RUN
 #include <OGRE/Ogre.h>
+#endif // Q_MOC_RUN
 #include <QGLWidget>
 #ifndef WIN32
     #ifndef MACOS

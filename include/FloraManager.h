@@ -1,12 +1,14 @@
 #ifndef FLORAMANAGER_H
 #define FLORAMANAGER_H
 
-#include <vector>
-
 #include "FloraMain.h" // Includes OgreRoot
 
+#include <vector>
+
+#ifndef Q_MOC_RUN
 #include "OgreStaticGeometry.h"
 #include "OgreManualObject.h"
+#endif // Q_MOC_RUN
 
 class FloraManager
 {
