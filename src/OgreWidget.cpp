@@ -14,14 +14,14 @@ void THIS::init( std::string logFile,
          std::string renderSystem)
 {qDebug() << QString(logFile.c_str());
     // create the main ogre object
-    mOgreRoot = new Ogre::Root( "", "", logFile );
+    mOgreRoot = new Ogre::Root( "plugins.cfg", "", logFile );
 
     // Load plugins
-    if(renderSystem == "Direct3D9")
+    /*if(renderSystem == "Direct3D9")
         mOgreRoot->loadPlugin("RenderSystem_Direct3D9");
     else// if(renderSystem == "OpenGL") OpenGL is more cross-platform so should be used as a fallback unless Direct3D is explicitly specified
         mOgreRoot->loadPlugin("RenderSystem_GL");
-    mOgreRoot->loadPlugin("Plugin_CgProgramManager");
+    mOgreRoot->loadPlugin("Plugin_CgProgramManager");*/
 
     // setup a renderer
     Ogre::RenderSystemList::const_iterator renderers = mOgreRoot->getAvailableRenderers().begin();
