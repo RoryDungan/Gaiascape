@@ -1,6 +1,6 @@
 #include "MainWindow.h"
 #include "ui_MainWindow.h"
-#include "algorithms/random.h"
+#include "algorithms/Random.h"
 #include "OptionsDialog.h"
 #include "AboutBox.h"
 #include "NewFileWizard.h"
