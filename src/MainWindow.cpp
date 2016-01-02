@@ -13,7 +13,6 @@
 #include <QCheckBox>
 #include <QDir>
 #include <QDesktopServices>
-#include <QStandardPaths>
 #include <QColorDialog>
 #include <QMessageBox>
 #include <QDebug>
@@ -38,7 +37,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
 
     // Locate applications settings directory
-    mApplicationDataDir = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
+    mApplicationDataDir = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
     // some platforms currently don't define this location and you don't want to write to /foo
     if (mApplicationDataDir.isEmpty())
         mApplicationDataDir = QDir::homePath() + "/." + QCoreApplication::applicationName();
@@ -234,7 +233,7 @@ MainWindow::~MainWindow()
     }
 
     // Clean up temporty files
-    QFile::remove(QStandardPaths::writableLocation(QStandardPaths::TempLocation) + QDir::separator() + "gaiascape-heightmap.bmp");
+    QFile::remove(QDesktopServices::storageLocation(QDesktopServices::TempLocation) + QDir::separator() + "gaiascape-heightmap.bmp");
 
     delete mHeightmapViewer;
 
@@ -601,7 +600,7 @@ void MainWindow::clearTerrain()
 // Create a new dialog and show the heightmap image in it
 void MainWindow::showHeightmapImage()
 {
-    QImage image(QStandardPaths::writableLocation(QStandardPaths::TempLocation) + QDir::separator() + "gaiascape-heightmap.bmp");
+    QImage image(QDesktopServices::storageLocation(QDesktopServices::TempLocation) + QDir::separator() + "gaiascape-heightmap.bmp");
     if(!image.isNull()) mHeightmapViewer->loadImage(QPixmap::fromImage(image)); // Todo: make it copy the image directly from mmory rather than reading from a file
     mHeightmapViewer->showNormal();
 }

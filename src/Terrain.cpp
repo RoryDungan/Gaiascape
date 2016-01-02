@@ -1,7 +1,7 @@
 #include "Terrain.h"
 #include <vector>
 #include <cmath> // Needed only temporarily so that dimensions can be calculated without going through the heightmap generator
-#include <QStandardPaths> // Also needed temporarily, so that the heightmap image can be outputted to a directory where ImageViewer can easily find it
+#include <QDesktopServices> // Also needed temporarily, so that the heightmap image can be outputted to a directory where ImageViewer can easily find it
 #include <QDir> // Same as QDesktopServices
 #include <QElapsedTimer> // Used for profiling
 #include <QDebug>
@@ -146,8 +146,7 @@ void Terrain::generateTerrain(unsigned int seed, unsigned short size, unsigned s
 
     qDebug() << "Converted to Ogre::Image -" << timer.elapsed() <<  "ms";
 
-    //img.save(std::string(QDesktopServices::storageLocation(QDesktopServices::TempLocation).toAscii() + QDir::separator().toAscii() + "gaiascape-heightmap.bmp"));
-    img.save(QStandardPaths::writableLocation(QStandardPaths::TempLocation).toStdString() + QDir::separator().toLatin1() + "gaiascape-heightmap.bmp");
+    img.save(std::string(QDesktopServices::storageLocation(QDesktopServices::TempLocation).toAscii() + QDir::separator().toAscii() + "gaiascape-heightmap.bmp"));
 
     qDebug() << "Image saved -" << timer.elapsed() << "ms";
 
