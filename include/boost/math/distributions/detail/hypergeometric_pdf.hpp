@@ -16,6 +16,10 @@
 #include <boost/math/special_functions/prime.hpp>
 #include <boost/math/policies/error_handling.hpp>
 
+#ifdef BOOST_MATH_INSTRUMENT
+#include <typeinfo>
+#endif
+
 namespace boost{ namespace math{ namespace detail{
 
 template <class T, class Func>
@@ -49,27 +53,34 @@ T hypergeometric_pdf_lanczos_imp(T /*dummy*/, unsigned x, unsigned r, unsigned n
 {
    BOOST_MATH_STD_USING
 
+   BOOST_MATH_INSTRUMENT_FPU
+   BOOST_MATH_INSTRUMENT_VARIABLE(x);
+   BOOST_MATH_INSTRUMENT_VARIABLE(r);
+   BOOST_MATH_INSTRUMENT_VARIABLE(n);
+   BOOST_MATH_INSTRUMENT_VARIABLE(N);
+   BOOST_MATH_INSTRUMENT_VARIABLE(typeid(Lanczos).name());
+
    T bases[9] = {
-      T(n) + Lanczos::g() + 0.5f,
-      T(r) + Lanczos::g() + 0.5f,
-      T(N - n) + Lanczos::g() + 0.5f,
-      T(N - r) + Lanczos::g() + 0.5f,
-      1 / (T(N) + Lanczos::g() + 0.5f),
-      1 / (T(x) + Lanczos::g() + 0.5f),
-      1 / (T(n - x) + Lanczos::g() + 0.5f),
-      1 / (T(r - x) + Lanczos::g() + 0.5f),
-      1 / (T(N - n - r + x) + Lanczos::g() + 0.5f)
+      T(n) + static_cast<T>(Lanczos::g()) + 0.5f,
+      T(r) + static_cast<T>(Lanczos::g()) + 0.5f,
+      T(N - n) + static_cast<T>(Lanczos::g()) + 0.5f,
+      T(N - r) + static_cast<T>(Lanczos::g()) + 0.5f,
+      1 / (T(N) + static_cast<T>(Lanczos::g()) + 0.5f),
+      1 / (T(x) + static_cast<T>(Lanczos::g()) + 0.5f),
+      1 / (T(n - x) + static_cast<T>(Lanczos::g()) + 0.5f),
+      1 / (T(r - x) + static_cast<T>(Lanczos::g()) + 0.5f),
+      1 / (T(N - n - r + x) + static_cast<T>(Lanczos::g()) + 0.5f)
    };
    T exponents[9] = {
-      n + 0.5f,
-      r + 0.5f,
-      N - n + 0.5f,
-      N - r + 0.5f,
-      N + 0.5f,
-      x + 0.5f,
-      n - x + 0.5f,
-      r - x + 0.5f,
-      N - n - r + x + 0.5f
+      n + T(0.5f),
+      r + T(0.5f),
+      N - n + T(0.5f),
+      N - r + T(0.5f),
+      N + T(0.5f),
+      x + T(0.5f),
+      n - x + T(0.5f),
+      r - x + T(0.5f),
+      N - n - r + x + T(0.5f)
    };
    int base_e_factors[9] = {
       -1, -1, -1, -1, 1, 1, 1, 1, 1
@@ -77,7 +88,29 @@ T hypergeometric_pdf_lanczos_imp(T /*dummy*/, unsigned x, unsigned r, unsigned n
    int sorted_indexes[9] = {
       0, 1, 2, 3, 4, 5, 6, 7, 8
    };
+#ifdef BOOST_MATH_INSTRUMENT
+   BOOST_MATH_INSTRUMENT_FPU
+   for(unsigned i = 0; i < 9; ++i)
+   {
+      BOOST_MATH_INSTRUMENT_VARIABLE(i);
+      BOOST_MATH_INSTRUMENT_VARIABLE(bases[i]);
+      BOOST_MATH_INSTRUMENT_VARIABLE(exponents[i]);
+      BOOST_MATH_INSTRUMENT_VARIABLE(base_e_factors[i]);
+      BOOST_MATH_INSTRUMENT_VARIABLE(sorted_indexes[i]);
+   }
+#endif
    std::sort(sorted_indexes, sorted_indexes + 9, sort_functor<T>(exponents));
+#ifdef BOOST_MATH_INSTRUMENT
+   BOOST_MATH_INSTRUMENT_FPU
+   for(unsigned i = 0; i < 9; ++i)
+   {
+      BOOST_MATH_INSTRUMENT_VARIABLE(i);
+      BOOST_MATH_INSTRUMENT_VARIABLE(bases[i]);
+      BOOST_MATH_INSTRUMENT_VARIABLE(exponents[i]);
+      BOOST_MATH_INSTRUMENT_VARIABLE(base_e_factors[i]);
+      BOOST_MATH_INSTRUMENT_VARIABLE(sorted_indexes[i]);
+   }
+#endif
 
    do{
       exponents[sorted_indexes[0]] -= exponents[sorted_indexes[1]];
@@ -88,6 +121,17 @@ T hypergeometric_pdf_lanczos_imp(T /*dummy*/, unsigned x, unsigned r, unsigned n
       }
       base_e_factors[sorted_indexes[1]] += base_e_factors[sorted_indexes[0]];
       bubble_down_one(sorted_indexes, sorted_indexes + 9, sort_functor<T>(exponents));
+
+#ifdef BOOST_MATH_INSTRUMENT
+      for(unsigned i = 0; i < 9; ++i)
+      {
+         BOOST_MATH_INSTRUMENT_VARIABLE(i);
+         BOOST_MATH_INSTRUMENT_VARIABLE(bases[i]);
+         BOOST_MATH_INSTRUMENT_VARIABLE(exponents[i]);
+         BOOST_MATH_INSTRUMENT_VARIABLE(base_e_factors[i]);
+         BOOST_MATH_INSTRUMENT_VARIABLE(sorted_indexes[i]);
+      }
+#endif
    }while(exponents[sorted_indexes[1]] > 1);
 
    //
@@ -106,6 +150,18 @@ T hypergeometric_pdf_lanczos_imp(T /*dummy*/, unsigned x, unsigned r, unsigned n
          --j;
       }
       --j;
+
+#ifdef BOOST_MATH_INSTRUMENT
+      BOOST_MATH_INSTRUMENT_VARIABLE(j);
+      for(unsigned i = 0; i < 9; ++i)
+      {
+         BOOST_MATH_INSTRUMENT_VARIABLE(i);
+         BOOST_MATH_INSTRUMENT_VARIABLE(bases[i]);
+         BOOST_MATH_INSTRUMENT_VARIABLE(exponents[i]);
+         BOOST_MATH_INSTRUMENT_VARIABLE(base_e_factors[i]);
+         BOOST_MATH_INSTRUMENT_VARIABLE(sorted_indexes[i]);
+      }
+#endif
    }
 
 #ifdef BOOST_MATH_INSTRUMENT
@@ -255,7 +311,7 @@ T hypergeometric_pdf_prime_loop_imp(hypergeometric_pdf_prime_loop_data& data, hy
       }
       if(prime_powers)
       {
-         T p = integer_power<T>(data.current_prime, prime_powers);
+         T p = integer_power<T>(static_cast<T>(data.current_prime), prime_powers);
          if((p > 1) && (tools::max_value<T>() / p < result.value))
          {
             //
@@ -336,7 +392,7 @@ template <class T, class Policy>
 T hypergeometric_pdf_factorial_imp(unsigned x, unsigned r, unsigned n, unsigned N, const Policy&)
 {
    BOOST_MATH_STD_USING
-   BOOST_ASSERT(N < boost::math::max_factorial<T>::value);
+   BOOST_ASSERT(N <= boost::math::max_factorial<T>::value);
    T result = boost::math::unchecked_factorial<T>(n);
    T num[3] = {
       boost::math::unchecked_factorial<T>(r),
