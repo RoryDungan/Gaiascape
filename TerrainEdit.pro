@@ -45,9 +45,21 @@ HEADERS  += include/algorithms/TerrainBlock.h \
     include/NewFileWizard.h \
     include/WorldOptions.h
 
+OGRE_LOCATION = $$(OGRE_HOME)
+BOOST_LOCATION = $$(BOOST_HOME)
+
+isEmpty(OGRE_LOCATION) {
+    error("Make sure to set OGRE_HOME to the location of your Ogre SDK")
+}
+isEmpty(BOOST_LOCATION) {
+    error("Make sure to set BOOST_HOME to the location of Boost")
+}
+
 INCLUDEPATH += include/ \
-    include/OGRE \
-    ui/
+    ui/ \
+    $$(OGRE_HOME)/include \
+    $$(OGRE_HOME)/include/OGRE \
+    $$(BOOST_HOME)
 
 UI_DIR = ui/
 
@@ -56,11 +68,21 @@ FORMS    += ui/MainWindow.ui \
     ui/OptionsDialog.ui \
     ui/AddObjectDialog.ui
 
-LIBS += -L../gstest -L../gstest/lib
+LIBS += -L$$(BOOST_HOME)/stage/lib
 
-Debug:LIBS += -lOgreMain_d -lOgreTerrain_d -lboost_system-mgw48-mt-d-1_60
-Release:LIBS += -lOgreMain -lOgreTerrain -lboost_system-mgw48-mt-1_60
-
+CONFIG(debug, debug|release) {
+    LIBS += -L$$(OGRE_HOME)/lib/debug \
+        -L$$(OGRE_HOME)/bin/debug \
+        -lOgreMain_d \
+        -lOgreTerrain_d \
+        -lboost_system-mgw48-mt-d-1_60
+} else {
+    LIBS += -L$$(OGRE_HOME)/lib/release \
+        -L$$(OGRE_HOME)/bin/release \
+        -lOgreMain \
+        -lOgreTerrain \
+        -lboost_system-mgw48-mt-1_60
+}
 
 win32 {
     DEFINES += _WIN32
