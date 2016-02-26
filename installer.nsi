@@ -5,10 +5,9 @@
 RequestExecutionLevel admin
 
 InstallDir "$PROGRAMFILES\Gaiascape"
-LicenseData "license.txt"
-Var DirectXSetupError
+#LicenseData "license.txt"
 Name "Gaiascape"
-#Icon "icon.ico"
+Icon "media\icon.ico"
 OutFile "Gaiascape-setup.exe"
 
 !insertmacro MUI_PAGE_DIRECTORY
@@ -42,21 +41,24 @@ Section "install"
 	# Copy files...
 	SetOutPath $INSTDIR
 	File Gaiascape.exe
-	File mingwm10.dll
-	File libgcc_s_dw2-1.dll
-	File libstdc++-6.dll
-	File QtCore4.dll
-	File QtGui4.dll
-	File QtOpenGL4.dll
-	File OgreMain.dll
-	File OgrePaging.dll
-	File OgreTerrain.dll
-	File RenderSystem_Direct3d9.dll
-	File RenderSystem_GL.dll
-	File Plugin_CgProgramManager.dll
-	File cg.dll
-	File libboost_thread-mgw45-mt-1_44.dll
-	File icon.ico
+	File lib\libgcc_s_dw2-1.dll
+	File lib\libstdc++-6.dll
+	File lib\libwinpthread-1.dll
+	File C:\Qt\4.8.6\bin\QtCore4.dll
+	File C:\Qt\4.8.6\bin\QtGui4.dll
+	File C:\Qt\4.8.6\bin\QtOpenGL4.dll
+	File lib\OgreMain.dll
+	File lib\OgrePaging.dll
+	File lib\OgreTerrain.dll
+	File lib\libboost_date_time-mgw48-mt-1_60.dll
+	File lib\libboost_system-mgw48-mt-1_60.dll
+	File lib\libboost_thread-mgw48-mt-1_60.dll
+	File media\icon.ico
+	File plugins.cfg
+	SetOutPath $INSTDIR\plugins
+	File plugins\RenderSystem_GL.dll
+	File plugins\Plugin_CgProgramManager.dll
+	File plugins\cg.dll
 	SetOutPath $INSTDIR\media\models
 	File media\models\sphere.mesh
 	SetOutPath $INSTDIR\media\textures
@@ -88,14 +90,6 @@ Section "install"
 	WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}" "EstimatedSize" "$0"
 SectionEnd
 
-Section "DirectX Install" SEC_DIRECTX
-	SectionIn RO
- 
-	DetailPrint "Running DirectX Setup..."
-	ExecWait '"$EXEDIR\DirectX\DXSETUP.exe" /silent' $DirectXSetupError
-	DetailPrint "Finished DirectX Setup"
-SectionEnd
-
 # Uninstaller
  
 function un.onInit
@@ -111,21 +105,23 @@ functionEnd
 Section "uninstall"
 	
 	Delete $INSTDIR\Gaiascape.exe
-	Delete $INSTDIR\mingwm10.dll
 	Delete $INSTDIR\libgcc_s_dw2-1.dll
 	Delete $INSTDIR\libstdc++-6.dll
+	Delete $INSTDIR\libwinpthread-1.dll
 	Delete $INSTDIR\QtCore4.dll
 	Delete $INSTDIR\QtGui4.dll
 	Delete $INSTDIR\QtOpenGL4.dll
 	Delete $INSTDIR\OgreMain.dll
 	Delete $INSTDIR\OgrePaging.dll
 	Delete $INSTDIR\OgreTerrain.dll
-	Delete $INSTDIR\RenderSystem_Direct3d9.dll
-	Delete $INSTDIR\RenderSystem_GL.dll
-	Delete $INSTDIR\Plugin_CgProgramManager.dll
-	Delete $INSTDIR\cg.dll
-	Delete $INSTDIR\libboost_thread-mgw45-mt-1_44.dll
+	Delete $INSTDIR\libboost_date_time-mgw48-mt-1_60.dll
+	Delete $INSTDIR\libboost_thread-mgw48-mt-1_60.dll
+	Delete $INSTDIR\libboost_system-mgw48-mt-1_60.dll
 	Delete $INSTDIR\icon.ico
+	Delete $INSTDIR\plugins.cfg
+	Delete $INSTDIR\Plugins\RenderSystem_GL.dll
+	Delete $INSTDIR\Plugins\Plugin_CgProgramManager.dll
+	Delete $INSTDIR\Plugins\cg.dll
 	Delete $INSTDIR\media\models\sphere.mesh
 	Delete $INSTDIR\media\textures\clouds.jpg
 	Delete $INSTDIR\media\textures\terrain.png
@@ -141,6 +137,7 @@ Section "uninstall"
 	RmDir $INSTDIR\media\textures
 	RmDir $INSTDIR\media\models
 	Rmdir $INSTDIR\media
+	RmDir $INSTDIR\plugins
 	
 	Delete $INSTDIR\uninstaller.exe
 	RmDir $INSTDIR 
