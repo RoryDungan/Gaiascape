@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2009 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -34,6 +34,10 @@ THE SOFTWARE.
 #include "OgreShaderParameter.h"
 #include "OgreShaderFunction.h"
 
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+#include "OgreStringSerialiser.h"
+#endif
+
 namespace Ogre {
 namespace RTShader {
 
@@ -55,28 +59,44 @@ class _OgreRTSSExport ProgramWriter : public RTShaderSystemAlloc
 public:
 
 	/** Class destructor */
-	virtual ~ProgramWriter	() {}
+	virtual ~ProgramWriter() {}
 
 
 	/** Write the program shader source code.
 	@param os The output stream to write to code into.
 	@param program The source CPU program for the GPU program code.
 	*/
-	virtual void				writeSourceCode			(std::ostream& os, Program* program) = 0;
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+	virtual void writeSourceCode(StringSerialiser& os, Program* program) = 0;
+#else
+	virtual void writeSourceCode(std::ostream& os, Program* program) = 0;
+#endif
 
 	/** Return the target language of this writer. */
-	virtual const String&		getTargetLanguage	() const = 0;
+	virtual const String& getTargetLanguage() const = 0;
 
 // Protected methods.
 protected:
 	/** Write the program title. */
-	void				writeProgramTitle			(std::ostream& os, Program* program);
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+	void writeProgramTitle(StringSerialiser& os, Program* program);
+#else
+	void writeProgramTitle(std::ostream& os, Program* program);
+#endif
 
 	/** Write the uniform parameters title. */
-	void				writeUniformParametersTitle	(std::ostream& os, Program* program);
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+	void writeUniformParametersTitle(StringSerialiser& os, Program* program);
+#else
+	void writeUniformParametersTitle(std::ostream& os, Program* program);
+#endif
 
 	/** Write a function title. */
-	void				writeFunctionTitle			(std::ostream& os, Function* function);
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+	void writeFunctionTitle(StringSerialiser& os, Function* function);
+#else
+	void writeFunctionTitle(std::ostream& os, Function* function);
+#endif
 };
 
 /** @} */

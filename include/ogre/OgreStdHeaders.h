@@ -5,12 +5,16 @@
     #define __STD_ALGORITHM
 #endif
 
-#if defined ( OGRE_GCC_VISIBILITY )
+#if defined ( OGRE_GCC_VISIBILITY ) && ((OGRE_PLATFORM == OGRE_PLATFORM_APPLE && !__LP64__) && OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS)
 /* Until libstdc++ for gcc 4.2 is released, we have to declare all
  * symbols in libstdc++.so externally visible, otherwise we end up
  * with them marked as hidden by -fvisible=hidden.
  *
  * See http://gcc.gnu.org/bugzilla/show_bug.cgi?id=20218
+ *
+ * Due to a more strict linker included with Xcode 4, this is disabled on Mac OS X and iOS.
+ * The reason? It changes the visibility of Boost functions.  The mismatch between visibility Boost when used in Ogre (default)
+ * and Boost when compiled (hidden) results in mysterious link errors such as "Bad codegen, pointer diff".
  */
 #   pragma GCC visibility push(default)
 #endif
@@ -42,6 +46,14 @@
 #   else
 #       include <ext/hash_map>
 #       include <ext/hash_set>
+#   endif
+#elif (OGRE_COMPILER == OGRE_COMPILER_CLANG)
+#   if defined(_LIBCPP_VERSION)
+#       include <unordered_map>
+#       include <unordered_set>
+#   else
+#       include <tr1/unordered_map>
+#       include <tr1/unordered_set>
 #   endif
 #else
 #   if (OGRE_COMPILER == OGRE_COMPILER_MSVC) && !defined(STLPORT) && OGRE_COMP_VER >= 1600 // VC++ 10.0
@@ -86,7 +98,7 @@ extern "C" {
 #  endif
 #endif
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_LINUX
+#if OGRE_PLATFORM == OGRE_PLATFORM_LINUX || OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
 extern "C" {
 
 #   include <unistd.h>
@@ -95,7 +107,7 @@ extern "C" {
 }
 #endif
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
 extern "C" {
 #   include <unistd.h>
 #   include <sys/param.h>
@@ -110,7 +122,7 @@ extern "C" {
 #   include "Threading/OgreThreadHeaders.h"
 #endif
 
-#if defined ( OGRE_GCC_VISIBILITY )
+#if defined ( OGRE_GCC_VISIBILITY ) && ((OGRE_PLATFORM == OGRE_PLATFORM_APPLE && !__LP64__) && OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS)
 #   pragma GCC visibility pop
 #endif
 #endif

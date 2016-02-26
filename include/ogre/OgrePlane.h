@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2009 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -88,8 +88,8 @@ namespace Ogre {
         Side getSide (const Vector3& rkPoint) const;
 
         /**
-        returns the side where the aligneBox is. the flag BOTH_SIDE indicates an intersecting box.
-        one corner ON the plane is sufficient to consider the box and the plane intersecting.
+        Returns the side where the alignedBox is. The flag BOTH_SIDE indicates an intersecting box.
+        One corner ON the plane is sufficient to consider the box and the plane intersecting.
         */
         Side getSide (const AxisAlignedBox& rkBox) const;
 
@@ -97,7 +97,7 @@ namespace Ogre {
             The box is defined as centre/half-size pairs for effectively.
         @param centre The centre of the box.
         @param halfSize The half-size of the box.
-        @returns
+        @return
             POSITIVE_SIDE if the box complete lies on the "positive side" of the plane,
             NEGATIVE_SIDE if the box complete lies on the "negative side" of the plane,
             and BOTH_SIDE if the box intersects the plane.
@@ -137,7 +137,7 @@ namespace Ogre {
             @note
                 This function will not crash for zero-sized vectors, but there
                 will be no changes made to their components.
-            @returns The previous length of the plane's normal.
+            @return The previous length of the plane's normal.
         */
         Real normalise(void);
 
@@ -151,7 +151,7 @@ namespace Ogre {
         }
         bool operator!=(const Plane& rhs) const
         {
-            return (rhs.d != d && rhs.normal != normal);
+            return (rhs.d != d || rhs.normal != normal);
         }
 
         _OgreExport friend std::ostream& operator<< (std::ostream& o, const Plane& p);
