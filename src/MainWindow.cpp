@@ -54,11 +54,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     if(!mSettings->contains("Renderer/RenderingSubsystem"))
     {
-#ifdef _WIN32 // Default to Direct3D on Windows, OpenGL on everything else
-        mSettings->setValue("Renderer/RenderingSubsystem", "Direct3D9");
-#else
         mSettings->setValue("Renderer/RenderingSubsystem", "OpenGL");
-#endif
     }
 
     if(!mSettings->contains("MainWindow/Width"))
