@@ -37,29 +37,29 @@ Go to https://bitbucket.org/cabalistic/ogredeps and download or clone the reposi
 
 We will compile first in release mode and then in debug mode. 
 
- - Open CMake GUI and change
-   - Where the source code is: `C:/dev/ogredeps`
-   - Where the library will be built: `C:/dev/ogredeps/build/rel`
- - Click "Configure" and choose "MinGW Makefiles". You may need to then tell CMake where to find `gcc`, `g++`
+*   Open CMake GUI and change
+    *   Where the source code is: `C:/dev/ogredeps`
+    *   Where the library will be built: `C:/dev/ogredeps/build/rel`
+*   Click "Configure" and choose "MinGW Makefiles". You may need to then tell CMake where to find `gcc`, `g++`
    and `mingw32-make`.
- - Set `CMAKE_BUILD_TYPE` to `Release`
- - Set `CMAKE_INSTALL_PREFIX` to `C:/dev/ogredeps/build/inst`
- - Click "Configure" again and then "Generate"
- - In a command prompt:
-   - `PATH=%PATH%;C:\mingw32\bin`
-   - `cd C:\dev\ogredeps\build\rel`
-   - `mingw32-make install`
+*   Set `CMAKE_BUILD_TYPE` to `Release`
+*   Set `CMAKE_INSTALL_PREFIX` to `C:/dev/ogredeps/build/inst`
+*   Click "Configure" again and then "Generate"
+*   In a command prompt:
+    *   `PATH=%PATH%;C:\mingw32\bin`
+    *   `cd C:\dev\ogredeps\build\rel`
+    *   `mingw32-make install`
    
 Then we compile in debug mode
- - Go back to CMake GUI and change where teh library will be built to `C:/dev/ogredeps/build/dbg`
- - Click "Configure"
- - Set `CMAKE_BUILD_TYPE` to `Debug`
- - Set `CMAKE_INSTALL_PREFIX` to `C:/dev/ogredeps/build/inst`
- - Click "Configure" again and then "Generate"
- - In a command prompt:
-   - `PATH=%PATH%;C:\mingw32\bin`
-   - `cd C:\dev\ogredeps\build\dbg`
-   - `mingw32-make install`
+*   Go back to CMake GUI and change where teh library will be built to `C:/dev/ogredeps/build/dbg`
+*   Click "Configure"
+*   Set `CMAKE_BUILD_TYPE` to `Debug`
+*   Set `CMAKE_INSTALL_PREFIX` to `C:/dev/ogredeps/build/inst`
+*   Click "Configure" again and then "Generate"
+*   In a command prompt:
+    *   `PATH=%PATH%;C:\mingw32\bin`
+    *   `cd C:\dev\ogredeps\build\dbg`
+    *   `mingw32-make install`
 
 ### Ogre
 
@@ -68,32 +68,32 @@ https://sourceforge.net/projects/ogre/files/ogre/1.8/1.8.1/ogre_src_v1-8-1.exe/d
 Extract to `C:\dev\ogre-1.8.1-src`
 
 For the release build: 
- - Open CMake GUI and change
-   - Where the source code is: `C:/dev/ogre-1.8.1-src`
-   - Where the library will be built: `C:/dev/ogre-1.8.1/build/rel`
- - Click "Configure"
- - Set `CMAKE_BUILD_TYPE` to `Release`
- - Set `CMAKE_INSTALL_PREFIX` to `C:/dev/ogre-1.8.1/sdk`
- - Set `OGRE_DEPENDENCIES_DIR` to `C:/dev/ogredeps/build/inst`
- - Set `Boost_INCLUDE_DIR` to `C:/dev/boost_1_60_0`
- - Uncheck `OGRE_BUILD_RENDERSYSTEM_D3D9`
- - Click "Configure" and then "Generate"
-  - In a command prompt:
-   - `cd C:\dev\ogre-1.8.1\build\rel`
-   - `mingw32-make install`
+*   Open CMake GUI and change
+    *   Where the source code is: `C:/dev/ogre-1.8.1-src`
+    *   Where the library will be built: `C:/dev/ogre-1.8.1/build/rel`
+*   Click "Configure"
+*   Set `CMAKE_BUILD_TYPE` to `Release`
+*   Set `CMAKE_INSTALL_PREFIX` to `C:/dev/ogre-1.8.1/sdk`
+*   Set `OGRE_DEPENDENCIES_DIR` to `C:/dev/ogredeps/build/inst`
+*   Set `Boost_INCLUDE_DIR` to `C:/dev/boost_1_60_0`
+*   Uncheck `OGRE_BUILD_RENDERSYSTEM_D3D9`
+*   Click "Configure" and then "Generate"
+*   In a command prompt:
+    *   `cd C:\dev\ogre-1.8.1\build\rel`
+    *   `mingw32-make install`
 
 Then for the debug build:
- - Open CMake GUI and change
-   - Where the source code is: `C:/dev/ogre-1.8.1-src`
-   - Where the library will be built: `C:/dev/ogre-1.8.1/build/dbg`
- - Click "Configure"
- - Set `CMAKE_BUILD_TYPE` to `Debug`
- - Set `CMAKE_INSTALL_PREFIX` to `C:/dev/ogre-1.8.1/sdk`
- - Set `OGRE_DEPENDENCIES_DIR` to `C:/dev/ogredeps/build/inst`
- - Set `Boost_INCLUDE_DIR` to `C:/dev/boost_1_60_0`
- - Uncheck `OGRE_BUILD_RENDERSYSTEM_D3D9`
- - Click "Configure" and then "Generate"
-  - In a command prompt:
-   - `cd C:\dev\ogre-1.8.1\build\dbg`
-   - `mingw32-make install`
+*   Open CMake GUI and change
+    *   Where the source code is: `C:/dev/ogre-1.8.1-src`
+    *   Where the library will be built: `C:/dev/ogre-1.8.1/build/dbg`
+*   Click "Configure"
+*   Set `CMAKE_BUILD_TYPE` to `Debug`
+*   Set `CMAKE_INSTALL_PREFIX` to `C:/dev/ogre-1.8.1/sdk`
+*   Set `OGRE_DEPENDENCIES_DIR` to `C:/dev/ogredeps/build/inst`
+*   Set `Boost_INCLUDE_DIR` to `C:/dev/boost_1_60_0`
+*   Uncheck `OGRE_BUILD_RENDERSYSTEM_D3D9`
+*   Click "Configure" and then "Generate"
+*   In a command prompt:
+    *   `cd C:\dev\ogre-1.8.1\build\dbg`
+    *   `mingw32-make install`
    
