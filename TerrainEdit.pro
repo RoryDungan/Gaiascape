@@ -11,6 +11,8 @@ TEMPLATE = app
 
 CXXFLAGS += -fno-strict-aliasing
 
+Debug:DEFINES += _DEBUG
+
 SOURCES += src/main.cpp\
     src/Terrain.cpp \
     src/OgreWidget.cpp \
