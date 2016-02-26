@@ -46,7 +46,7 @@ HEADERS  += include/algorithms/TerrainBlock.h \
     include/WorldOptions.h
 
 INCLUDEPATH += include/ \
-    /usr/include/OGRE/ \
+    include/OGRE \
     ui/
 
 UI_DIR = ui/
@@ -56,9 +56,14 @@ FORMS    += ui/MainWindow.ui \
     ui/OptionsDialog.ui \
     ui/AddObjectDialog.ui
 
-LIBS += -L. -lOgreMain -lOgreTerrain -lboost_system
+LIBS += -L../gstest -L../gstest/lib
+
+Debug:LIBS += -lOgreMain_d -lOgreTerrain_d -lboost_system-mgw48-mt-d-1_60
+Release:LIBS += -lOgreMain -lOgreTerrain -lboost_system-mgw48-mt-1_60
+
 
 win32 {
+    DEFINES += _WIN32
     RC_FILE = resource.rc
 }
 
