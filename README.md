@@ -1,4 +1,4 @@
-#Gaiascape
+# Gaiascape
 Gaiascape is a program that gives artists and designers the ability to quickly and easily generate terrains 
 and landscapes.
 
@@ -9,24 +9,28 @@ parameters, as well as the ability to edit existing terrain manually.
 ## Building
 Gaiascape is designed to build on Windows with Qt 4.8.6 and MinGW GCC 4.8.2.
 
-To build, make sure you have the correct version of MiinGW, available here:
-[mingw-builds i686-4.8.2-release-posix-dwarf-rt_v3-rev3](http://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win32/Personal%20Builds/mingw-builds/4.8.2/threads-posix/dwarf/i686-4.8.2-release-posix-dwarf-rt_v3-rev3.7z/download)
-
-Then install download and install Qt 4.8.6 for Windows MinGW (`qt-opensource-windows-x86-mingw482-4.8.6-1.exe`) 
-from the Qt archive: http://download.qt.io/archive/qt/4.8/4.8.6/qt-opensource-windows-x86-mingw482-4.8.6-1.exe
-
-Set up a Qt configuration for Qt 4.8.6 with GCC 4.8.2 in Qt Creator, then load up `TerrainEdit.pro`, and you
-should be ready to build Gaiascape.
-
-
-## Rebuilding Ogre
-
-The repository includes a prebuilt copy of Ogre 1.8.1 for Windows, although in the case that you want to 
-rebuild it from source, this is how to do it.
-
 ### Tools required
- - CMake gui: https://cmake.org/download/
+ - MinGW GCC 4.8.2: [mingw-builds i686-4.8.2-release-posix-dwarf-rt_v3-rev3](http://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win32/Personal%20Builds/mingw-builds/4.8.2/threads-posix/dwarf/i686-4.8.2-release-posix-dwarf-rt_v3-rev3.7z/download)
+ - Qt 4.8.6 for MinGW GCC 4.8.2: http://download.qt.io/archive/qt/4.8/4.8.6/qt-opensource-windows-x86-mingw482-4.8.6-1.exe
+ - CMake gui (used for compiling Ogre and its dependencies): https://cmake.org/download/
  - DirectX SDK (needed to compile Ogre): https://www.microsoft.com/en-us/download/details.aspx?id=6812
+ - 7-zip (for extracting downloads): http://www.7-zip.org/download.html
+
+Extract MinGW (`i686-4.8.2-release-posix-dwarf-rt_v3-rev3.7z`) to C:\ and then go into Qt Creator to register 
+it. Go to Tools -> Options -> Build & Run -> Compilers, click "Add", then "MinGW". This will add another 
+compiler under the "Manual" section. Select it, and in the "Compiler path:" field enter `C:\mingw32\bin\g++.exe`
+and in the "Name" field enter "MinGW32 4.8.2".
+
+Next, go to the "Debuggers" tab, click "Add", and set the "Path" field of the new compiler to 
+`C:\mingw32\bin\gdb.exe` and the "Name" field to "MinGW32 4.8.2 GDB".
+
+Ensure that "Qt 4.8.6" is listed under the "Qt Versions" tab. If not, click "Add..." and navigate to the qmake.exe
+executable, which should be located at `C:\Qt\4.8.6\bin\qmake.exe`. 
+
+Finally, go to the "Kits" tab and click "Add". Set the compiler to "MinGW32 4.8.2", set the debugger to "MinGW32
+4.8.2 GDB", and set the Qt version to 4.8.6.
+
+Now that we've set up our environment we'll need to build Gaiascape's dependencies.
 
 ### Boost
 Follow the instructions on http://www.boost.org/ to build Boost 1.60.0
@@ -97,3 +101,19 @@ Then for the debug build:
     *   `cd C:\dev\ogre-1.8.1\build\dbg`
     *   `mingw32-make install`
    
+### Building Gaiascape
+
+Finally, now that our build environment is configured and dependencies built, we can build Gaiascape. 
+
+Open `TerrainEdit.pro` in Qt Creator. You will be prompted to configure the project - select the Qt kit
+we created earlier for Qt 4.8.6 with MinGW32 4.8.2 and click "Configure project". This will set up the user 
+configuration file for the project but we still need to tell it where to look for the dependencies. Switch to
+the "Projects" view on the left, select "Build and Run" and under that "Build". Expand the `Build Environment`
+section to see all the environment variables used when building and running the project and add the following:
+ - `OGRE_HOME`: `C:\dev\ogre-1.8.1\sdk`
+ - `BOOST_HOME`: `C:\dev\boost_1_60_0`
+Repeat this process for both the Debug and Release builds (selectable by clicking on the computer icon in the
+bottom left corner of the window). Alternatively, you can set these up as system environment variables rather
+than including it just in the environment that gets set up when QMake is invoked. 
+ 
+Hit the green triangle on the left or press Ctrl-R to build and run the application!
